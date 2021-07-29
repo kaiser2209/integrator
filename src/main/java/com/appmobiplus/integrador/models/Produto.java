@@ -8,22 +8,11 @@ import javax.persistence.Id;
 @Entity
 public class Produto {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
-
     private String ean;
     private String descricao;
     private float preco_de;
     private float preco_por;
     private String link_image;
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
 
     public String getEan() {
         return ean;

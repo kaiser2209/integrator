@@ -9,6 +9,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class MainController {
     @GetMapping("/")
     private String home() {
+        return "flutter/index";
+    }
+
+    @GetMapping("/config")
+    private String config() {
         return "home";
     }
+
+    @GetMapping("/config/file")
+    private String file() {
+        //return "fileConfig";
+        return "fileConfiguration";
+    }
+
 }

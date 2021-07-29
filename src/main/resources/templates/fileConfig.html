@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head th:replace="fragments :: html_head" />
+<body>
+<div class="container">
+    <div th:replace="fragments :: menu" />
+
+    <h2>Carregar Arquivo</h2>
+    <div class="row m-3">
+        <form method="POST" enctype="multipart/form-data" action="/config/file/upload">
+            <div class="input-group">
+                <input type="file" class="form-control" name="file" id="file" aria-describedby="carregar" aria-label="Upload" required />
+                <input class="btn btn-outline-secondary" type="submit" value="Carregar" id="carregar" />
+            </div>
+        </form>
+    </div>
+</div>
+<div th:replace="fragments :: html_foot" />
+<div th:replace="fragments :: bootstrap-js" />
+</body>
+</html>

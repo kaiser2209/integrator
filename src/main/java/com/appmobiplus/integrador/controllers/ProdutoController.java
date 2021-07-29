@@ -1,10 +1,13 @@
 package com.appmobiplus.integrador.controllers;
 
+import com.appmobiplus.integrador.exceptions.ResourceNotFoundException;
 import com.appmobiplus.integrador.models.Produto;
 import com.appmobiplus.integrador.repositories.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @Controller
 public class ProdutoController {
@@ -31,6 +34,10 @@ public class ProdutoController {
 
     @GetMapping(path="/buscapreco")
     public @ResponseBody Produto get(@RequestParam String ean) {
-        return produtoRepository.findByEan(ean);
+        if (produtoRepository.existsByEan(ean)) {
+            return produtoRepository.findByEan(ean);
+        }
+
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "O recurso procurado não foi encontrado!");
     }
 }

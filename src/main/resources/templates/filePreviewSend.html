@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head th:replace="fragments :: html_head" />
+<body>
+<div class="container">
+  <div th:replace="fragments :: menu" />
+
+  <h3>Carregar Arquivo</h3>
+  <div class="row m-3">
+    <div class="col-sm-12">
+      <h4>Prévia do Arquivo</h4>
+    </div>
+    <table class="table table-bordered col-sm-12 m-2 table-sm">
+      <thead><tr><th><span th:text="${fields[0]}"></span></th><th><span th:text="${fields[1]}"></span></th><th><span th:text="${fields[2]}"></span></th></tr></thead>
+      <tbody>
+      <tr class="table-borderless mx-auto">
+        <td><span th:text="${produtos[0].ean}">Linha</span></td><td><span th:text="${produtos[0].descricao}">Linha</span></td><td><span th:text="${produtos[0].preco_de}">Linha</span></td>
+      </tr>
+      <tr class="table-borderless mx-auto">
+        <td><span th:text="${produtos[1].ean}">Linha</span></td><td><span th:text="${produtos[1].descricao}">Linha</span></td><td><span th:text="${produtos[1].preco_de}">Linha</span></td>
+      </tr>
+      <tr class="table-borderless mx-auto">
+        <td><span th:text="${produtos[2].ean}">Linha</span></td><td><span th:text="${produtos[2].descricao}">Linha</span></td><td><span th:text="${produtos[2].preco_de}">Linha</span></td>
+      </tr>
+      <tr class="table-borderless mx-auto">
+        <td><span th:text="${produtos[3].ean}">Linha</span></td><td><span th:text="${produtos[3].descricao}">Linha</span></td><td><span th:text="${produtos[3].preco_de}">Linha</span></td>
+      </tr>
+      <tr class="table-borderless mx-auto">
+        <td><span th:text="${produtos[4].ean}">Linha</span></td><td><span th:text="${produtos[4].descricao}">Linha</span></td><td><span th:text="${produtos[4].preco_de}">Linha</span></td>
+      </tr>
+      <tr class="table-borderless mx-auto">
+        <td><span th:text="${produtos[5].ean}">Linha</span></td><td><span th:text="${produtos[5].descricao}">Linha</span></td><td><span th:text="${produtos[5].preco_de}">Linha</span></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <form method="POST" enctype="multipart/form-data" action="/config/file/send/save">
+
+    <input type="hidden" id="path" name="path" th:value="${path}" />
+    <input type="hidden" id="integrationType" name="integrationType" th:value="${integrationType}" />
+    <input type="hidden" id="hasDelimiter" name="hasDelimiter" th:value="${hasDelimiter}" />
+    <input type="hidden" id="delimiter" name="delimiter" th:value="${delimiter}" />
+    <div th:each="field : ${fields}">
+      <input type="hidden" id="fields" name="fields" th:value="${field}" />
+    </div>
+    <div th:each="posB : ${posBegin}">
+      <input type="hidden" id="posBegin" name="posBegin" th:value="${posB}" />
+    </div>
+    <div th:each="posE : ${posEnd}">
+      <input type="hidden" id="posEnd" name="posEnd" th:value="${posE}" />
+    </div>
+    <input type="hidden" id="fieldPrice" name="fieldPrice" th:value="${fieldPrice}" />
+    <input type="hidden" id="decimalPoint" name="decimalPoint" th:value="${decimalPoint}" />
+
+    <div class="row mb-2">
+      <input class="btn btn-outline-secondary" type="submit" value="Salvar" id="salvar" />
+    </div>
+  </form>
+</div>
+<div th:replace="fragments :: html_foot" />
+<div th:replace="fragments :: bootstrap-js" />
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head th:replace="fragments :: html_head" />
+<body>
+<div class="container">
+  <div th:replace="fragments :: menu" />
+
+  <h3>Carregar Arquivo</h3>
+  <div class="row m-3">
+    <div class="col-sm-12">
+      <h4>Prévia do Arquivo</h4>
+    </div>
+    <table class="table table-bordered col-sm-12 m-2 table-sm">
+      <tbody>
+        <tr class="table-borderless mx-auto" th:each="line : ${preview}">
+          <td><pre><span class="text-monospace" th:text="${line}">Linha</span></pre></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+    <form method="POST" enctype="multipart/form-data" action="/config/file/send/preview">
+
+        <input type="hidden" id="path" name="path" th:value="${path}" />
+        <input type="hidden" id="integrationType" name="integrationType" th:value="${integrationType}">
+        <div class="row mb-2" id="delimiterConfig">
+            <div class="col-md-3">
+                <div class="card border-dark">
+                    <div class="card-body">
+                        <h5 class="card-title">Delimitador</h5>
+                        <div class="m-3">
+                            <input class="form-check-input" type="checkbox" id="hasDelimiter" name="hasDelimiter" />
+                            <label class="form-check-label" for="hasDelimiter">Possui Delimitador</label>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-text text-white bg-secondary">Delimitador</span>
+                            <input class="form-control" type="input" id="delimiter" name="delimiter" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-dark">
+                    <div class="card-body">
+                        <h5 class="card-title">Campos</h5>
+                        <div class="row m-1">
+                            <button type="button" class="btn btn-outline-secondary" id="moreFields">+</button>
+                        </div>
+                        <div id="campos">
+                            <div class="row mb-1">
+                                <div class="input-group col">
+                                    <span class="input-group-text text-white bg-secondary">1</span>
+                                    <input class="form-control input-field" type="text" name="fields" />
+                                </div>
+                                <div class="input-group col-sm-4 position-field">
+                                    <span class="input-group-text text-white bg-secondary">Pos. Inicial</span>
+                                    <input class="form-control input-field" type="text" name="posBegin" value="0" />
+                                </div>
+                                <div class="input-group col-sm-4 position-field">
+                                    <span class="input-group-text text-white bg-secondary">Pos. Final</span>
+                                    <input  class="form-control input-field" type="text" name="posEnd" value="0" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-dark">
+                    <div class="card-body">
+                        <h5 class="card-title">Campo Valor</h5>
+                        <div class="input-group">
+                            <span class="input-group-text text-white bg-secondary">Campo</span>
+                            <input class="form-control input-field" type="text" name="fieldPrice" />
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-text text-white bg-secondary">Casas Decimais</span>
+                            <input class="form-control input-field" type="text" name="decimalPoint" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-2">
+          <input class="btn btn-outline-secondary" type="submit" value="Carregar" id="carregar" />
+        </div>
+    </form>
+</div>
+<div th:replace="fragments :: html_foot" />
+<div th:replace="fragments :: bootstrap-js" />
+</body>
+</html>
