@@ -23,4 +23,9 @@ public class MainController {
         return "fileConfiguration";
     }
 
+    @GetMapping("/config/ws")
+    private String webService() {
+        return "wsConfig";
+    }
+
 }

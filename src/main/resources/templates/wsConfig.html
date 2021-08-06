@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head th:replace="fragments :: html_head" />
+<body>
+<div class="container">
+    <div th:replace="fragments :: menu" />
+
+    <h3>Configurar Web Service</h3>
+    <div class="row m-3">
+        <form class="col-sm-12" method="POST" action="/config/ws/send">
+            <div class="input-group">
+                <div class="col-1">
+                    <select class="form-select bg-secondary text-white" id="method">
+                        <option selected>GET</option>
+                        <option>POST</option>
+                    </select>
+                </div>
+                <input type="hidden" id="integrationType" name="integrationType" value="WEB_SERVICE" />
+                <input type="text" class="form-control" name="path" id="file_path" aria-describedby="next" aria-label="Próximo" required />
+                <input class="btn btn-outline-secondary" type="submit" value="Enviar" id="next" />
+            </div>
+        </form>
+    </div>
+</div>
+<div th:replace="fragments :: html_foot" />
+<div th:replace="fragments :: bootstrap-js" />
+</body>
+</html>
