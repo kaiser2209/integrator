@@ -14,6 +14,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 
 import javax.annotation.Resource;
 import java.io.File;
@@ -53,7 +54,7 @@ public class IntegradorApplication implements CommandLineRunner {
 		};
 
 		ScheduledExecutorService exec = Executors.newScheduledThreadPool(1);
-		exec.scheduleAtFixedRate(compare, 0, 1, TimeUnit.SECONDS);
+		exec.scheduleAtFixedRate(compare, 0, 30, TimeUnit.SECONDS);
 	}
 
 	public void compareFile() {

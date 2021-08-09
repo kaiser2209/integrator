@@ -8,7 +8,7 @@
 
     <h3>Configurar Web Service</h3>
     <div class="row m-3">
-        <form class="col-sm-12" method="POST" action="/config/ws/send">
+        <form class="col-sm-12" method="POST" action="/config/ws/teste" id="ws-form" enctype="application/x-www-form-urlencoded">
             <div class="input-group">
                 <div class="col-1">
                     <select class="form-select bg-secondary text-white" id="method">
@@ -17,10 +17,52 @@
                     </select>
                 </div>
                 <input type="hidden" id="integrationType" name="integrationType" value="WEB_SERVICE" />
-                <input type="text" class="form-control" name="path" id="file_path" aria-describedby="next" aria-label="Próximo" required />
-                <input class="btn btn-outline-secondary" type="submit" value="Enviar" id="next" />
+                <input type="text" class="form-control" name="ws_path" id="ws_path" aria-describedby="next" aria-label="Próximo" required />
+                <button type="button" class="btn btn-outline-secondary" id="send">Próximo</button>
             </div>
+        <div class="m-3 p-3 border rounded">
+            <nav>
+                <div class="nav nav-tabs" id="nav-tabs" role="tablist">
+                    <button class="nav-link active" id="nav-header-tab" data-bs-toggle="tab" data-bs-target="#nav-header" type="button" role="tab" aria-controls="nav-header" aria-selected="true">Header</button>
+                    <button class="nav-link" id="nav-body-tab" data-bs-toggle="tab" data-bs-target="#nav-body" type="button" role="tab" aria-controls="nav-body" aria-selected="false">Body</button>
+                </div>
+                <div class="tab-content" id="nav-tabContent">
+                    <div class="tab-pane fade show active" id="nav-header" role="tabpanel" aria-labelledby="nav-header-tab">
+
+                        <table class="table" id="table-header-keys">
+                            <thead>
+                                <tr>
+                                    <th scope="col">CHAVE</th>
+                                    <th scope="col">VALOR</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <input type="text" class="form-control border-0" name="key" />
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control border-0" name="value" />
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <button class="btn btn-outline-secondary" type="button" id="btn-new-key">Adicionar Chave</button>
+                    </div>
+                    <div class="tab-pane fade" id="nav-body" role="tabpanel" aria-labelledby="nav-body-tab">
+                        Conteúdo aqui! Body.
+                    </div>
+                </div>
+            </nav>
+        </div>
         </form>
+        </div>
+        <div id="json-view">
+            <pre id="json" th:text="${result}">
+
+            </pre>
+        </div>
     </div>
 </div>
 <div th:replace="fragments :: html_foot" />
