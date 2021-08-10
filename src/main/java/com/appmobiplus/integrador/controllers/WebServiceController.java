@@ -1,5 +1,6 @@
 package com.appmobiplus.integrador.controllers;
 
+import com.appmobiplus.integrador.utils.FileUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,6 +17,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -41,17 +45,37 @@ public class WebServiceController {
 
         //System.out.println(responseEntity.getBody());
 
+        //ObjectMapper mapper = new ObjectMapper();
+        //JsonNode json = mapper.readTree(responseEntity.getBody());
+
+        //mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+
+        //String fJson = mapper.writeValueAsString(json);
+
+        map.addAttribute("result", FileUtils.getFormattedJson(responseEntity.getBody()));
+
+        //System.out.println(fJson);
+
+        return "dataFragments :: #json-view";
+    }
+
+    @PostMapping("/config/ws/fields")
+    public String getFields(ModelMap map,
+                            @RequestParam String json) throws JsonProcessingException {
+
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode json = mapper.readTree(responseEntity.getBody());
+        JsonNode jsonNode = mapper.readTree(json);
 
-        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+        List<String> fields = new ArrayList<>();
 
-        String fJson = mapper.writeValueAsString(json);
+        for (Iterator<String> it = jsonNode.fieldNames(); it.hasNext(); ) {
+            String field = it.next();
+            fields.add(field);
 
-        map.addAttribute("result", fJson);
+        }
 
-        System.out.println(fJson);
+        map.addAttribute("fields", fields);
 
-        return "wsConfig :: #json";
+        return "dataFragments :: #json-fields";
     }
 }

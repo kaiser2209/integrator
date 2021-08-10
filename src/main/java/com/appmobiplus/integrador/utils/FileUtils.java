@@ -3,6 +3,10 @@ package com.appmobiplus.integrador.utils;
 import com.appmobiplus.integrador.models.Config;
 import com.appmobiplus.integrador.models.Produto;
 import com.appmobiplus.integrador.repositories.ProdutoRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -143,5 +147,16 @@ public class FileUtils {
         File file = new File(path);
 
         return file.lastModified();
+    }
+
+    public static String getFormattedJson(String json) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonNode = mapper.readTree(json);
+
+        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+
+        String returnJson = mapper.writeValueAsString(jsonNode);
+
+        return returnJson;
     }
 }

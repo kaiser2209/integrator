@@ -40,7 +40,19 @@
                 $.post("/config/ws/teste", $("#ws-form").serialize()).done(function(data) {
                     //alert(data);
                     //$("#json").replaceWith(data);
-                    $("#json-view").html(data);
+                    $("#json-view").replaceWith(data);
+
+                    $("#getJsonFields").off();
+                    $("#getJsonFields").click(function() {
+                        var jsonValue = $("#json").text();
+                        var url = $("#ws_path").val();
+                        var method = $("#method").val();
+                        $.post("/config/ws/fields", { json: jsonValue } ).done(function(data) {
+                            $("#json-fields").replaceWith(data);
+                            $("#url").val(url);
+                            $("#method-selected").val(method);
+                        });
+                    });
                 });
             });
 
@@ -51,6 +63,8 @@
                     '</tr>';
                 $("#table-header-keys tr:last").after(newLine);
             });
+
+
         });
     </script>
 </head>

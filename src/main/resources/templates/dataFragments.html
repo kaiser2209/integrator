@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head th:replace="fragments :: html_head" />
+<body>
+<div class="container">
+    <div th:replace="fragments :: menu" />
+
+    <div id="json-view">
+        <div class="border round p-3 my-3 overflow-auto" style="max-height: 25vh">
+                <pre id="json" th:text="${result}">
+
+                </pre>
+        </div>
+        <div class="pb-3 d-grid justify-content-end">
+            <button type="button" class="btn btn-outline-secondary" id="getJsonFields">Carregar Campos</button>
+        </div>
+    </div>
+
+    <div id="json-fields" class="pb-2">
+        <form method="post" enctype="application/x-www-form-urlencoded" id="fields-form">
+        <div th:each="field : ${fields}" class="input-group pb-1">
+            <div class="input-group-text">
+                <input class="form-check-input mt-0" type="checkbox" value="" name="enable" />
+            </div>
+            <span class="input-group-text" th:text="${field}" style="min-width: 12vh"></span>
+            <input type="hidden" name="orginalName" th:value="${field}" />
+            <input type="text" class="form-control" name="newName" />
+        </div>
+            <input type="hidden" name="url" id="url"/>
+            <input type="hidden" name="method-selected" id="method-selected"/>
+        </form>
+    </div>
+</div>
+<div th:replace="fragments :: html_foot" />
+<div th:replace="fragments :: bootstrap-js" />
+</body>
+</html>
