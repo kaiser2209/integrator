@@ -1,7 +1,12 @@
 package com.appmobiplus.integrador.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +25,7 @@ public class WebServiceController {
     public String teste(ModelMap map,
                         @RequestParam String[] key,
                         @RequestParam String[] value,
-                        @RequestParam String ws_path) {
+                        @RequestParam String ws_path) throws JsonProcessingException {
         map.addAttribute("teste", "Agora é um teste válido!");
 
         RestTemplate restTemplate = new RestTemplate();
@@ -34,11 +39,18 @@ public class WebServiceController {
 
         ResponseEntity<String> responseEntity = restTemplate.exchange(ws_path, HttpMethod.GET, request, String.class);
 
-        System.out.println(responseEntity.getBody());
+        //System.out.println(responseEntity.getBody());
 
-        map.addAttribute("result", responseEntity.getBody());
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode json = mapper.readTree(responseEntity.getBody());
 
-        System.out.println(value[0]);
+        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+
+        String fJson = mapper.writeValueAsString(json);
+
+        map.addAttribute("result", fJson);
+
+        System.out.println(fJson);
 
         return "wsConfig :: #json";
     }
