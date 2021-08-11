@@ -78,4 +78,15 @@ public class WebServiceController {
 
         return "dataFragments :: #json-fields";
     }
+
+    @PostMapping("/config/ws/save")
+    public String save(ModelMap map,
+                       @RequestParam boolean[] enable,
+                       @RequestParam String[] originalName,
+                       @RequestParam String[] newName,
+                       @RequestParam String url,
+                       @RequestParam String methodSelected) {
+
+        return null;
+    }
 }

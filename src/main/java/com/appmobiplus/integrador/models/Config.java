@@ -2,6 +2,7 @@ package com.appmobiplus.integrador.models;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 public class Config {
@@ -27,6 +28,9 @@ public class Config {
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "config")
     private List<Campo> campos;
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "config")
+    private Set<Header> headers;
 
     public long getId() {
         return id;
@@ -110,6 +114,14 @@ public class Config {
 
     public void setFileLastModified(long fileLastModified) {
         this.fileLastModified = fileLastModified;
+    }
+
+    public Set<Header> getHeaders() {
+        return headers;
+    }
+
+    public void setHeaders(Set<Header> headers) {
+        this.headers = headers;
     }
 }
 

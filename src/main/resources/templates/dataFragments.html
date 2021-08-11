@@ -7,7 +7,7 @@
     <div th:replace="fragments :: menu" />
 
     <div id="json-view">
-        <div class="border round p-3 my-3 overflow-auto" style="max-height: 25vh">
+        <div class="border round p-3 my-3 overflow-auto" style="max-height: 15em">
                 <pre id="json" th:text="${result}">
 
                 </pre>
@@ -23,12 +23,15 @@
             <div class="input-group-text">
                 <input class="form-check-input mt-0" type="checkbox" value="" name="enable" />
             </div>
-            <span class="input-group-text" th:text="${field}" style="min-width: 12vh"></span>
+            <span class="input-group-text" th:text="${field}" style="min-width: 10em"></span>
             <input type="hidden" name="orginalName" th:value="${field}" />
             <input type="text" class="form-control" name="newName" />
         </div>
             <input type="hidden" name="url" id="url"/>
-            <input type="hidden" name="method-selected" id="method-selected"/>
+            <input type="hidden" name="methodSelected" id="method-selected"/>
+            <div class="d-grid justify-content-end">
+                <button type="button" class="btn btn-outline-secondary" id="save-config">Salvar Configurações</button>
+            </div>
         </form>
     </div>
 </div>
