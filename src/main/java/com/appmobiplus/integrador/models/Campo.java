@@ -1,9 +1,10 @@
 package com.appmobiplus.integrador.models;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
-public class Campo {
+public class Campo implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;

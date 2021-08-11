@@ -18,13 +18,14 @@
     </div>
 
     <div id="json-fields" class="pb-2">
-        <form method="post" enctype="application/x-www-form-urlencoded" id="fields-form">
+        <form method="post" enctype="application/x-www-form-urlencoded" id="fields-form" >
         <div th:each="field : ${fields}" class="input-group pb-1">
             <div class="input-group-text">
-                <input class="form-check-input mt-0" type="checkbox" value="" name="enable" />
+                <input type="hidden" class="hidden-enable" name="enable" value="false" />
+                <input class="form-check-input mt-0 chk-enable" type="checkbox" />
             </div>
             <span class="input-group-text" th:text="${field}" style="min-width: 10em"></span>
-            <input type="hidden" name="orginalName" th:value="${field}" />
+            <input type="hidden" name="originalName" th:value="${field}" />
             <input type="text" class="form-control" name="newName" />
         </div>
             <input type="hidden" name="url" id="url"/>
@@ -33,6 +34,9 @@
                 <button type="button" class="btn btn-outline-secondary" id="save-config">Salvar Configurações</button>
             </div>
         </form>
+    </div>
+    <div id="save-complete">
+
     </div>
 </div>
 <div th:replace="fragments :: html_foot" />

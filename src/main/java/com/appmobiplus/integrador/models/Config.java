@@ -1,11 +1,12 @@
 package com.appmobiplus.integrador.models;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
 @Entity
-public class Config {
+public class Config implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;

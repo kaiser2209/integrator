@@ -3,9 +3,10 @@ package com.appmobiplus.integrador.models;
 import org.hibernate.annotations.ManyToAny;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
-public class Header {
+public class Header implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;

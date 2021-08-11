@@ -1,29 +1,35 @@
 package com.appmobiplus.integrador.controllers;
 
+import com.appmobiplus.integrador.models.Campo;
+import com.appmobiplus.integrador.models.Config;
+import com.appmobiplus.integrador.repositories.CampoRepository;
+import com.appmobiplus.integrador.repositories.ConfigRepository;
 import com.appmobiplus.integrador.utils.FileUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
-import org.w3c.dom.Text;
 
+import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 @Controller
 public class WebServiceController {
+    @Autowired
+    ConfigRepository configRepository;
+
+    @Autowired
+    CampoRepository campoRepository;
 
     @PostMapping(value = "/config/ws/teste", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
     public String teste(ModelMap map,
@@ -81,12 +87,72 @@ public class WebServiceController {
 
     @PostMapping("/config/ws/save")
     public String save(ModelMap map,
-                       @RequestParam boolean[] enable,
+                       @RequestParam(value = "enable", defaultValue = "false") boolean[] enable,
                        @RequestParam String[] originalName,
                        @RequestParam String[] newName,
                        @RequestParam String url,
                        @RequestParam String methodSelected) {
 
-        return null;
+        Config config = new Config();
+        List<Campo> campos = new ArrayList<>();
+
+        for(int i = 0; i < enable.length; i++) {
+            if (enable[i]) {
+                Campo c = new Campo();
+                c.setOriginalName(originalName[i]);
+                c.setNewName(newName[i]);
+                c.setConfig(config);
+
+                campos.add(c);
+            }
+        }
+
+        config.setId(1);
+        config.setPath(url);
+        config.setCampos(campos);
+
+        List<Campo> cs = (List<Campo>) campoRepository.findAll();
+        List<Config> cfs = (List<Config>) configRepository.findAll();
+
+        for (Config c : cfs) {
+            System.out.println("Id: " + c.getId());
+            System.out.println("Url: " + c.getPath());
+        }
+
+        for(Campo c : cs) {
+            System.out.println(c.getOriginalName());
+        }
+
+        Path root = Paths.get("config");
+        String directoryName = "config";
+        File directory = new File(directoryName);
+
+        if (!directory.exists()) {
+            directory.mkdir();
+        }
+
+        try {
+            FileInputStream fileInputStream = new FileInputStream("config/integrador.config");
+            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+            Config conf = (Config) objectInputStream.readObject();
+            objectInputStream.close();
+
+            System.out.println("URL do arquivo: " + conf.getPath());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream("config/integrador.config");
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+            objectOutputStream.writeObject(config);
+            objectOutputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        //configRepository.save(config);
+
+        return "dataFragments :: #save-complete";
     }
 }

@@ -51,6 +51,18 @@
                             $("#json-fields").replaceWith(data);
                             $("#url").val(url);
                             $("#method-selected").val(method);
+
+                            $("#save-config").off();
+                            $("#save-config").click(function() {
+                                $.post("/config/ws/save", $("#fields-form").serialize()).done(function(data) {
+                                    alert(data);
+                                });
+                            });
+
+                            $(".chk-enable").off();
+                            $(".chk-enable").click(function() {
+                                $(this).parent().children(".hidden-enable").val(this.checked);
+                            });
                         });
                     });
                 });
