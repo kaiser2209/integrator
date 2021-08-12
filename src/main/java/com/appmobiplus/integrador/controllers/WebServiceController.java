@@ -1,7 +1,9 @@
 package com.appmobiplus.integrador.controllers;
 
-import com.appmobiplus.integrador.models.Campo;
-import com.appmobiplus.integrador.models.Config;
+import com.appmobiplus.integrador.configuration.Config;
+import com.appmobiplus.integrador.configuration.ConfigBuilder;
+import com.appmobiplus.integrador.configuration.Field;
+import com.appmobiplus.integrador.configuration.FieldBuilder;
 import com.appmobiplus.integrador.repositories.CampoRepository;
 import com.appmobiplus.integrador.repositories.ConfigRepository;
 import com.appmobiplus.integrador.utils.FileUtils;
@@ -19,9 +21,7 @@ import org.springframework.web.client.RestTemplate;
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 @Controller
 public class WebServiceController {
@@ -93,35 +93,23 @@ public class WebServiceController {
                        @RequestParam String url,
                        @RequestParam String methodSelected) {
 
-        Config config = new Config();
-        List<Campo> campos = new ArrayList<>();
+        Set<Field> fields = new HashSet<>();
 
         for(int i = 0; i < enable.length; i++) {
             if (enable[i]) {
-                Campo c = new Campo();
-                c.setOriginalName(originalName[i]);
-                c.setNewName(newName[i]);
-                c.setConfig(config);
+                Field f = FieldBuilder.get()
+                        .setOriginalName(originalName[i])
+                        .setNewName(newName[i])
+                        .build();
 
-                campos.add(c);
+                fields.add(f);
             }
         }
 
-        config.setId(1);
-        config.setPath(url);
-        config.setCampos(campos);
-
-        List<Campo> cs = (List<Campo>) campoRepository.findAll();
-        List<Config> cfs = (List<Config>) configRepository.findAll();
-
-        for (Config c : cfs) {
-            System.out.println("Id: " + c.getId());
-            System.out.println("Url: " + c.getPath());
-        }
-
-        for(Campo c : cs) {
-            System.out.println(c.getOriginalName());
-        }
+        Config config = ConfigBuilder.get()
+                .setPath(url)
+                .setFields(fields)
+                .build();
 
         Path root = Paths.get("config");
         String directoryName = "config";
@@ -136,8 +124,8 @@ public class WebServiceController {
             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
             Config conf = (Config) objectInputStream.readObject();
             objectInputStream.close();
+            System.out.println("Config: " + conf.getPath());
 
-            System.out.println("URL do arquivo: " + conf.getPath());
         } catch (Exception e) {
             e.printStackTrace();
         }
