@@ -5,6 +5,7 @@ import com.appmobiplus.integrador.models.Produto;
 import com.appmobiplus.integrador.repositories.ConfigRepository;
 import com.appmobiplus.integrador.repositories.ProdutoRepository;
 import com.appmobiplus.integrador.service.FileStorageService;
+import com.appmobiplus.integrador.utils.ConfigUtils;
 import com.appmobiplus.integrador.utils.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -45,6 +46,11 @@ public class IntegradorApplication implements CommandLineRunner {
 	public void run(String... arg) throws Exception {
 		storageService.deleteAll();
 		storageService.init();
+
+		com.appmobiplus.integrador.configuration.Config config = ConfigUtils.getCurrentConfig();
+
+		if (config != null)
+			System.out.println(config.toString());
 
 		Runnable compare = new Runnable() {
 			@Override

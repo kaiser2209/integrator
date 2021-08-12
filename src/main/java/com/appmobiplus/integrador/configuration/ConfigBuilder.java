@@ -10,15 +10,18 @@ public class ConfigBuilder {
     private String path;
     private Set<Field> fields = new HashSet<>();
     private Set<Header> headers = new HashSet<>();
+    private Set<String> parameters = new HashSet<>();
 
     public ConfigBuilder(IntegrationType integrationType,
                          String path,
                          Set<Field> fields,
-                         Set<Header> headers) {
+                         Set<Header> headers,
+                         Set<String> parameters) {
         this.integrationType = integrationType;
         this.path = path;
         this.fields = fields;
         this.headers = headers;
+        this.parameters = parameters;
     }
 
     public ConfigBuilder() {
@@ -59,7 +62,12 @@ public class ConfigBuilder {
         return this;
     }
 
+    public ConfigBuilder setParameters(Set<String> parameters) {
+        this.parameters = parameters;
+        return this;
+    }
+
     public Config build() {
-        return new Config(integrationType, path, fields, headers);
+        return new Config(integrationType, path, fields, headers, parameters);
     }
 }

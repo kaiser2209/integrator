@@ -1,12 +1,11 @@
 package com.appmobiplus.integrador.controllers;
 
-import com.appmobiplus.integrador.configuration.Config;
-import com.appmobiplus.integrador.configuration.ConfigBuilder;
-import com.appmobiplus.integrador.configuration.Field;
-import com.appmobiplus.integrador.configuration.FieldBuilder;
+import com.appmobiplus.integrador.configuration.*;
 import com.appmobiplus.integrador.repositories.CampoRepository;
 import com.appmobiplus.integrador.repositories.ConfigRepository;
+import com.appmobiplus.integrador.utils.ConfigUtils;
 import com.appmobiplus.integrador.utils.FileUtils;
+import com.appmobiplus.integrador.utils.WebServiceUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -91,9 +90,13 @@ public class WebServiceController {
                        @RequestParam String[] originalName,
                        @RequestParam String[] newName,
                        @RequestParam String url,
-                       @RequestParam String methodSelected) {
+                       @RequestParam String methodSelected,
+                       @RequestParam IntegrationType integrationType) {
 
         Set<Field> fields = new HashSet<>();
+
+        String absolutUrl = WebServiceUtils.getAbsolutUrl(url);
+        String parameters[] = WebServiceUtils.getParameters(url);
 
         for(int i = 0; i < enable.length; i++) {
             if (enable[i]) {
@@ -107,39 +110,11 @@ public class WebServiceController {
         }
 
         Config config = ConfigBuilder.get()
-                .setPath(url)
+                .setPath(absolutUrl)
                 .setFields(fields)
+                .setIntegrationType(integrationType)
+                .setParameters(new HashSet<>(Arrays.asList(parameters)))
                 .build();
-
-        Path root = Paths.get("config");
-        String directoryName = "config";
-        File directory = new File(directoryName);
-
-        if (!directory.exists()) {
-            directory.mkdir();
-        }
-
-        try {
-            FileInputStream fileInputStream = new FileInputStream("config/integrador.config");
-            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-            Config conf = (Config) objectInputStream.readObject();
-            objectInputStream.close();
-            System.out.println("Config: " + conf.getPath());
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        try {
-            FileOutputStream fileOutputStream = new FileOutputStream("config/integrador.config");
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
-            objectOutputStream.writeObject(config);
-            objectOutputStream.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        //configRepository.save(config);
 
         return "dataFragments :: #save-complete";
     }

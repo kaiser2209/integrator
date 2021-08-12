@@ -71,4 +71,9 @@ public class Field implements Serializable {
     public void setDecimalPoint(int decimalPoint) {
         this.decimalPoint = decimalPoint;
     }
+
+    @Override
+    public String toString() {
+        return "{Names: [Original:" + originalName + ", New:" + newName + "]}";
+    }
 }
