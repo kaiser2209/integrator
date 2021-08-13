@@ -1,5 +1,6 @@
 package com.appmobiplus.integrador.utils;
 
+import com.appmobiplus.integrador.configuration.Field;
 import com.appmobiplus.integrador.models.Config;
 import com.appmobiplus.integrador.models.Produto;
 import com.appmobiplus.integrador.repositories.ProdutoRepository;
@@ -53,6 +54,41 @@ public class FileUtils {
             }
         }
         System.out.println(config.getCampos());
+
+        return getProdutos(config.getPath(), config.isHasDelimiter(), config.getDelimiter(), campos,
+                posBegin, posEnd, fieldPrice, decimalPoint);
+    }
+
+    public static List<Produto> getProdutos(com.appmobiplus.integrador.configuration.Config config) throws IOException {
+        String[] campos = new String[config.getFields().size()];
+        int[] posBegin = new int[config.getFields().size()];
+        int[] posEnd = new int[config.getFields().size()];
+        String fieldPrice = "";
+        int decimalPoint = 0;
+        int count = 0;
+        for(Field f : config.getFields()) {
+            campos[count] = f.getNewName();
+            posBegin[count] = f.getPosBegin();
+            posEnd[count] = f.getPosEnd();
+            if(f.isCurrencyField()) {
+                fieldPrice = campos[count];
+                decimalPoint = f.getDecimalPoint();
+            }
+            count++;
+        }
+        /*
+        for(int i = 0; i < config.getFields().size(); i++) {
+            campos[i] = config.getFields().get(i).getNewName();
+            posBegin[i] = config.getCampos().get(i).getInitialPos();
+            posEnd[i] = config.getCampos().get(i).getFinalPos();
+            if (config.getCampos().get(i).isPriceField()) {
+                fieldPrice = campos[i];
+                decimalPoint = config.getCampos().get(i).getDecimalPoint();
+            }
+        }
+        System.out.println(config.getCampos());
+
+         */
 
         return getProdutos(config.getPath(), config.isHasDelimiter(), config.getDelimiter(), campos,
                 posBegin, posEnd, fieldPrice, decimalPoint);

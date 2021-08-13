@@ -11,17 +11,26 @@ public class ConfigBuilder {
     private Set<Field> fields = new HashSet<>();
     private Set<Header> headers = new HashSet<>();
     private Set<String> parameters = new HashSet<>();
+    private boolean hasDelimiter;
+    private String delimiter;
+    private long fileLastModified;
 
     public ConfigBuilder(IntegrationType integrationType,
                          String path,
                          Set<Field> fields,
                          Set<Header> headers,
-                         Set<String> parameters) {
+                         Set<String> parameters,
+                         boolean hasDelimiter,
+                         String delimiter,
+                         long fileLastModified) {
         this.integrationType = integrationType;
         this.path = path;
         this.fields = fields;
         this.headers = headers;
         this.parameters = parameters;
+        this.hasDelimiter = hasDelimiter;
+        this.delimiter = delimiter;
+        this.fileLastModified = fileLastModified;
     }
 
     public ConfigBuilder() {
@@ -67,7 +76,22 @@ public class ConfigBuilder {
         return this;
     }
 
+    public ConfigBuilder hasDelimiter(boolean hasDelimiter) {
+        this.hasDelimiter = hasDelimiter;
+        return this;
+    }
+
+    public ConfigBuilder setDelimiter(String delimiter) {
+        this.delimiter = delimiter;
+        return this;
+    }
+
+    public ConfigBuilder setFileLastModified(long fileLastModified) {
+        this.fileLastModified = fileLastModified;
+        return this;
+    }
+
     public Config build() {
-        return new Config(integrationType, path, fields, headers, parameters);
+        return new Config(integrationType, path, fields, headers, parameters, hasDelimiter, delimiter, fileLastModified);
     }
 }

@@ -1,6 +1,7 @@
 package com.appmobiplus.integrador;
 
-import com.appmobiplus.integrador.models.Config;
+import com.appmobiplus.integrador.configuration.Config;
+import com.appmobiplus.integrador.configuration.IntegrationType;
 import com.appmobiplus.integrador.models.Produto;
 import com.appmobiplus.integrador.repositories.ConfigRepository;
 import com.appmobiplus.integrador.repositories.ProdutoRepository;
@@ -47,7 +48,7 @@ public class IntegradorApplication implements CommandLineRunner {
 		storageService.deleteAll();
 		storageService.init();
 
-		com.appmobiplus.integrador.configuration.Config config = ConfigUtils.getCurrentConfig();
+		Config config = ConfigUtils.getCurrentConfig();
 
 		if (config != null)
 			System.out.println(config.toString());
@@ -64,7 +65,31 @@ public class IntegradorApplication implements CommandLineRunner {
 	}
 
 	public void compareFile() {
+		Config config = ConfigUtils.getCurrentConfig();
+		if(config != null) {
+			if(config.getIntegrationType() == IntegrationType.FILE) {
+				long lastModifiedSaved = config.getFileLastModified();
+				long lastModifiedNow = FileUtils.getFileLastModificationTime(config.getPath());
+				if (lastModifiedNow > lastModifiedSaved) {
+					try {
+						List<Produto> produtos = FileUtils.getProdutos(config);
 
+						produtoRepository.saveAll(produtos);
+
+						config.setFileLastModified(lastModifiedNow);
+						ConfigUtils.saveConfig(config);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+				System.out.println("Verificando arquivo");
+			} else {
+				System.out.println("Não é integração por arquivo");
+			}
+		} else {
+			System.out.println("Não há configuração salva");
+		}
+		/*
 		if(configRepository.existsById(1)) {
 			Config config = configRepository.findById(1);
 			long lastModifiedSaved = config.getFileLastModified();
@@ -83,5 +108,7 @@ public class IntegradorApplication implements CommandLineRunner {
 		} else {
 			System.out.println("Não existe!");
 		}
+
+		 */
 	}
 }

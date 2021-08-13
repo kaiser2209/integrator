@@ -9,17 +9,26 @@ public class Config implements Serializable {
     private Set<String> parameters;
     private Set<Field> fields;
     private Set<Header> headers;
+    private boolean hasDelimiter;
+    private String delimiter;
+    private long fileLastModified;
 
     protected Config(IntegrationType integrationType,
-                  String path,
-                  Set<Field> fields,
-                  Set<Header> headers,
-                  Set<String> parameters) {
+                     String path,
+                     Set<Field> fields,
+                     Set<Header> headers,
+                     Set<String> parameters,
+                     boolean hasDelimiter,
+                     String delimiter,
+                     long fileLastModified) {
         this.integrationType = integrationType;
         this.path = path;
         this.fields = fields;
         this.headers = headers;
         this.parameters = parameters;
+        this.hasDelimiter = hasDelimiter;
+        this.delimiter = delimiter;
+        this.fileLastModified = fileLastModified;
     }
 
     public IntegrationType getIntegrationType() {
@@ -60,6 +69,30 @@ public class Config implements Serializable {
 
     public void setParameters(Set<String> parameters) {
         this.parameters = parameters;
+    }
+
+    public boolean isHasDelimiter() {
+        return hasDelimiter;
+    }
+
+    public void setHasDelimiter(boolean hasDelimiter) {
+        this.hasDelimiter = hasDelimiter;
+    }
+
+    public String getDelimiter() {
+        return delimiter;
+    }
+
+    public void setDelimiter(String delimiter) {
+        this.delimiter = delimiter;
+    }
+
+    public long getFileLastModified() {
+        return fileLastModified;
+    }
+
+    public void setFileLastModified(long fileLastModified) {
+        this.fileLastModified = fileLastModified;
     }
 
     @Override

@@ -1,10 +1,16 @@
 package com.appmobiplus.integrador.controllers;
 
+import com.appmobiplus.integrador.configuration.Config;
+import com.appmobiplus.integrador.configuration.ConfigBuilder;
+import com.appmobiplus.integrador.configuration.Field;
+import com.appmobiplus.integrador.configuration.FieldBuilder;
+import com.appmobiplus.integrador.configuration.IntegrationType;
 import com.appmobiplus.integrador.message.ResponseMessage;
 import com.appmobiplus.integrador.models.*;
 import com.appmobiplus.integrador.repositories.ConfigRepository;
 import com.appmobiplus.integrador.repositories.ProdutoRepository;
 import com.appmobiplus.integrador.service.FileStorageService;
+import com.appmobiplus.integrador.utils.ConfigUtils;
 import com.appmobiplus.integrador.utils.FileUtils;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +28,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -121,7 +125,7 @@ public class FilesController {
 
     @PostMapping("/config/file/send/save")
     public ModelAndView save(@RequestParam("path") String path,
-                             @RequestParam("integrationType") String integrationType,
+                             @RequestParam("integrationType") IntegrationType integrationType,
                              @RequestParam(value = "hasDelimiter", defaultValue = "false") boolean hasDelimiter,
                              @RequestParam("delimiter") String delimiter,
                              @RequestParam("fields") String[] fields,
@@ -132,8 +136,36 @@ public class FilesController {
 
         ModelAndView modelAndView = new ModelAndView();
 
+        Set<Field> allFields = new HashSet<>();
 
+        for(int i = 0; i < fields.length; i++) {
+            Field f = FieldBuilder.get()
+                    .setOriginalName(fields[i])
+                    .setNewName(fields[i])
+                    .setPosBegin(posBegin[i])
+                    .setPosEnd(posEnd[i])
+                    .setCurrencyField(fields[i].equals(fieldPrice))
+                    .build();
 
+            if(fields[i].equals(fieldPrice)) {
+                f.setDecimalPoint(decimalPoint);
+            }
+
+            allFields.add(f);
+        }
+
+        Config config = ConfigBuilder.get()
+                .hasDelimiter(hasDelimiter)
+                .setDelimiter(delimiter)
+                .setIntegrationType(integrationType)
+                .setPath(path)
+                .setFileLastModified(FileUtils.getFileLastModificationTime(path))
+                .setFields(allFields)
+                .build();
+
+        ConfigUtils.saveConfig(config);
+
+        /*
         List<Campo> campos = new ArrayList<>();
         for(int i = 0; i < fields.length; i++) {
             Campo c = new Campo();
@@ -147,8 +179,6 @@ public class FilesController {
             }
             campos.add(c);
         }
-
-        System.out.println(campos);
 
         Config config;
 
@@ -172,6 +202,8 @@ public class FilesController {
 
         configRepository.save(config);
 
+
+         */
         List<Produto> produtos = new ArrayList<>();
         try {
             produtos = FileUtils.getProdutos(path, hasDelimiter, delimiter, fields, posBegin, posEnd, fieldPrice, decimalPoint);
@@ -180,6 +212,7 @@ public class FilesController {
             e.printStackTrace();
         }
 
+        produtoRepository.deleteAll();
         produtoRepository.saveAll(produtos);
 
         modelAndView.setViewName("fileSave");
