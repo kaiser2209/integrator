@@ -8,6 +8,7 @@ import com.appmobiplus.integrador.repositories.ProdutoRepository;
 import com.appmobiplus.integrador.service.FileStorageService;
 import com.appmobiplus.integrador.utils.ConfigUtils;
 import com.appmobiplus.integrador.utils.FileUtils;
+import com.appmobiplus.integrador.utils.ImageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -52,6 +53,9 @@ public class IntegradorApplication implements CommandLineRunner {
 
 		if (config != null)
 			System.out.println(config.toString());
+
+		ImageUtils.downloadImage(ImageUtils.getImageServerPath(), ImageUtils.getLocalPath(), "7897316806388", "png");
+		ImageUtils.downloadImage(ImageUtils.getImageServerPath(), ImageUtils.getLocalPath(), "7891025107897", "png");
 
 		Runnable compare = new Runnable() {
 			@Override

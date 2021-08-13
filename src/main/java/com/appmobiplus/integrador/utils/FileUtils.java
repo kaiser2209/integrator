@@ -1,7 +1,7 @@
 package com.appmobiplus.integrador.utils;
 
+import com.appmobiplus.integrador.configuration.Config;
 import com.appmobiplus.integrador.configuration.Field;
-import com.appmobiplus.integrador.models.Config;
 import com.appmobiplus.integrador.models.Produto;
 import com.appmobiplus.integrador.repositories.ProdutoRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -38,7 +38,7 @@ public class FileUtils {
         return lines;
     }
 
-    public static List<Produto> getProdutos(Config config) throws IOException {
+    public static List<Produto> getProdutos(com.appmobiplus.integrador.models.Config config) throws IOException {
         String[] campos = new String[config.getCampos().size()];
         int[] posBegin = new int[config.getCampos().size()];
         int[] posEnd = new int[config.getCampos().size()];
@@ -59,7 +59,7 @@ public class FileUtils {
                 posBegin, posEnd, fieldPrice, decimalPoint);
     }
 
-    public static List<Produto> getProdutos(com.appmobiplus.integrador.configuration.Config config) throws IOException {
+    public static List<Produto> getProdutos(Config config) throws IOException {
         String[] campos = new String[config.getFields().size()];
         int[] posBegin = new int[config.getFields().size()];
         int[] posEnd = new int[config.getFields().size()];
