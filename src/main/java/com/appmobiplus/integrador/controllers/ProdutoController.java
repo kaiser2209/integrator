@@ -4,6 +4,7 @@ import com.appmobiplus.integrador.exceptions.ResourceNotFoundException;
 import com.appmobiplus.integrador.json.ProdutoJson;
 import com.appmobiplus.integrador.models.Produto;
 import com.appmobiplus.integrador.repositories.ProdutoRepository;
+import com.appmobiplus.integrador.utils.ImageUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -48,7 +49,14 @@ public class ProdutoController {
     @GetMapping(path="/buscapreco")
     public @ResponseBody Produto get(@RequestParam String ean) {
         if (produtoRepository.existsByEan(ean)) {
-            return produtoRepository.findByEan(ean);
+            Produto p = produtoRepository.findByEan(ean);
+            if (p.getLink_image() == null || p.getLink_image().isEmpty()) {
+                if (ImageUtils.downloadImage(ImageUtils.getImageServerPath(), ImageUtils.getLocalPath(), p.getEan(), "png")) {
+                    p.setLink_image(ImageUtils.getLocalImagePath(p.getEan(), "png"));
+                    produtoRepository.save(p);
+                }
+            }
+            return p;
         }
 
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "O recurso procurado não foi encontrado!");
