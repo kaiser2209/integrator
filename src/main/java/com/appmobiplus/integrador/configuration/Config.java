@@ -1,12 +1,13 @@
 package com.appmobiplus.integrador.configuration;
 
 import java.io.Serializable;
+import java.util.Map;
 import java.util.Set;
 
 public class Config implements Serializable {
     private IntegrationType integrationType;
     private String path;
-    private Set<String> parameters;
+    private Map<String, String> parameters;
     private Set<Field> fields;
     private Set<Header> headers;
     private boolean hasDelimiter;
@@ -17,7 +18,7 @@ public class Config implements Serializable {
                      String path,
                      Set<Field> fields,
                      Set<Header> headers,
-                     Set<String> parameters,
+                     Map<String, String> parameters,
                      boolean hasDelimiter,
                      String delimiter,
                      long fileLastModified) {
@@ -63,11 +64,11 @@ public class Config implements Serializable {
         this.headers = headers;
     }
 
-    public Set<String> getParameters() {
+    public Map<String, String> getParameters() {
         return parameters;
     }
 
-    public void setParameters(Set<String> parameters) {
+    public void setParameters(Map<String, String> parameters) {
         this.parameters = parameters;
     }
 

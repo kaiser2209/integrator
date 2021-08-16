@@ -88,8 +88,12 @@ public class ProdutoController {
                 HttpEntity<String> request = new HttpEntity<>(httpHeaders);
                 RestTemplate restTemplate = new RestTemplate();
 
+                for(String key : parameters.keySet()) {
+                    config.getParameters().put(key, parameters.get(key));
+                }
+
                 ResponseEntity<String> responseEntity = restTemplate.exchange(
-                        WebServiceUtils.getWebServiceURL(config.getPath(), parameters), HttpMethod.GET,
+                        WebServiceUtils.getWebServiceURL(config.getPath(), config.getParameters()), HttpMethod.GET,
                         request, String.class);
 
                 System.out.println(responseEntity.getBody());
@@ -108,6 +112,12 @@ public class ProdutoController {
                 ObjectMapper mapper = new ObjectMapper();
 
                 Produto produto = mapper.readValue(finalJson, com.appmobiplus.integrador.configuration.Produto.class);
+                produto.setLink_image(ImageUtils.downloadImage(produto.getLink_image(), produto.getEan(), ImageUtils.getLocalPath()));
+
+                Set<Produto> sugestoes = produto.getSugestoes();
+                for(Produto product : sugestoes) {
+                    product.setLink_image(ImageUtils.downloadImage(product.getLink_image(), product.getEan(), ImageUtils.getLocalPath()));
+                }
 
                 message = HttpStatus.OK + " - Produto encontrado";
                 LogUtils.saveLog(message);

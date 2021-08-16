@@ -102,7 +102,9 @@ public class WebServiceController {
         Set<Field> fields = new HashSet<>();
 
         String absolutUrl = WebServiceUtils.getAbsolutUrl(url);
-        String parameters[] = WebServiceUtils.getParameters(url);
+        Map<String, String> parameters = WebServiceUtils.getParameters(url);
+        //String parameters[] = WebServiceUtils.getParameters(url);
+        System.out.println(parameters);
 
         for(int i = 0; i < enable.length; i++) {
             if (enable[i]) {
@@ -129,7 +131,7 @@ public class WebServiceController {
                 .setPath(absolutUrl)
                 .setFields(fields)
                 .setIntegrationType(integrationType)
-                .setParameters(new HashSet<>(Arrays.asList(parameters)))
+                .setParameters(parameters)
                 .setHeaders(headers)
                 .build();
 

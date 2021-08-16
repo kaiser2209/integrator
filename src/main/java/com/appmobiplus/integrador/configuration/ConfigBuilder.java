@@ -2,7 +2,9 @@ package com.appmobiplus.integrador.configuration;
 
 import com.appmobiplus.integrador.models.Campo;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class ConfigBuilder {
@@ -10,7 +12,7 @@ public class ConfigBuilder {
     private String path;
     private Set<Field> fields = new HashSet<>();
     private Set<Header> headers = new HashSet<>();
-    private Set<String> parameters = new HashSet<>();
+    private Map<String, String> parameters = new HashMap<>();
     private boolean hasDelimiter;
     private String delimiter;
     private long fileLastModified;
@@ -19,7 +21,7 @@ public class ConfigBuilder {
                          String path,
                          Set<Field> fields,
                          Set<Header> headers,
-                         Set<String> parameters,
+                         Map<String, String> parameters,
                          boolean hasDelimiter,
                          String delimiter,
                          long fileLastModified) {
@@ -71,7 +73,7 @@ public class ConfigBuilder {
         return this;
     }
 
-    public ConfigBuilder setParameters(Set<String> parameters) {
+    public ConfigBuilder setParameters(Map<String, String> parameters) {
         this.parameters = parameters;
         return this;
     }

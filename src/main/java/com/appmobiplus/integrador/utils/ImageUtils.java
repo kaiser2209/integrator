@@ -1,12 +1,15 @@
 package com.appmobiplus.integrador.utils;
 
 import com.appmobiplus.integrador.configuration.Config;
+import org.apache.commons.io.FilenameUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class ImageUtils {
     private static String localPath = "download/images/";
@@ -14,18 +17,40 @@ public class ImageUtils {
 
     public static boolean downloadImage(String from, String to, String fileName, String fileExtension) {
         BufferedImage image = null;
-        ConfigUtils.checkAndCreateDirectory(localPath);
+        ConfigUtils.checkAndCreateDirectory(to);
 
         try {
             URL url = new URL(from + fileName + "." + fileExtension);
             image = ImageIO.read(url);
-            ImageIO.write(image, fileExtension, new File(localPath + fileName + "." + fileExtension));
+            ImageIO.write(image, fileExtension, new File(to + fileName + "." + fileExtension));
             return true;
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
 
         return false;
+    }
+
+    public static String downloadImage(String originLink, String ean, String saveTo) {
+        BufferedImage image = null;
+        ConfigUtils.checkAndCreateDirectory(saveTo);
+
+        try {
+            URL url = new URL(originLink);
+            String filename = FilenameUtils.getBaseName(url.getPath());
+            String extension = FilenameUtils.getExtension(url.getPath());
+            String saveToWithFilename = saveTo + ean + "." + extension;
+            File file = new File(saveToWithFilename);
+            if(!file.exists()) {
+                image = ImageIO.read(url);
+                ImageIO.write(image, extension, new File(saveToWithFilename));
+            }
+            return saveToWithFilename;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     public static String getLocalImagePath(String filename, String fileExtension) {

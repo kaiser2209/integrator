@@ -23,6 +23,8 @@ import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -48,6 +50,9 @@ public class IntegradorApplication implements CommandLineRunner {
 	@Override
 	public void run(String... arg) throws Exception {
 		LogUtils.saveLog("Servidor Iniciado...");
+
+		InetAddress inetAddress = InetAddress.getLocalHost();
+		System.out.println(inetAddress.getHostAddress());
 
 		storageService.deleteAll();
 		storageService.init();
