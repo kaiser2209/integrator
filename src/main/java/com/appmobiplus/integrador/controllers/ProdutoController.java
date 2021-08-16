@@ -1,9 +1,14 @@
 package com.appmobiplus.integrador.controllers;
 
+import com.appmobiplus.integrador.configuration.Produto;
+import com.appmobiplus.integrador.configuration.Config;
+import com.appmobiplus.integrador.configuration.Field;
+import com.appmobiplus.integrador.configuration.Header;
+import com.appmobiplus.integrador.configuration.IntegrationType;
 import com.appmobiplus.integrador.exceptions.ResourceNotFoundException;
 import com.appmobiplus.integrador.json.ProdutoJson;
-import com.appmobiplus.integrador.models.Produto;
 import com.appmobiplus.integrador.repositories.ProdutoRepository;
+import com.appmobiplus.integrador.utils.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,22 +19,23 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
-@Controller
+@RestController
 public class ProdutoController {
     @Autowired
     private ProdutoRepository produtoRepository;
 
     @PostMapping(path="/add")
     public @ResponseBody String add(@RequestParam String name, @RequestParam String email) {
-        Produto p = new Produto();
+        com.appmobiplus.integrador.models.Produto p = new com.appmobiplus.integrador.models.Produto();
         p.setDescricao("Teste");
         p.setEan("12243242451515412");
         p.setPreco_de(2.50f);
@@ -41,16 +47,88 @@ public class ProdutoController {
     }
 
     @GetMapping(path="/all")
-    public @ResponseBody Iterable<Produto> getAll() {
+    public @ResponseBody Iterable<com.appmobiplus.integrador.models.Produto> getAll() {
         return produtoRepository.findAll();
     }
 
     @GetMapping(path="/buscapreco")
-    public @ResponseBody Produto get(@RequestParam String ean) {
-        if (produtoRepository.existsByEan(ean)) {
-            return produtoRepository.findByEan(ean);
+    public @ResponseBody Object get(@RequestParam Map<String, String> parameters) throws JsonProcessingException {
+        Config config = ConfigUtils.getCurrentConfig();
+        com.appmobiplus.integrador.models.Produto p;
+        String message = "Busca realizada com ean=" + parameters.get("ean");
+        LogUtils.saveLog(message);
+        if (config.getIntegrationType() == IntegrationType.FILE) {
+            String ean = parameters.get("ean");
+            if (produtoRepository.existsByEan(ean)) {
+                p = produtoRepository.findByEan(ean);
+                if (p.getLink_image() == null || p.getLink_image().isEmpty()) {
+                    if (!ImageUtils.hasImageDownloaded(p.getEan(), "png")) {
+                        if (ImageUtils.downloadImage(ImageUtils.getImageServerPath(), ImageUtils.getLocalPath(), p.getEan(), "png")) {
+                            p.setLink_image(ImageUtils.getLocalImagePath(p.getEan(), "png"));
+                            produtoRepository.save(p);
+                        }
+                    } else {
+                        p.setLink_image(ImageUtils.getLocalImagePath(p.getEan(), "png"));
+                        produtoRepository.save(p);
+                    }
+                }
+
+                message = HttpStatus.OK + " - Produto encontado";
+                LogUtils.saveLog(message);
+                return WebServiceUtils.getProdutoFromModel(p);
+            }
+        } else if (config.getIntegrationType() == IntegrationType.WEB_SERVICE) {
+            try {
+                Set<Header> headers = config.getHeaders();
+                HttpHeaders httpHeaders = new HttpHeaders();
+                for (Header h : headers) {
+                    httpHeaders.add(h.getKey(), h.getValue());
+                }
+
+                HttpEntity<String> request = new HttpEntity<>(httpHeaders);
+                RestTemplate restTemplate = new RestTemplate();
+
+                ResponseEntity<String> responseEntity = restTemplate.exchange(
+                        WebServiceUtils.getWebServiceURL(config.getPath(), parameters), HttpMethod.GET,
+                        request, String.class);
+
+                System.out.println(responseEntity.getBody());
+
+                String finalJson = responseEntity.getBody();
+
+                Set<Field> fields = config.getFields();
+
+                for (Field f : fields) {
+                    if (!(f.getNewName().isEmpty() && f.getOriginalName().equals(f.getNewName()))) {
+                        finalJson = finalJson.replaceAll(f.getOriginalName(), f.getNewName());
+                        System.out.println(f.getNewName());
+                    }
+                }
+
+                ObjectMapper mapper = new ObjectMapper();
+
+                Produto produto = mapper.readValue(finalJson, com.appmobiplus.integrador.configuration.Produto.class);
+
+                message = HttpStatus.OK + " - Produto encontrado";
+                LogUtils.saveLog(message);
+                return produto;
+            } catch (HttpClientErrorException e) {
+                System.out.println(e.getMessage());
+                message = HttpStatus.NOT_FOUND + " - Produto não encontrado";
+                LogUtils.saveLog(message);
+                Map<String, String> erro = new HashMap<>();
+                erro.put("errorMessage", "Produto não econtrado!");
+                erro.put("errorCode", HttpStatus.NOT_FOUND.toString());
+
+                return erro;
+            }
+
+        } else if (config.getIntegrationType() == IntegrationType.DATABASE) {
+
         }
 
+        message = "Produto não encontrado! " + HttpStatus.NOT_FOUND;
+        LogUtils.saveLog(message);
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "O recurso procurado não foi encontrado!");
     }
 

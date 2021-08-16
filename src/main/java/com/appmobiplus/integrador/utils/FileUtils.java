@@ -128,6 +128,10 @@ public class FileUtils {
                 p.setPreco_de(getValue(mapa.get(fieldPrice), decimalPoint));
                 p.setEan(mapa.get("ean"));
 
+                //if (ImageUtils.downloadImage(ImageUtils.getImageServerPath(), ImageUtils.getLocalPath(), p.getEan(), "png")) {
+                //    p.setLink_image(ImageUtils.getLocalImagePath(p.getEan(), "png"));
+                //}
+
                 produtos.add(p);
                 //System.out.println(p);
             }

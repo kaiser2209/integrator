@@ -9,6 +9,7 @@ import com.appmobiplus.integrador.service.FileStorageService;
 import com.appmobiplus.integrador.utils.ConfigUtils;
 import com.appmobiplus.integrador.utils.FileUtils;
 import com.appmobiplus.integrador.utils.ImageUtils;
+import com.appmobiplus.integrador.utils.LogUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -46,6 +47,8 @@ public class IntegradorApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... arg) throws Exception {
+		LogUtils.saveLog("Servidor Iniciado...");
+
 		storageService.deleteAll();
 		storageService.init();
 
@@ -53,9 +56,6 @@ public class IntegradorApplication implements CommandLineRunner {
 
 		if (config != null)
 			System.out.println(config.toString());
-
-		ImageUtils.downloadImage(ImageUtils.getImageServerPath(), ImageUtils.getLocalPath(), "7897316806388", "png");
-		ImageUtils.downloadImage(ImageUtils.getImageServerPath(), ImageUtils.getLocalPath(), "7891025107897", "png");
 
 		Runnable compare = new Runnable() {
 			@Override
@@ -87,32 +87,9 @@ public class IntegradorApplication implements CommandLineRunner {
 					}
 				}
 				System.out.println("Verificando arquivo");
-			} else {
-				System.out.println("Não é integração por arquivo");
 			}
 		} else {
 			System.out.println("Não há configuração salva");
 		}
-		/*
-		if(configRepository.existsById(1)) {
-			Config config = configRepository.findById(1);
-			long lastModifiedSaved = config.getFileLastModified();
-			long lastModifiedNow = FileUtils.getFileLastModificationTime(config.getPath());
-			if (lastModifiedSaved != lastModifiedNow) {
-				try {
-					List<Produto> produtos = FileUtils.getProdutos(config);
-					produtoRepository.saveAll(produtos);
-					config.setFileLastModified(lastModifiedNow);
-					configRepository.save(config);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				System.out.println("Dados Atualizados!");
-			}
-		} else {
-			System.out.println("Não existe!");
-		}
-
-		 */
 	}
 }

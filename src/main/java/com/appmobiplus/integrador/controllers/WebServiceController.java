@@ -7,6 +7,7 @@ import com.appmobiplus.integrador.utils.ConfigUtils;
 import com.appmobiplus.integrador.utils.FileUtils;
 import com.appmobiplus.integrador.utils.WebServiceUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,30 +49,32 @@ public class WebServiceController {
 
         ResponseEntity<String> responseEntity = restTemplate.exchange(ws_path, HttpMethod.GET, request, String.class);
 
-        //System.out.println(responseEntity.getBody());
+        Map<String, String> mapHeader = new HashMap<>();
+        for(int i = 0; i < key.length; i++) {
+            mapHeader.put(key[i], value[i]);
+        }
 
-        //ObjectMapper mapper = new ObjectMapper();
-        //JsonNode json = mapper.readTree(responseEntity.getBody());
-
-        //mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-
-        //String fJson = mapper.writeValueAsString(json);
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonHeader = mapper.writeValueAsString(mapHeader);
 
         map.addAttribute("result", FileUtils.getFormattedJson(responseEntity.getBody()));
-
-        //System.out.println(fJson);
+        map.addAttribute("jsonHeader", jsonHeader);
 
         return "dataFragments :: #json-view";
     }
 
     @PostMapping("/config/ws/fields")
     public String getFields(ModelMap map,
-                            @RequestParam String json) throws JsonProcessingException {
+                            @RequestParam String json,
+                            @RequestParam String header) throws JsonProcessingException {
 
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode = mapper.readTree(json);
 
         List<String> fields = new ArrayList<>();
+
+        TypeReference<HashMap<String, String>> typeRef = new TypeReference<HashMap<String, String>>() {};
+        Map<String, String> mapHeader = mapper.readValue(header, typeRef);
 
         for (Iterator<String> it = jsonNode.fieldNames(); it.hasNext(); ) {
             String field = it.next();
@@ -80,6 +83,7 @@ public class WebServiceController {
         }
 
         map.addAttribute("fields", fields);
+        map.addAttribute("header", mapHeader);
 
         return "dataFragments :: #json-fields";
     }
@@ -91,7 +95,9 @@ public class WebServiceController {
                        @RequestParam String[] newName,
                        @RequestParam String url,
                        @RequestParam String methodSelected,
-                       @RequestParam IntegrationType integrationType) {
+                       @RequestParam IntegrationType integrationType,
+                       @RequestParam String[] key,
+                       @RequestParam String[] value) {
 
         Set<Field> fields = new HashSet<>();
 
@@ -109,12 +115,25 @@ public class WebServiceController {
             }
         }
 
+        Set<Header> headers = new HashSet<>();
+        for(int i = 0; i < key.length; i++) {
+            Header h = new HeaderBuilder()
+                    .setKey(key[i])
+                    .setValue(value[i])
+                    .build();
+
+            headers.add(h);
+        }
+
         Config config = ConfigBuilder.get()
                 .setPath(absolutUrl)
                 .setFields(fields)
                 .setIntegrationType(integrationType)
                 .setParameters(new HashSet<>(Arrays.asList(parameters)))
+                .setHeaders(headers)
                 .build();
+
+        ConfigUtils.saveConfig(config);
 
         return "dataFragments :: #save-complete";
     }
