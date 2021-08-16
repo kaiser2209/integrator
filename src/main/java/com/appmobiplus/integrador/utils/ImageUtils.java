@@ -39,4 +39,9 @@ public class ImageUtils {
     public static String getImageServerPath() {
         return imageServerPath;
     }
+
+    public static boolean hasImageDownloaded(String filename, String fileExtension) {
+        File file = new File(localPath + filename + "." + fileExtension);
+        return file.exists();
+    }
 }

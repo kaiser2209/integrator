@@ -45,9 +45,10 @@
                     $("#getJsonFields").off();
                     $("#getJsonFields").click(function() {
                         var jsonValue = $("#json").text();
+                        var jsonHeader = $("#json-header").text();
                         var url = $("#ws_path").val();
                         var method = $("#method").val();
-                        $.post("/config/ws/fields", { json: jsonValue } ).done(function(data) {
+                        $.post("/config/ws/fields", { json: jsonValue, header:  jsonHeader } ).done(function(data) {
                             $("#json-fields").replaceWith(data);
                             $("#url").val(url);
                             $("#method-selected").val(method);

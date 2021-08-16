@@ -15,6 +15,9 @@
         <div class="pb-3 d-grid justify-content-end">
             <button type="button" class="btn btn-outline-secondary" id="getJsonFields">Carregar Campos</button>
         </div>
+        <div class="d-none" id="json-header" th:text="${jsonHeader}">
+
+        </div>
     </div>
 
     <div id="json-fields" class="pb-2">
@@ -33,6 +36,10 @@
             <input type="hidden" name="integrationType" value="WEB_SERVICE" />
             <div class="d-grid justify-content-end">
                 <button type="button" class="btn btn-outline-secondary" id="save-config">Salvar Configurações</button>
+            </div>
+            <div th:each="entry, stats : ${header}">
+                <input type="hidden" name="key" th:value="${entry.key}" />
+                <input type="hidden" name="value" th:value="${entry.value}" />
             </div>
         </form>
     </div>
