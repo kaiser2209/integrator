@@ -3,6 +3,9 @@ package com.appmobiplus.integrador.utils;
 import com.appmobiplus.integrador.configuration.Config;
 
 import java.io.*;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.UnknownHostException;
 
 public class ConfigUtils {
     private static final String configFolder = "config/";
@@ -70,5 +73,9 @@ public class ConfigUtils {
     public static boolean fileExists(String filePath) {
         File file = new File(filePath);
         return file.exists();
+    }
+
+    public static String getIpAddress() throws UnknownHostException {
+        return InetAddress.getLocalHost().getHostAddress();
     }
 }
