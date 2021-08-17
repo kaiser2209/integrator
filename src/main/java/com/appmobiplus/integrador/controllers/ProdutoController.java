@@ -64,11 +64,11 @@ public class ProdutoController {
                 if (p.getLink_image() == null || p.getLink_image().isEmpty()) {
                     if (!ImageUtils.hasImageDownloaded(p.getEan(), "png")) {
                         if (ImageUtils.downloadImage(ImageUtils.getImageServerPath(), ImageUtils.getLocalPath(), p.getEan(), "png")) {
-                            p.setLink_image(ImageUtils.getLocalImagePath(p.getEan(), "png"));
+                            p.setLink_image(ImageUtils.getImagePath(p.getEan(), "png"));
                             produtoRepository.save(p);
                         }
                     } else {
-                        p.setLink_image(ImageUtils.getLocalImagePath(p.getEan(), "png"));
+                        p.setLink_image(ImageUtils.getImagePath(p.getEan(), "png"));
                         produtoRepository.save(p);
                     }
                 }

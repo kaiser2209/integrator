@@ -1,6 +1,7 @@
 package com.appmobiplus.integrador.utils;
 
 import com.appmobiplus.integrador.configuration.Config;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -75,7 +76,13 @@ public class ConfigUtils {
         return file.exists();
     }
 
-    public static String getIpAddress() throws UnknownHostException {
-        return InetAddress.getLocalHost().getHostAddress();
+    public static String getIpAddress() {
+        try {
+            return InetAddress.getLocalHost().getHostAddress();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+
+        return "";
     }
 }

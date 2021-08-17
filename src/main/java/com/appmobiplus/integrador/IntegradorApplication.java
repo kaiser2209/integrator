@@ -6,11 +6,9 @@ import com.appmobiplus.integrador.models.Produto;
 import com.appmobiplus.integrador.repositories.ConfigRepository;
 import com.appmobiplus.integrador.repositories.ProdutoRepository;
 import com.appmobiplus.integrador.service.FileStorageService;
-import com.appmobiplus.integrador.utils.ConfigUtils;
-import com.appmobiplus.integrador.utils.FileUtils;
-import com.appmobiplus.integrador.utils.ImageUtils;
-import com.appmobiplus.integrador.utils.LogUtils;
+import com.appmobiplus.integrador.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -43,6 +41,9 @@ public class IntegradorApplication implements CommandLineRunner {
 	@Autowired
 	ProdutoRepository produtoRepository;
 
+	@Value("${server.port}")
+	private int port;
+
 	public static void main(String[] args) {
 		SpringApplication.run(IntegradorApplication.class, args);
 	}
@@ -53,6 +54,8 @@ public class IntegradorApplication implements CommandLineRunner {
 
 		InetAddress inetAddress = InetAddress.getLocalHost();
 		System.out.println(inetAddress.getHostAddress());
+
+		ServerUtils.setPort(port);
 
 		storageService.deleteAll();
 		storageService.init();

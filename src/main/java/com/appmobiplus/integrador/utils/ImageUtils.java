@@ -1,25 +1,18 @@
 package com.appmobiplus.integrador.utils;
 
-import com.appmobiplus.integrador.configuration.Config;
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
+@Component
 public class ImageUtils {
     private static String localPath = "download/images/";
     private static String imageServerPath = "https://storage-api.appmobiplus.com/app/produtos/";
-
-    @Autowired
-    private static Environment environment;
 
     public static boolean downloadImage(String from, String to, String fileName, String fileExtension) {
         BufferedImage image = null;
@@ -61,6 +54,10 @@ public class ImageUtils {
 
     public static String getLocalImagePath(String filename, String fileExtension) {
         return localPath + filename + "." + fileExtension;
+    }
+
+    public static String getImagePath(String filename, String fileExtension) {
+        return ConfigUtils.getIpAddress() + ":" + ServerUtils.getPort() + "/image/" + filename + "." + fileExtension;
     }
 
     public static String getLocalPath() {
