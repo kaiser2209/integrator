@@ -12,7 +12,6 @@ public class ServerUtils {
     private static int port;
 
     public static void setPort(int port) {
-        System.out.println(port);
         ServerUtils.port = port;
     }
 

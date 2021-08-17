@@ -14,13 +14,6 @@ public class WebServiceUtils {
         return url.split(Pattern.quote("?"))[0];
     }
 
-    /*
-    public static String[] getParameters(String url) {
-        return url.split(Pattern.quote("?"))[1].split(Pattern.quote("&"));
-    }
-
-     */
-
     public static Map<String, String> getParameters(String url) {
         String[] parameters = url.split(Pattern.quote("?"))[1].split(Pattern.quote("&"));
         Map<String, String> returnParameters = new HashMap<>();

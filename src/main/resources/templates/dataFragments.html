@@ -29,7 +29,15 @@
             </div>
             <span class="input-group-text" th:text="${field}" style="min-width: 10em"></span>
             <input type="hidden" name="originalName" th:value="${field}" />
-            <input type="text" class="form-control" name="newName" />
+            <select class="form-select" name="newName">
+                <option selected>Escolha uma opção</option>
+                <option value="ean">ean</option>
+                <option value="descricao">descricao</option>
+                <option value="preco_de">preco_de</option>
+                <option value="preco_por">preco_por</option>
+                <option value="link_image">link_image</option>
+                <option value="sugestoes">sugestoes</option>
+            </select>
         </div>
             <input type="hidden" name="url" id="url"/>
             <input type="hidden" name="methodSelected" id="method-selected" />

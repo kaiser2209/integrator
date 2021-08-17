@@ -96,8 +96,6 @@ public class ProdutoController {
                         WebServiceUtils.getWebServiceURL(config.getPath(), config.getParameters()), HttpMethod.GET,
                         request, String.class);
 
-                System.out.println(responseEntity.getBody());
-
                 String finalJson = responseEntity.getBody();
 
                 Set<Field> fields = config.getFields();
@@ -105,7 +103,6 @@ public class ProdutoController {
                 for (Field f : fields) {
                     if (!(f.getNewName().isEmpty() && f.getOriginalName().equals(f.getNewName()))) {
                         finalJson = finalJson.replaceAll(f.getOriginalName(), f.getNewName());
-                        System.out.println(f.getNewName());
                     }
                 }
 
@@ -123,7 +120,6 @@ public class ProdutoController {
                 LogUtils.saveLog(message);
                 return produto;
             } catch (HttpClientErrorException e) {
-                System.out.println(e.getMessage());
                 message = HttpStatus.NOT_FOUND + " - Produto não encontrado";
                 LogUtils.saveLog(message);
                 Map<String, String> erro = new HashMap<>();
@@ -156,14 +152,6 @@ public class ProdutoController {
 
         ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.GET, request, String.class);
 
-        //Object object = responseEntity.getBody();
-
-        //Field field = object.getClass().getDeclaredField("ean");
-        //field.setAccessible(true);
-        //Object value = field.get(object);
-
-        //System.out.println(object);
-
         String newJson = responseEntity.getBody().replaceAll("precoDe", "preco_de");
         newJson = newJson.replaceAll("precoPor", "preco_por");
 
@@ -172,8 +160,6 @@ public class ProdutoController {
 
         ObjectMapper mapper = new ObjectMapper();
         JsonNode actualObj = mapper.readTree(newJson);
-
-        System.out.println(actualObj);
 
         ObjectNode returnJson = new ObjectMapper().createObjectNode();
         returnJson.set("preco_de", actualObj.get("precoDe"));

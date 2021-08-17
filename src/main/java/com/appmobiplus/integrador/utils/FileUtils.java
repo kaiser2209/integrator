@@ -31,7 +31,6 @@ public class FileUtils {
         String line;
         while ((line = br.readLine()) != null && actualLine < totalLines) {
             lines.add(line);
-            //System.out.println(line.length());
             actualLine++;
         }
 
@@ -53,7 +52,6 @@ public class FileUtils {
                 decimalPoint = config.getCampos().get(i).getDecimalPoint();
             }
         }
-        System.out.println(config.getCampos());
 
         return getProdutos(config.getPath(), config.isHasDelimiter(), config.getDelimiter(), campos,
                 posBegin, posEnd, fieldPrice, decimalPoint);
@@ -76,19 +74,6 @@ public class FileUtils {
             }
             count++;
         }
-        /*
-        for(int i = 0; i < config.getFields().size(); i++) {
-            campos[i] = config.getFields().get(i).getNewName();
-            posBegin[i] = config.getCampos().get(i).getInitialPos();
-            posEnd[i] = config.getCampos().get(i).getFinalPos();
-            if (config.getCampos().get(i).isPriceField()) {
-                fieldPrice = campos[i];
-                decimalPoint = config.getCampos().get(i).getDecimalPoint();
-            }
-        }
-        System.out.println(config.getCampos());
-
-         */
 
         return getProdutos(config.getPath(), config.isHasDelimiter(), config.getDelimiter(), campos,
                 posBegin, posEnd, fieldPrice, decimalPoint);
@@ -109,7 +94,6 @@ public class FileUtils {
 
             if(hasDelimiter) {
                 dados = dados(line, delimiter);
-                //System.out.println("Delimitador: " + hasDelimiter);
             } else {
                 dados = dados(line, posBegin, posEnd);
             }
@@ -121,19 +105,12 @@ public class FileUtils {
                     mapa.put(campos[i], dados[i]);
                 }
 
-                //System.out.println(mapa);
-
                 Produto p = new Produto();
                 p.setDescricao(mapa.get("descricao"));
                 p.setPreco_de(getValue(mapa.get(fieldPrice), decimalPoint));
                 p.setEan(mapa.get("ean"));
 
-                //if (ImageUtils.downloadImage(ImageUtils.getImageServerPath(), ImageUtils.getLocalPath(), p.getEan(), "png")) {
-                //    p.setLink_image(ImageUtils.getLocalImagePath(p.getEan(), "png"));
-                //}
-
                 produtos.add(p);
-                //System.out.println(p);
             }
         }
 

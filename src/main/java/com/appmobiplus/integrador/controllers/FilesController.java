@@ -103,7 +103,6 @@ public class FilesController {
         try {
             produtos = FileUtils.getProdutos(path, hasDelimiter, delimiter, fields, posBegin, posEnd, fieldPrice, decimalPoint);
         } catch (IOException e) {
-            System.out.println("Erro");
             e.printStackTrace();
         }
 
@@ -165,50 +164,10 @@ public class FilesController {
 
         ConfigUtils.saveConfig(config);
 
-        /*
-        List<Campo> campos = new ArrayList<>();
-        for(int i = 0; i < fields.length; i++) {
-            Campo c = new Campo();
-            c.setOriginalName(fields[i]);
-            c.setNewName(fields[i]);
-            c.setInitialPos(posBegin[i]);
-            c.setFinalPos(posEnd[i]);
-            c.setPriceField(fields[i].equals(fieldPrice));
-            if (fields[i].equals(fieldPrice)) {
-                c.setDecimalPoint(decimalPoint);
-            }
-            campos.add(c);
-        }
-
-        Config config;
-
-        if (configRepository.existsById(1)) {
-            config = configRepository.findById(1);
-        } else {
-            config = new Config();
-        }
-
-        config.setHasDelimiter(hasDelimiter);
-        config.setDelimiter(delimiter);
-        config.setIntegrationType(integrationType);
-        config.setPath(path);
-        config.setFileLastModified(FileUtils.getFileLastModificationTime(path));
-
-        for(Campo c : campos) {
-            c.setConfig(config);
-        }
-
-        config.setCampos(campos);
-
-        configRepository.save(config);
-
-
-         */
         List<Produto> produtos = new ArrayList<>();
         try {
             produtos = FileUtils.getProdutos(path, hasDelimiter, delimiter, fields, posBegin, posEnd, fieldPrice, decimalPoint);
         } catch (IOException e) {
-            System.out.println("Erro");
             e.printStackTrace();
         }
 

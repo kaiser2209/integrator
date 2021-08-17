@@ -52,18 +52,12 @@ public class IntegradorApplication implements CommandLineRunner {
 	public void run(String... arg) throws Exception {
 		LogUtils.saveLog("Servidor Iniciado...");
 
-		InetAddress inetAddress = InetAddress.getLocalHost();
-		System.out.println(inetAddress.getHostAddress());
-
 		ServerUtils.setPort(port);
 
 		storageService.deleteAll();
 		storageService.init();
 
 		Config config = ConfigUtils.getCurrentConfig();
-
-		if (config != null)
-			System.out.println(config.toString());
 
 		Runnable compare = new Runnable() {
 			@Override

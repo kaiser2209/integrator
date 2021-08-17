@@ -24,7 +24,7 @@ public class ImageUtils {
             ImageIO.write(image, fileExtension, new File(to + fileName + "." + fileExtension));
             return true;
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
 
         return false;
@@ -44,7 +44,7 @@ public class ImageUtils {
                 image = ImageIO.read(url);
                 ImageIO.write(image, "png", new File(saveToWithFilename));
             }
-            return ConfigUtils.getIpAddress() + "/image/";
+            return ConfigUtils.getIpAddress() + ":" + ServerUtils.getPort() + "/image/" + ean + "." + "png";
         } catch (IOException e) {
             e.printStackTrace();
         }

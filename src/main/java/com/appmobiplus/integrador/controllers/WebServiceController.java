@@ -103,8 +103,6 @@ public class WebServiceController {
 
         String absolutUrl = WebServiceUtils.getAbsolutUrl(url);
         Map<String, String> parameters = WebServiceUtils.getParameters(url);
-        //String parameters[] = WebServiceUtils.getParameters(url);
-        System.out.println(parameters);
 
         for(int i = 0; i < enable.length; i++) {
             if (enable[i]) {
