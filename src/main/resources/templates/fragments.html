@@ -56,7 +56,12 @@
                             $("#save-config").off();
                             $("#save-config").click(function() {
                                 $.post("/config/ws/save", $("#fields-form").serialize()).done(function(data) {
-                                    alert(data);
+                                    $("#dialog-success").replaceWith(data);
+                                    $("#save-complete").modal('show');
+                                    $(".redirect-button").off();
+                                    $(".redirect-button").click(function() {
+                                        $(location).attr("href", "/config/ws");
+                                    });
                                 });
                             });
 

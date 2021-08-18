@@ -51,8 +51,21 @@
             </div>
         </form>
     </div>
-    <div id="save-complete">
-
+    <div id="save-complete" class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modal Title</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Configurações salvas com sucesso!</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary redirect-button" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <div th:replace="fragments :: html_foot" />
