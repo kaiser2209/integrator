@@ -44,8 +44,8 @@ public class ConfigUtils {
             return config;
 
         } catch (Exception e) {
-            e.printStackTrace();
             lastErrorMessage = e.getMessage();
+            LogUtils.saveLog("Falha ao recuperar a configuração. - " + e.getMessage());
         }
 
         return null;

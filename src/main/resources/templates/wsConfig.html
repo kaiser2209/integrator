@@ -7,61 +7,74 @@
     <div th:replace="fragments :: menu" />
 
     <h3>Configurar Web Service</h3>
-    <div class="row m-3 border">
-        <form class="col-sm-12" method="POST" action="/config/ws/teste" id="ws-form" enctype="application/x-www-form-urlencoded">
-            <div class="input-group py-3">
-                <div class="col-1">
-                    <select class="form-select bg-secondary text-white" id="method">
-                        <option selected value="get">GET</option>
-                        <option value="post">POST</option>
-                    </select>
+    <div class="nav nav-tabs" id="tabWebServiceMode" role="tablist">
+        <button class="nav-link active" id="auth-fix-tab" data-bs-toggle="tab" data-bs-target="#auth-fix" type="button" role="tab" aria-controls="auth-fix" aria-selected="true">Autenticação Fixa</button>
+        <button class="nav-link" id="with-auth-token-tab" data-bs-toggle="tab" data-bs-target="#with-auth-token" type="button" role="tab" aria-controls="with-auth-token" aria-selected="false">Busca de Token</button>
+    </div>
+    <div class="tab-content" id="tabWebServiceModeContent">
+        <!--Início da área relativa à autenticação com token fixo-->
+        <div class="tab-pane fade show active" id="auth-fix" role="tabpanel" aria-labelledby="auth-fix-tab">
+            <div class="row m-3 border rounded">
+                <form class="col-sm-12" method="POST" action="/config/ws/startConfig" id="ws-form" enctype="application/x-www-form-urlencoded">
+                    <div class="input-group py-3">
+                        <div class="col-1">
+                            <select class="form-select bg-secondary text-white" id="method">
+                                <option selected value="get">GET</option>
+                                <option value="post">POST</option>
+                            </select>
+                        </div>
+                        <input type="hidden" id="integrationType" name="integrationType" value="WEB_SERVICE" />
+                        <input type="text" class="form-control" name="ws_path" id="ws_path" aria-describedby="next" aria-label="Próximo" required />
+                        <button type="button" class="btn btn-outline-secondary" id="send">Próximo</button>
+                    </div>
+                <div class="p-3 border rounded">
+                    <nav>
+                        <div class="nav nav-tabs" id="nav-tabs" role="tablist">
+                            <button class="nav-link active" id="nav-header-tab" data-bs-toggle="tab" data-bs-target="#nav-header" type="button" role="tab" aria-controls="nav-header" aria-selected="true">Header</button>
+                            <button class="nav-link" id="nav-body-tab" data-bs-toggle="tab" data-bs-target="#nav-body" type="button" role="tab" aria-controls="nav-body" aria-selected="false">Body</button>
+                        </div>
+                        <div class="tab-content" id="nav-tabContent">
+                            <div class="tab-pane fade show active" id="nav-header" role="tabpanel" aria-labelledby="nav-header-tab">
+
+                                <table class="table" id="table-header-keys">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">CHAVE</th>
+                                            <th scope="col">VALOR</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <input type="text" class="form-control border-0" name="key" />
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control border-0" name="value" />
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <button class="btn btn-outline-secondary" type="button" id="btn-new-key">Adicionar Chave</button>
+                            </div>
+                            <div class="tab-pane fade" id="nav-body" role="tabpanel" aria-labelledby="nav-body-tab">
+                                Conteúdo aqui! Body.
+                            </div>
+                        </div>
+                    </nav>
                 </div>
-                <input type="hidden" id="integrationType" name="integrationType" value="WEB_SERVICE" />
-                <input type="text" class="form-control" name="ws_path" id="ws_path" aria-describedby="next" aria-label="Próximo" required />
-                <button type="button" class="btn btn-outline-secondary" id="send">Próximo</button>
+
+                <div id="json-view" class="mb-3">
+                </div>
+                <div id="json-fields">
+                </div>
+                </form>
             </div>
-        <div class="p-3 border rounded">
-            <nav>
-                <div class="nav nav-tabs" id="nav-tabs" role="tablist">
-                    <button class="nav-link active" id="nav-header-tab" data-bs-toggle="tab" data-bs-target="#nav-header" type="button" role="tab" aria-controls="nav-header" aria-selected="true">Header</button>
-                    <button class="nav-link" id="nav-body-tab" data-bs-toggle="tab" data-bs-target="#nav-body" type="button" role="tab" aria-controls="nav-body" aria-selected="false">Body</button>
-                </div>
-                <div class="tab-content" id="nav-tabContent">
-                    <div class="tab-pane fade show active" id="nav-header" role="tabpanel" aria-labelledby="nav-header-tab">
-
-                        <table class="table" id="table-header-keys">
-                            <thead>
-                                <tr>
-                                    <th scope="col">CHAVE</th>
-                                    <th scope="col">VALOR</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>
-                                        <input type="text" class="form-control border-0" name="key" />
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control border-0" name="value" />
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-
-                        <button class="btn btn-outline-secondary" type="button" id="btn-new-key">Adicionar Chave</button>
-                    </div>
-                    <div class="tab-pane fade" id="nav-body" role="tabpanel" aria-labelledby="nav-body-tab">
-                        Conteúdo aqui! Body.
-                    </div>
-                </div>
-            </nav>
         </div>
-
-        <div id="json-view" class="mb-3">
+        <!--Final da área relativa à autenticação com token fixo-->
+        <div class="tab-pane fade" id="with-auth-token" role="tabpanel" aria-labelledby="with-auth-token">
+            <div th:replace="fragments :: pageWebService(typeWebService='auth', action='/config/ws/auth/startConfig')" />
         </div>
-        <div id="json-fields">
-        </div>
-        </form>
     </div>
 
     <div id="dialog-success">

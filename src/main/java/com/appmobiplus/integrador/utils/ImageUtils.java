@@ -36,8 +36,6 @@ public class ImageUtils {
 
         try {
             URL url = new URL(originLink);
-            String filename = FilenameUtils.getBaseName(url.getPath());
-            String extension = FilenameUtils.getExtension(url.getPath());
             String saveToWithFilename = saveTo + ean + "." + "png";
             File file = new File(saveToWithFilename);
             if(!file.exists()) {

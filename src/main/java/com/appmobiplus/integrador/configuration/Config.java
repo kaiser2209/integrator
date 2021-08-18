@@ -13,6 +13,9 @@ public class Config implements Serializable {
     private boolean hasDelimiter;
     private String delimiter;
     private long fileLastModified;
+    private ConfigAuth configAuth;
+    private ConfigCadastroProdutos configCadastroProdutos;
+    private ConfigCustosProdutos configCustosProdutos;
 
     protected Config(IntegrationType integrationType,
                      String path,
@@ -21,7 +24,10 @@ public class Config implements Serializable {
                      Map<String, String> parameters,
                      boolean hasDelimiter,
                      String delimiter,
-                     long fileLastModified) {
+                     long fileLastModified,
+                     ConfigAuth configAuth,
+                     ConfigCadastroProdutos configCadastroProdutos,
+                     ConfigCustosProdutos configCustosProdutos) {
         this.integrationType = integrationType;
         this.path = path;
         this.fields = fields;
@@ -30,6 +36,9 @@ public class Config implements Serializable {
         this.hasDelimiter = hasDelimiter;
         this.delimiter = delimiter;
         this.fileLastModified = fileLastModified;
+        this.configAuth = configAuth;
+        this.configCadastroProdutos = configCadastroProdutos;
+        this.configCustosProdutos = configCustosProdutos;
     }
 
     public IntegrationType getIntegrationType() {
@@ -94,6 +103,30 @@ public class Config implements Serializable {
 
     public void setFileLastModified(long fileLastModified) {
         this.fileLastModified = fileLastModified;
+    }
+
+    public ConfigAuth getConfigAuth() {
+        return configAuth;
+    }
+
+    public void setConfigAuth(ConfigAuth configAuth) {
+        this.configAuth = configAuth;
+    }
+
+    public ConfigCadastroProdutos getConfigCadastroProdutos() {
+        return configCadastroProdutos;
+    }
+
+    public void setConfigCadastroProdutos(ConfigCadastroProdutos configCadastroProdutos) {
+        this.configCadastroProdutos = configCadastroProdutos;
+    }
+
+    public ConfigCustosProdutos getConfigCustosProdutos() {
+        return configCustosProdutos;
+    }
+
+    public void setConfigCustosProdutos(ConfigCustosProdutos configCustosProdutos) {
+        this.configCustosProdutos = configCustosProdutos;
     }
 
     @Override

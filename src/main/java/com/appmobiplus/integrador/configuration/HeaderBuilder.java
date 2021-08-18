@@ -28,6 +28,12 @@ public class HeaderBuilder {
         return this;
     }
 
+    public HeaderBuilder addKeySet(String key, String value) {
+        this.key = key;
+        this.value = value;
+        return this;
+    }
+
     public Header build() {
         return new Header(key, value);
     }

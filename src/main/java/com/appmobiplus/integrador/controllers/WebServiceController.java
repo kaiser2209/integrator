@@ -31,7 +31,7 @@ public class WebServiceController {
     @Autowired
     CampoRepository campoRepository;
 
-    @PostMapping(value = "/config/ws/teste", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
+    @PostMapping(value = "/config/ws/startConfig", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
     public String teste(ModelMap map,
                         @RequestParam String[] key,
                         @RequestParam String[] value,
@@ -136,5 +136,10 @@ public class WebServiceController {
         ConfigUtils.saveConfig(config);
 
         return "dataFragments :: #save-complete";
+    }
+
+    @PostMapping(value = "/config/ws/auth/startConfig", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
+    public String authStartConfig() {
+        return null;
     }
 }

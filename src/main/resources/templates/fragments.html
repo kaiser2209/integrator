@@ -36,10 +36,7 @@
             });
 
             $("#send").click(function() {
-                //$("#teste").load("/config/ws/teste?name=teste");
-                $.post("/config/ws/teste", $("#ws-form").serialize()).done(function(data) {
-                    //alert(data);
-                    //$("#json").replaceWith(data);
+                $.post("/config/ws/startConfig", $("#ws-form").serialize()).done(function(data) {
                     $("#json-view").replaceWith(data);
 
                     $("#getJsonFields").off();
@@ -82,7 +79,13 @@
                 $("#table-header-keys tr:last").after(newLine);
             });
 
-
+            $("#btn-auth-new-key").click(function() {
+                var newLine = '<tr>' +
+                    '<th><input type="text" class="form-control border-0" name="key" /></th>' +
+                    '<th><input type="text" class="form-control border-0" name="value" /></th>' +
+                    '</tr>';
+                $("#table-auth-header-keys tr:last").after(newLine);
+            });
         });
     </script>
 </head>
@@ -108,6 +111,59 @@
     <div th:fragment="html_foot" class="text-center">
         <p>Integrador Mobiplus - Copyright &copy;</p>
     </div>
+
+    <!-- Fragmento padronizado para web service -->
+    <div class="row m-3 border rounded" th:fragment="pageWebService(typeWebService, action)">
+        <form class="col-sm-12" method="POST" th:action="${action}" th:id="${typeWebService}+'-form'" enctype="application/x-www-form-urlencoded">
+            <div class="input-group py-3">
+                <div class="col-1">
+                    <select class="form-select bg-secondary text-white" name="method">
+                        <option selected value="get">GET</option>
+                        <option value="post">POST</option>
+                    </select>
+                </div>
+                <input type="hidden" name="integrationType" value="WEB_SERVICE" />
+                <input type="text" class="form-control" name="ws_path" aria-describedby="next" aria-label="Próximo" required />
+                <button type="button" class="btn btn-outline-secondary" th:id="${typeWebService}+'-send'">Próximo</button>
+            </div>
+            <div class="border rounder p-3 mb-3">
+                <div class="nav nav-tabs" th:id="${typeWebService}+'-keys'" role="tablist">
+                    <button class="nav-link active" th:id="${typeWebService}+'-header-tab'" data-bs-toggle="tab" th:data-bs-target="'#'+${typeWebService}+'-header'" type="button" role="tab" th:aria-controls="${typeWebService}+'-header'" aria-selected="true">Header</button>
+                    <button class="nav-link" th:id="${typeWebService}+'-body-tab'" data-bs-toggle="tab" th:data-bs-target="'#'+${typeWebService}+'-body'" type="button" role="tab" th:aria-controls="${typeWebService}+'-body'" aria-selected="false">Body</button>
+                </div>
+                <div class="tab-content" th:id="${typeWebService}+'-content'">
+                    <div class="tab-pane fade show active" th:id="${typeWebService}+'-header'" role="tabpanel" th:aria-labelledby="${typeWebService}+'-header'">
+
+                        <table class="table" th:id="'table-'+${typeWebService}+'-header-keys'">
+                            <thead>
+                            <tr>
+                                <th scope="col">CHAVE</th>
+                                <th scope="col">VALOR</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>
+                                    <input type="text" class="form-control border-0" name="key" />
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control border-0" name="value" />
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                        <button class="btn btn-outline-secondary" type="button" th:id="'btn-'+${typeWebService}+'-new-key'">Adicionar Chave</button>
+                    </div>
+                    <div class="tab-pane fade" th:id="${typeWebService}+'-body'" role="tabpanel" th:aria-labelledby="${typeWebService}+'-body'">
+                        Body!
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!-- Fim do fragmento para web service -->
+
     <div th:fragment="bootstrap-js">
 
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js" integrity="sha384-eMNCOe7tC1doHpGoWe/6oMVemdAVTMs2xqW4mwXrXsW0L84Iytr2wi5v2QjrP/xp" crossorigin="anonymous"></script>

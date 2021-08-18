@@ -16,6 +16,9 @@ public class ConfigBuilder {
     private boolean hasDelimiter;
     private String delimiter;
     private long fileLastModified;
+    private ConfigAuth configAuth;
+    private ConfigCadastroProdutos configCadastroProdutos;
+    private ConfigCustosProdutos configCustosProdutos;
 
     public ConfigBuilder(IntegrationType integrationType,
                          String path,
@@ -24,7 +27,10 @@ public class ConfigBuilder {
                          Map<String, String> parameters,
                          boolean hasDelimiter,
                          String delimiter,
-                         long fileLastModified) {
+                         long fileLastModified,
+                         ConfigAuth configAuth,
+                         ConfigCadastroProdutos configCadastroProdutos,
+                         ConfigCustosProdutos configCustosProdutos) {
         this.integrationType = integrationType;
         this.path = path;
         this.fields = fields;
@@ -33,6 +39,9 @@ public class ConfigBuilder {
         this.hasDelimiter = hasDelimiter;
         this.delimiter = delimiter;
         this.fileLastModified = fileLastModified;
+        this.configAuth = configAuth;
+        this.configCadastroProdutos = configCadastroProdutos;
+        this.configCustosProdutos = configCustosProdutos;
     }
 
     public ConfigBuilder() {
@@ -93,7 +102,32 @@ public class ConfigBuilder {
         return this;
     }
 
+    public ConfigBuilder setConfigAuth(ConfigAuth configAuth) {
+        this.configAuth = configAuth;
+        return this;
+    }
+
+    public ConfigBuilder setConfigCadastroProdutos(ConfigCadastroProdutos configCadastroProdutos) {
+        this.configCadastroProdutos = configCadastroProdutos;
+        return this;
+    }
+
+    public ConfigBuilder setConfigCustosProdutos(ConfigCustosProdutos configCustosProdutos) {
+        this.configCustosProdutos = configCustosProdutos;
+        return this;
+    }
+
     public Config build() {
-        return new Config(integrationType, path, fields, headers, parameters, hasDelimiter, delimiter, fileLastModified);
+        return new Config(integrationType,
+                path,
+                fields,
+                headers,
+                parameters,
+                hasDelimiter,
+                delimiter,
+                fileLastModified,
+                configAuth,
+                configCadastroProdutos,
+                configCustosProdutos);
     }
 }
