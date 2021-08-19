@@ -35,6 +35,26 @@
                 $(".position-field").toggle(!this.checked);
             });
 
+            $("#auth-urlencoded").click(function() {
+                $("#auth-urlencoded-content").toggle(this.checked);
+                $("#auth-raw-content").toggle(!this.checked);
+            });
+
+            $("#auth-raw").click(function() {
+                $("#auth-urlencoded-content").toggle(!this.checked);
+                $("#auth-raw-content").toggle(this.checked);
+            });
+
+            $("#cad-urlencoded").click(function() {
+                $("#cad-urlencoded-content").toggle(this.checked);
+                $("#cad-raw-content").toggle(!this.checked);
+            });
+
+            $("#cad-raw").click(function() {
+                $("#cad-urlencoded-content").toggle(!this.checked);
+                $("#cad-raw-content").toggle(this.checked);
+            });
+
             $("#send").click(function() {
                 $.post("/config/ws/startConfig", $("#ws-form").serialize()).done(function(data) {
                     $("#json-view").replaceWith(data);
@@ -87,6 +107,14 @@
                 $("#table-auth-header-keys tr:last").after(newLine);
             });
 
+            $("#btn-cad-new-key").click(function() {
+                var newLine = '<tr>' +
+                    '<th><input type="text" class="form-control border-0" name="headerKey" /></th>' +
+                    '<th><input type="text" class="form-control border-0" name="headerValue" /></th>' +
+                    '</tr>';
+                $("#table-cad-header-keys tr:last").after(newLine);
+            });
+
             $("#btn-auth-new-bodyKey").click(function() {
                 var newLine = '<tr>' +
                     '<th><input type="text" class="form-control border-0" name="bodyKey" /></th>' +
@@ -95,7 +123,29 @@
                 $("#table-auth-body-keys tr:last").after(newLine);
             });
 
+            $("#btn-cad-new-bodyKey").click(function() {
+                var newLine = '<tr>' +
+                    '<th><input type="text" class="form-control border-0" name="bodyKey" /></th>' +
+                    '<th><input type="text" class="form-control border-0" name="bodyValue" /></th>' +
+                    '</tr>';
+                $("#table-cad-body-keys tr:last").after(newLine);
+            });
+
             $("#auth-send").click(function() {
+                $.post("/config/ws/auth/startConfig", $("#auth-form").serialize()).done(function(data) {
+                    $("#auth-jsonView").replaceWith(data);
+
+                    $("#auth-getJsonFields").off();
+                    $("#auth-getJsonFields").click(function() {
+                        var jsonValue = $("#auth-json").text();
+                        $.post("/config/ws/auth/configAuth", { json: jsonValue } ).done(function(data) {
+                            $("#auth-fieldsView").replaceWith(data);
+                        });
+                    });
+                });
+            });
+
+            $("#cad-send").click(function() {
                 $.post("/config/ws/auth/startConfig", $("#auth-form").serialize()).done(function(data) {
                     alert(data);
                 });
@@ -170,30 +220,68 @@
                         <button class="btn btn-outline-secondary" type="button" th:id="'btn-'+${typeWebService}+'-new-key'">Adicionar Chave</button>
                     </div>
                     <div class="tab-pane fade" th:id="${typeWebService}+'-body'" role="tabpanel" th:aria-labelledby="${typeWebService}+'-body'">
-                        <table class="table" th:id="'table-'+${typeWebService}+'-body-keys'">
-                            <thead>
-                            <tr>
-                                <th scope="col">CHAVE</th>
-                                <th scope="col">VALOR</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <input type="text" class="form-control border-0" name="bodyKey" />
-                                </td>
-                                <td>
-                                    <input type="text" class="form-control border-0" name="bodyValue" />
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
+                        <div class="p-3">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" th:name="${typeWebService}+'-bodyType'" value="x-www-form-urlencoded" th:id="${typeWebService}+'-urlencoded'" checked>
+                                <label class="form-check-label" th:for="${typeWebService}+'-urlencoded'">x-www-form-urlencoded</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" th:name="${typeWebService}+'-bodyType'" value="raw" th:id="${typeWebService}+'-raw'">
+                                <label class="form-check-label" th:for="${typeWebService}+'-raw'">raw</label>
+                            </div>
+                        </div>
+                        <div th:id="${typeWebService}+'-urlencoded-content'">
+                            <table class="table" th:id="'table-'+${typeWebService}+'-body-keys'">
+                                <thead>
+                                <tr>
+                                    <th scope="col">CHAVE</th>
+                                    <th scope="col">VALOR</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>
+                                        <input type="text" class="form-control border-0" name="bodyKey" />
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control border-0" name="bodyValue" />
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
 
-                        <button class="btn btn-outline-secondary" type="button" th:id="'btn-'+${typeWebService}+'-new-bodyKey'">Adicionar Chave</button>
+                            <button class="btn btn-outline-secondary" type="button" th:id="'btn-'+${typeWebService}+'-new-bodyKey'">Adicionar Chave</button>
+                        </div>
+                        <div th:id="${typeWebService}+'-raw-content'" style="display: none">
+                            <table class="table" th:id="'table-'+${typeWebService}+'-raw-fields'">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">CAMPO</th>
+                                        <th scope="col">VALOR</th>
+                                        <th scope="col">OPERADOR</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><input type="text" class="form-control border-0" name="campo" /></td>
+                                        <td><input type="text" class="form-control border-0" name="valor" /></td>
+                                        <td><select class="form-select" name="operador">
+                                            <option value="IGUAL" selected>IGUAL</option>
+                                            <option value="DIFERENTE">DIFERENTE</option>
+                                            <option value="MENOR">MENOR</option>
+                                            <option value="MAIOR">MAIOR</option>
+                                        </select></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div id="teste">
+            <div th:id="${typeWebService}+'-jsonView'">
+
+            </div>
+            <div th:id="${typeWebService}+'-fieldsView'">
 
             </div>
         </form>

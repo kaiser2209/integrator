@@ -1,15 +1,17 @@
 package com.appmobiplus.integrador.configuration;
 
+import org.springframework.http.HttpMethod;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class ConfigAuthBuilder {
     private String path;
-    private MethodType methodType;
+    private HttpMethod methodType;
     private Map<String, String> bodyParameters = new HashMap<>();
 
-    public ConfigAuthBuilder(MethodType methodType,
-                             String path,
+    public ConfigAuthBuilder(String path,
+                             HttpMethod methodType,
                              Map<String, String> bodyParameters) {
         this.path = path;
         this.methodType = methodType;
@@ -21,7 +23,7 @@ public class ConfigAuthBuilder {
         return this;
     }
 
-    public ConfigAuthBuilder setMethodType(MethodType methodType) {
+    public ConfigAuthBuilder setMethodType(HttpMethod methodType) {
         this.methodType = methodType;
         return this;
     }

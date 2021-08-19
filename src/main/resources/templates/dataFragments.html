@@ -67,8 +67,40 @@
             </div>
         </div>
     </div>
-    <div id="teste_envio">
-        Teste de Envio
+    <div id="auth-jsonView">
+        <div class="border round p-3 my-3 overflow-auto" style="max-height: 15em">
+                <pre id="auth-json" th:text="${result}">
+
+                </pre>
+        </div>
+        <div class="pb-3 d-grid justify-content-end">
+            <button type="button" class="btn btn-outline-secondary" id="auth-getJsonFields">Carregar Campos</button>
+        </div>
+    </div>
+    <div id="auth-jsonFields">
+        <form enctype="application/x-www-form-urlencoded" method="post" name="auth-fields-form">
+            <div class="d-grid gap-2 d-md-flex">
+                <button th:each="field : ${fields}" class="btn btn-secondary" type="button" th:text="${field}"></button>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">KEY</th>
+                        <th scope="col">VALUE</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <select class="form-select" name="key">
+                                <option selected>Authorization</option>
+                            </select>
+                        </td>
+                        <td id="auth-composeField"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
     </div>
 </div>
 <div th:replace="fragments :: html_foot" />

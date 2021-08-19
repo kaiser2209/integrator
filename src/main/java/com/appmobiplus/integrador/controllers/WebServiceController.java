@@ -5,6 +5,7 @@ import com.appmobiplus.integrador.repositories.CampoRepository;
 import com.appmobiplus.integrador.repositories.ConfigRepository;
 import com.appmobiplus.integrador.utils.ConfigUtils;
 import com.appmobiplus.integrador.utils.FileUtils;
+import com.appmobiplus.integrador.utils.JsonUtils;
 import com.appmobiplus.integrador.utils.WebServiceUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -142,16 +143,14 @@ public class WebServiceController {
 
     @PostMapping(value = "/config/ws/auth/startConfig", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
     public String authStartConfig(ModelMap map,
-                                  @RequestParam String method,
+                                  @RequestParam HttpMethod method,
                                   @RequestParam String ws_path,
                                   @RequestParam String[] headerKey,
                                   @RequestParam String[] headerValue,
                                   @RequestParam String[] bodyKey,
-                                  @RequestParam String[] bodyValue) {
+                                  @RequestParam String[] bodyValue) throws JsonProcessingException {
 
         RestTemplate restTemplate = new RestTemplate();
-
-        HttpMethod httpMethod = HttpMethod.valueOf(method);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -163,11 +162,25 @@ public class WebServiceController {
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(postParameters, headers);
 
-        ResponseEntity<String> response = restTemplate.exchange(ws_path, httpMethod, request, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(ws_path, method, request, String.class);
 
-        System.out.println(response.getBody());
+        map.addAttribute("result", FileUtils.getFormattedJson(response.getBody()));
 
+        System.out.println(FileUtils.getFormattedJson(response.getBody()));
 
-        return "dataFragments :: #teste_envio";
+        return "dataFragments :: #auth-jsonView";
+    }
+
+    @PostMapping(value = "/config/ws/auth/configAuth", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
+    public String configAuth(ModelMap map,
+                             @RequestParam String json) throws JsonProcessingException {
+
+        JsonNode jsonNode = JsonUtils.getJsonObject(json);
+
+        List<String> fields = JsonUtils.getJsonFields(jsonNode);
+
+        map.addAttribute("fields", fields);
+
+        return "dataFragments :: #auth-jsonFields";
     }
 }

@@ -1,15 +1,17 @@
 package com.appmobiplus.integrador.configuration;
 
+import org.springframework.http.HttpMethod;
+
 import java.io.Serializable;
 import java.util.Map;
 
 public class ConfigAuth implements Serializable {
     private String path;
-    private MethodType methodType;
+    private HttpMethod methodType;
     private Map<String, String> bodyParameters;
 
     public ConfigAuth(String path,
-                      MethodType methodType,
+                      HttpMethod methodType,
                       Map<String, String> bodyParameters) {
         this.path = path;
         this.methodType = methodType;
@@ -24,11 +26,11 @@ public class ConfigAuth implements Serializable {
         this.path = path;
     }
 
-    public MethodType getMethodType() {
+    public HttpMethod getMethodType() {
         return methodType;
     }
 
-    public void setMethodType(MethodType methodType) {
+    public void setMethodType(HttpMethod methodType) {
         this.methodType = methodType;
     }
 
