@@ -81,10 +81,24 @@
 
             $("#btn-auth-new-key").click(function() {
                 var newLine = '<tr>' +
-                    '<th><input type="text" class="form-control border-0" name="key" /></th>' +
-                    '<th><input type="text" class="form-control border-0" name="value" /></th>' +
+                    '<th><input type="text" class="form-control border-0" name="headerKey" /></th>' +
+                    '<th><input type="text" class="form-control border-0" name="headerValue" /></th>' +
                     '</tr>';
                 $("#table-auth-header-keys tr:last").after(newLine);
+            });
+
+            $("#btn-auth-new-bodyKey").click(function() {
+                var newLine = '<tr>' +
+                    '<th><input type="text" class="form-control border-0" name="bodyKey" /></th>' +
+                    '<th><input type="text" class="form-control border-0" name="bodyValue" /></th>' +
+                    '</tr>';
+                $("#table-auth-body-keys tr:last").after(newLine);
+            });
+
+            $("#auth-send").click(function() {
+                $.post("/config/ws/auth/startConfig", $("#auth-form").serialize()).done(function(data) {
+                    alert(data);
+                });
             });
         });
     </script>
@@ -118,8 +132,8 @@
             <div class="input-group py-3">
                 <div class="col-1">
                     <select class="form-select bg-secondary text-white" name="method">
-                        <option selected value="get">GET</option>
-                        <option value="post">POST</option>
+                        <option selected value="GET">GET</option>
+                        <option value="POST">POST</option>
                     </select>
                 </div>
                 <input type="hidden" name="integrationType" value="WEB_SERVICE" />
@@ -144,10 +158,10 @@
                             <tbody>
                             <tr>
                                 <td>
-                                    <input type="text" class="form-control border-0" name="key" />
+                                    <input type="text" class="form-control border-0" name="headerKey" />
                                 </td>
                                 <td>
-                                    <input type="text" class="form-control border-0" name="value" />
+                                    <input type="text" class="form-control border-0" name="headerValue" />
                                 </td>
                             </tr>
                             </tbody>
@@ -156,9 +170,31 @@
                         <button class="btn btn-outline-secondary" type="button" th:id="'btn-'+${typeWebService}+'-new-key'">Adicionar Chave</button>
                     </div>
                     <div class="tab-pane fade" th:id="${typeWebService}+'-body'" role="tabpanel" th:aria-labelledby="${typeWebService}+'-body'">
-                        Body!
+                        <table class="table" th:id="'table-'+${typeWebService}+'-body-keys'">
+                            <thead>
+                            <tr>
+                                <th scope="col">CHAVE</th>
+                                <th scope="col">VALOR</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>
+                                    <input type="text" class="form-control border-0" name="bodyKey" />
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control border-0" name="bodyValue" />
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                        <button class="btn btn-outline-secondary" type="button" th:id="'btn-'+${typeWebService}+'-new-bodyKey'">Adicionar Chave</button>
                     </div>
                 </div>
+            </div>
+            <div id="teste">
+
             </div>
         </form>
     </div>

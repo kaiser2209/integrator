@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
@@ -139,7 +141,33 @@ public class WebServiceController {
     }
 
     @PostMapping(value = "/config/ws/auth/startConfig", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
-    public String authStartConfig() {
-        return null;
+    public String authStartConfig(ModelMap map,
+                                  @RequestParam String method,
+                                  @RequestParam String ws_path,
+                                  @RequestParam String[] headerKey,
+                                  @RequestParam String[] headerValue,
+                                  @RequestParam String[] bodyKey,
+                                  @RequestParam String[] bodyValue) {
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpMethod httpMethod = HttpMethod.valueOf(method);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> postParameters = new LinkedMultiValueMap<>();
+        for(int i = 0; i < bodyKey.length; i++) {
+            postParameters.add(bodyKey[i], bodyValue[i]);
+        }
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(postParameters, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(ws_path, httpMethod, request, String.class);
+
+        System.out.println(response.getBody());
+
+
+        return "dataFragments :: #teste_envio";
     }
 }
