@@ -78,6 +78,7 @@
         </div>
     </div>
     <div id="auth-jsonFields">
+        <h5 class="text-center display-6">Escolha os campos para definir a Chave de Autorização</h5>
         <form enctype="application/x-www-form-urlencoded" method="post" name="auth-fields-form">
             <div class="d-grid gap-2 d-md-flex" id="auth-list-fields">
                 <button th:each="field : ${fields}" class="btn btn-secondary btn-auth-field" type="button" th:text="${field}"></button>
@@ -91,7 +92,7 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td>
+                        <td style="width: 20em">
                             <select class="form-select" name="key">
                                 <option selected>Authorization</option>
                             </select>

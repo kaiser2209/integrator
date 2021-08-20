@@ -17,15 +17,19 @@
                                 $(".btn-auth-field").click(function() {
                                     var oldButton = this;
                                     var newButton = $(this).clone();
+                                    var input = '<input type="hidden" id="value-' + $(this).text() + '" value="' + $(this).text() + '" name="value">';
                                     $(this).addClass("disabled");
                                     $(newButton).removeClass("btn-auth-field");
                                     $(newButton).addClass("btn-auth-field-remove");
                                     $(newButton).appendTo("#auth-composeField");
+                                    $("#auth-composeField").append(input);
 
                                     $(newButton).off();
                                     $(newButton).click(function() {
                                         $(oldButton).removeClass("disabled");
                                         $(this).remove();
+                                        var inputForRemove = $("#value-" + $(this).text());
+                                        $(inputForRemove).remove();
                                     });
                                 });
                             }
@@ -172,7 +176,7 @@
                             $("#auth-fieldsView").replaceWith(data);
 
                             //$(".btn-auth-field").off();
-                            selectField(deselectField());
+                            selectField();
                         });
                     });
                 });

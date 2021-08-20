@@ -183,4 +183,13 @@ public class WebServiceController {
 
         return "dataFragments :: #auth-jsonFields";
     }
+
+    @PostMapping(value = "/config/ws/auth/configProd", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
+    public String configProd(ModelMap map,
+                             @RequestParam String key,
+                             @RequestParam String[] value,
+                             @RequestParam String jsonFields) {
+
+        return "dataFragments :: #auth-configProd";
+    }
 }
