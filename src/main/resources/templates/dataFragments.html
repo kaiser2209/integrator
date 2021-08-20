@@ -79,8 +79,8 @@
     </div>
     <div id="auth-jsonFields">
         <form enctype="application/x-www-form-urlencoded" method="post" name="auth-fields-form">
-            <div class="d-grid gap-2 d-md-flex">
-                <button th:each="field : ${fields}" class="btn btn-secondary" type="button" th:text="${field}"></button>
+            <div class="d-grid gap-2 d-md-flex" id="auth-list-fields">
+                <button th:each="field : ${fields}" class="btn btn-secondary btn-auth-field" type="button" th:text="${field}"></button>
             </div>
             <table class="table">
                 <thead>
@@ -96,7 +96,11 @@
                                 <option selected>Authorization</option>
                             </select>
                         </td>
-                        <td id="auth-composeField"></td>
+                        <td>
+                            <div class="d-grid gap-2 d-md-flex" id="auth-composeField">
+
+                            </div>
+                        </td>
                     </tr>
                 </tbody>
             </table>

@@ -11,6 +11,36 @@
     <script type="text/javascript">
         $(document).ready(function() {
             var numField = 2;
+
+            var selectField = function() {
+                                $(".btn-auth-field").off();
+                                $(".btn-auth-field").click(function() {
+                                    var oldButton = this;
+                                    var newButton = $(this).clone();
+                                    $(this).addClass("disabled");
+                                    $(newButton).removeClass("btn-auth-field");
+                                    $(newButton).addClass("btn-auth-field-remove");
+                                    $(newButton).appendTo("#auth-composeField");
+
+                                    $(newButton).off();
+                                    $(newButton).click(function() {
+                                        $(oldButton).removeClass("disabled");
+                                        $(this).remove();
+                                    });
+                                });
+                            }
+            var deselectField = function() {
+                                $(".btn-auth-field-remove").off();
+                                $(".btn-auth-field-remove").click(function() {
+                                    $(this).removeClass("btn-auth-field-remove");
+                                    $(this).addClass("btn-auth-field");
+                                    $(this).appendTo("#auth-list-fields");
+
+                                    $(".btn-auth-field").off();
+                                    selectField();
+                                });
+                            }
+
             $("#moreFields").click(function() {
                 var inputField = '<div class="row mb-1">' +
                     '<div class="input-group col">' +
@@ -140,6 +170,9 @@
                         var jsonValue = $("#auth-json").text();
                         $.post("/config/ws/auth/configAuth", { json: jsonValue } ).done(function(data) {
                             $("#auth-fieldsView").replaceWith(data);
+
+                            //$(".btn-auth-field").off();
+                            selectField(deselectField());
                         });
                     });
                 });
