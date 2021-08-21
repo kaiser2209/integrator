@@ -79,7 +79,7 @@
     </div>
     <div id="auth-jsonFields">
         <h5 class="text-center display-6">Escolha os campos para definir a Chave de Autorização</h5>
-        <form enctype="application/x-www-form-urlencoded" method="post" name="auth-fields-form">
+        <form method="post" name="auth-fields-form">
             <div class="d-grid gap-2 d-md-flex" id="auth-list-fields">
                 <button th:each="field : ${fields}" class="btn btn-secondary btn-auth-field" type="button" th:text="${field}"></button>
             </div>
@@ -94,7 +94,7 @@
                     <tr>
                         <td style="width: 20em">
                             <select class="form-select" name="key">
-                                <option selected>Authorization</option>
+                                <option value="Authorization" selected>Authorization</option>
                             </select>
                         </td>
                         <td>
@@ -105,6 +105,10 @@
                     </tr>
                 </tbody>
             </table>
+            <input type="hidden" name="authJson" th:value="${authJsonFields}">
+            <div class="pb-3 d-grid justify-content-end">
+                <button type="button" class="btn btn-outline-secondary" id="goToCadConfig">Próximo</button>
+            </div>
         </form>
     </div>
 </div>

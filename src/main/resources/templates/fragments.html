@@ -12,7 +12,18 @@
         $(document).ready(function() {
             var numField = 2;
 
+            var goToCadConfig = function() {
+                                    $("#goToCadConfig").click(function() {
+                                        $.post("/config/ws/cad/startConfig", $("#auth-fields-form").serialize()).done(function(data) {
+
+                                            $("#with-auth-token").toggle(false);
+                                            $("#cad-config").toggle(true);
+                                        });
+                                    });
+                                }
+
             var selectField = function() {
+                                goToCadConfig();
                                 $(".btn-auth-field").off();
                                 $(".btn-auth-field").click(function() {
                                     var oldButton = this;
@@ -44,6 +55,7 @@
                                     selectField();
                                 });
                             }
+
 
             $("#moreFields").click(function() {
                 var inputField = '<div class="row mb-1">' +

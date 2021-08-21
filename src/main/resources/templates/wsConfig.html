@@ -75,6 +75,10 @@
         <div class="tab-pane fade" id="with-auth-token" role="tabpanel" aria-labelledby="with-auth-token">
             <div th:replace="fragments :: pageWebService(typeWebService='auth', action='/config/ws/auth/startConfig')" />
         </div>
+
+        <div id="cad-config" style="display: none">
+            <div th:replace="fragments :: pageWebService(typeWebService='cad', action='/config/ws/cad/startConfig')" />
+        </div>
     </div>
 
     <div id="dialog-success">

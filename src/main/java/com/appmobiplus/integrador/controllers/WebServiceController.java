@@ -180,15 +180,16 @@ public class WebServiceController {
         List<String> fields = JsonUtils.getJsonFields(jsonNode);
 
         map.addAttribute("fields", fields);
+        map.addAttribute("authJsonFields", json);
 
         return "dataFragments :: #auth-jsonFields";
     }
 
-    @PostMapping(value = "/config/ws/auth/configProd", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
+    @PostMapping(value = "/config/ws/cad/startConfig")
     public String configProd(ModelMap map,
                              @RequestParam String key,
                              @RequestParam String[] value,
-                             @RequestParam String jsonFields) {
+                             @RequestParam String authJson) {
 
         return "dataFragments :: #auth-configProd";
     }
