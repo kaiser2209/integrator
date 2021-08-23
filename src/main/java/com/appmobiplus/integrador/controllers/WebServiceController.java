@@ -185,12 +185,62 @@ public class WebServiceController {
         return "dataFragments :: #auth-jsonFields";
     }
 
-    @PostMapping(value = "/config/ws/cad/startConfig")
+    @PostMapping(value = "/config/ws/cad/startConfig", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
     public String configProd(ModelMap map,
-                             @RequestParam String key,
-                             @RequestParam String[] value,
-                             @RequestParam String authJson) {
+                             @RequestParam(value= "key", defaultValue = "") String key,
+                             @RequestParam(value = "value", defaultValue = "") String[] value,
+                             @RequestParam(value = "authJson", defaultValue = "") String authJson) throws JsonProcessingException {
 
-        return "dataFragments :: #auth-configProd";
+        String authorizationValue = "";
+
+        JsonNode json = JsonUtils.getJsonObject(authJson);
+
+        for(String v : value) {
+            authorizationValue += json.get(v).textValue() + " ";
+        }
+
+        authorizationValue = authorizationValue.trim();
+
+        map.addAttribute("headerKey", key);
+        map.addAttribute("headerValue", authorizationValue);
+
+        return "dataFragments :: #cad-config";
+    }
+
+    @PostMapping(value = "/config/ws/cad/cadConfig", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
+    public String confCadProd(ModelMap map,
+                              @RequestParam String ws_path,
+                              @RequestParam HttpMethod method,
+                              @RequestParam String[] key,
+                              @RequestParam String[] value,
+                              @RequestParam String campo,
+                              @RequestParam String valor,
+                              @RequestParam String operador) throws JsonProcessingException {
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        for(int i = 0; i < key.length; i++) {
+            headers.add(key[i], value[i]);
+        }
+
+        BuscaCadProdutos cadProdutos = new BuscaCadProdutos();
+        cadProdutos.getClausulas().put("campo", "nrcodbarprod");
+        cadProdutos.getClausulas().put("valor", "27896001016716");
+        cadProdutos.getClausulas().put("operador", "IGUAL");
+        cadProdutos.setPage(1);
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode node = mapper.valueToTree(cadProdutos);
+
+        MultiValueMap<String, String> mapBody = mapper.treeToValue(node, MultiValueMap.class);
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(mapBody, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(ws_path, method, request, String.class);
+
+        return "dataFragments :: #cad-prodConfig";
     }
 }

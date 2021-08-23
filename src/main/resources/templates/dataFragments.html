@@ -79,7 +79,7 @@
     </div>
     <div id="auth-jsonFields">
         <h5 class="text-center display-6">Escolha os campos para definir a Chave de Autorização</h5>
-        <form method="post" name="auth-fields-form">
+        <form method="post" id="auth-fields-form" enctype="application/x-www-form-urlencoded">
             <div class="d-grid gap-2 d-md-flex" id="auth-list-fields">
                 <button th:each="field : ${fields}" class="btn btn-secondary btn-auth-field" type="button" th:text="${field}"></button>
             </div>
@@ -94,7 +94,8 @@
                     <tr>
                         <td style="width: 20em">
                             <select class="form-select" name="key">
-                                <option value="Authorization" selected>Authorization</option>
+                                <option value="Default" selected>Escolha uma opção</option>
+                                <option value="Authorization">Authorization</option>
                             </select>
                         </td>
                         <td>
@@ -111,6 +112,123 @@
             </div>
         </form>
     </div>
+
+
+    <!-- Fragmento Configuração de Cadastro de Produtos - WebService com Autenticação  -->
+    <div id="cad-config" class="collapse">
+        <div class="row m-3 border rounded">
+            <form class="col-sm-12" method="POST" id="cad-form" enctype="application/x-www-form-urlencoded" action="/config/ws/cad/cadConfig">
+                <div class="input-group py-3">
+                    <div class="col-1">
+                        <select class="form-select bg-secondary text-white" name="method">
+                            <option selected value="GET">GET</option>
+                            <option value="POST">POST</option>
+                        </select>
+                    </div>
+                    <input type="hidden" name="integrationType" value="WEB_SERVICE" />
+                    <input type="text" class="form-control" name="ws_path" aria-describedby="next" aria-label="Próximo" required />
+                    <button type="button" class="btn btn-outline-secondary" id="cad-send">Próximo</button>
+                </div>
+                <div class="border rounder p-3 mb-3">
+                    <div class="nav nav-tabs" id="cad-keys" role="tablist">
+                        <button class="nav-link active" id="cad-header-tab" data-bs-toggle="tab" data-bs-target="#cad-header" type="button" role="tab" aria-controls="cad-header" aria-selected="true">Header</button>
+                        <button class="nav-link" id="cad-body-tab" data-bs-toggle="tab" data-bs-target="#cad-body" type="button" role="tab" aria-controls="cad-body" aria-selected="false">Body</button>
+                    </div>
+                    <div class="tab-content" id="cad-content">
+                        <div class="tab-pane fade show active" id="cad-header" role="tabpanel" aria-labelledby="cad-header">
+
+                            <table class="table" id="table-cad-header-keys">
+                                <thead>
+                                <tr>
+                                    <th scope="col">CHAVE</th>
+                                    <th scope="col">VALOR</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>
+                                        <input type="text" class="form-control border-0" name="headerKey" th:value="${headerKey}" />
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control border-0" name="headerValue" th:value="${headerValue}" />
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                            <button class="btn btn-outline-secondary" type="button" id="btn-cad-new-key" >Adicionar Chave</button>
+                        </div>
+                        <div class="tab-pane fade" id="cad-body" role="tabpanel"aria-labelledby="cad-body">
+                            <div class="p-3">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="cad-bodyType" value="x-www-form-urlencoded" id="cad-urlencoded" checked>
+                                    <label class="form-check-label" for="cad-urlencoded">x-www-form-urlencoded</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="cad-bodyType" value="raw" id="cad-raw">
+                                    <label class="form-check-label" for="cad-raw">raw</label>
+                                </div>
+                            </div>
+                            <div id="cad-urlencoded-content">
+                                <table class="table" id="table-cad-body-keys">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">CHAVE</th>
+                                        <th scope="col">VALOR</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            <input type="text" class="form-control border-0" name="bodyKey" />
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control border-0" name="bodyValue" />
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+
+                                <button class="btn btn-outline-secondary" type="button" id="btn-cad-new-bodyKey">Adicionar Chave</button>
+                            </div>
+                            <div id="cad-raw-content" style="display: none">
+                                <table class="table" id="table-cad-raw-fields'">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">CAMPO</th>
+                                        <th scope="col">VALOR</th>
+                                        <th scope="col">OPERADOR</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td><input type="text" class="form-control border-0" name="campo" /></td>
+                                        <td><input type="text" class="form-control border-0" name="valor" /></td>
+                                        <td><select class="form-select" name="operador">
+                                            <option value="IGUAL" selected>IGUAL</option>
+                                            <option value="DIFERENTE">DIFERENTE</option>
+                                            <option value="MENOR">MENOR</option>
+                                            <option value="MAIOR">MAIOR</option>
+                                        </select></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div th:id="cad-jsonView">
+
+                </div>
+                <div th:id="cad-fieldsView">
+
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Fim do Fragmento -->
+
+
 </div>
 <div th:replace="fragments :: html_foot" />
 <div th:replace="fragments :: bootstrap-js" />

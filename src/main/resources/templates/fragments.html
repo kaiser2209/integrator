@@ -17,7 +17,17 @@
                                         $.post("/config/ws/cad/startConfig", $("#auth-fields-form").serialize()).done(function(data) {
 
                                             $("#with-auth-token").toggle(false);
+                                            $("#cad-config").replaceWith(data);
                                             $("#cad-config").toggle(true);
+
+                                            $("#btn-cad-new-key").click(function() {
+                                                var newLine = '<tr>' +
+                                                    '<th><input type="text" class="form-control border-0" name="key" /></th>' +
+                                                    '<th><input type="text" class="form-control border-0" name="value" /></th>' +
+                                                    '</tr>';
+
+                                                    $("#table-cad-header-keys tr:last").after(newLine);
+                                            });
                                         });
                                     });
                                 }
@@ -139,10 +149,17 @@
 
             $("#btn-new-key").click(function() {
                 var newLine = '<tr>' +
-                    '<th><input type="text" class="form-control border-0" name="key" /></th>' +
-                    '<th><input type="text" class="form-control border-0" name="value" /></th>' +
+                    '<td><input type="text" class="form-control border-0" name="key" /></td>' +
+                    '<td><input type="text" class="form-control border-0" name="value" /><td>' +
+                    '<td><button type="button" class="btn"><i class="fas fa-backspace text-danger"></i></button></td>' +
                     '</tr>';
                 $("#table-header-keys tr:last").after(newLine);
+                var line = $("#table-header-keys").find("tr").last();
+                var button = $(line).find("button").last();
+
+                $(button).click(function() {
+                    $(line).remove();
+                });
             });
 
             $("#btn-auth-new-key").click(function() {
