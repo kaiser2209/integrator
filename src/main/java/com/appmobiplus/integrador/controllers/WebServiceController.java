@@ -225,7 +225,6 @@ public class WebServiceController {
 
         for(int i = 0; i < key.length; i++) {
             headers.add(key[i], value[i]);
-            System.out.println(key[i]+ ":" + value[i]);
         }
 
         BuscaCadProdutos buscaCadProdutos = new BuscaCadProdutos();
@@ -235,36 +234,87 @@ public class WebServiceController {
         ObjectMapper mapper = new ObjectMapper();
         String json = mapper.writeValueAsString(buscaCadProdutos);
 
-        System.out.println("Json:" + json);
-
         HttpEntity<String> request = new HttpEntity<>(json, headers);
 
         ResponseEntity<String> response = restTemplate.exchange(ws_path, method, request, String.class);
 
-        System.out.println(response);
-
         map.addAttribute("result", FileUtils.getFormattedJson(response.getBody()));
+        map.addAttribute("headers", headers);
 
         return "dataFragments :: #cadJsonView";
     }
 
-    @PostMapping(value = "/config/ws/cad/loadFieldsValue", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
-    public String loadFieldValues(ModelMap map,
-                                  String json) throws JsonProcessingException {
+    @PostMapping(value = "/config/ws/cad/loadFields", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
+    public String loadFields(ModelMap map,
+                                  @RequestParam String json,
+                                  @RequestParam String[] headerKey,
+                                  @RequestParam String[] headerValue) throws JsonProcessingException {
+
+        Map<String, String> headerMap = new HashMap<>();
+
+        for(int i = 0; i < headerKey.length; i++) {
+            headerMap.put(headerKey[i], headerValue[i]);
+        }
 
         JsonNode jsonNode = JsonUtils.getJsonObject(json);
-
-        for (Iterator<String> it = jsonNode.fieldNames(); it.hasNext(); ) {
-            String f = it.next();
-            System.out.println("Campo: " + f);
-        }
 
         List<String> fields = JsonUtils.getJsonFields(jsonNode.get("data").get(0));
 
         map.addAttribute("fields", fields);
+        map.addAttribute("headers", headerMap);
+        map.addAttribute("json", json);
+
+        return "dataFragments :: #cad-findValueContent";
+    }
+
+    @PostMapping(value = "/config/ws/cad/loadFieldsValues", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
+    public String loadFieldsValues(ModelMap map,
+                                   @RequestParam HttpMethod method,
+                                   @RequestParam String ws_path,
+                                   @RequestParam String campo,
+                                   @RequestParam long valor,
+                                   @RequestParam String operador,
+                                   @RequestParam String jsonProduto,
+                                   @RequestParam String[] key,
+                                   @RequestParam String[] value) throws JsonProcessingException {
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders httpHeaders = new HttpHeaders();
+
+        for(int i = 0; i < key.length; i++) {
+            httpHeaders.add(key[i], value[i]);
+        }
+
+        BuscaCadProdutos buscaCadProdutos = new BuscaCadProdutos();
+        buscaCadProdutos.setPage(1);
+        buscaCadProdutos.addClausula(campo, valor, operador);
+
+        ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writeValueAsString(buscaCadProdutos);
+
+        HttpEntity<String> request = new HttpEntity<>(json, httpHeaders);
+
+        ResponseEntity<String> response = restTemplate.exchange(ws_path, method, request, String.class);
+
+        map.addAttribute("result", FileUtils.getFormattedJson(response.getBody()));
+
+        JsonNode jsonNodeProduto = JsonUtils.getJsonObject(jsonProduto);
+        JsonNode jsonNodeCusto = JsonUtils.getJsonObject(FileUtils.getFormattedJson(response.getBody()));
+
+        List<String> fields = JsonUtils.getJsonFields(jsonNodeProduto.get("data").get(0));
+        List<String> fieldsCusto = JsonUtils.getJsonFields(jsonNodeCusto.get("data").get(0));
+        List<String> fieldsToAdd = new ArrayList<>();
+
+        for(String f : fieldsCusto) {
+            if(!fields.contains(f)) {
+                fieldsToAdd.add(f);
+            }
+        }
+
+        fields.addAll(fieldsToAdd);
 
         System.out.println(fields.toString());
 
-        return "dataFragments :: #cad-findValueContent";
+        return "dataFragments :: #cadFieldsValues";
     }
 }

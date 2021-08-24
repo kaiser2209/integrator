@@ -219,13 +219,20 @@
                         </div>
                     </div>
                 </div>
+            </form>
+            <form id="form-sendJsonToFindValue">
                 <div id="cad-jsonView">
 
                 </div>
+            </form>
+            <form id="form-loadFieldsValue">
                 <div id="cad-findValue">
 
                 </div>
             </form>
+            <div id="cad-fieldsValues">
+
+            </div>
         </div>
     </div>
     <!-- Fim do Fragmento -->
@@ -233,18 +240,35 @@
     <!-- Fragmento para visualização do Json dos Produtos -->
     <div id="cadJsonView">
         <div class="border round p-3 my-3 overflow-auto" style="max-height: 15em">
-                <pre id="cad-json" th:text="${result}">
+            <pre id="cad-json" th:text="${result}">
 
-                </pre>
+            </pre>
         </div>
         <div class="pb-3 d-grid justify-content-end">
             <button type="button" class="btn btn-outline-secondary" id="cad-findProdValue">Buscar Valor do Produto</button>
         </div>
+        <input type="hidden" name="json" th:value="${result}">
+        <div th:each="header: ${headers}">
+        <input type="hidden" name="headerKey" th:value="${header.key}" />
+        <input type="hidden" name="headerValue" th:each="headerValue : ${header.value}" th:value="${headerValue}" />
+        </div>
     </div>
     <!-- Fim do fragmento -->
 
+    <!-- Fragmento Retorno Campos de Busca -->
     <div id="cad-findValueContent">
         <div class="border round p-3">
+            <div class="input-group">
+                <div class="col-1">
+                    <select class="form-select bg-secondary text-white" name="method">
+                        <option selected value="GET">GET</option>
+                        <option value="POST">POST</option>
+                    </select>
+                </div>
+                <input type="hidden" name="integrationType" value="WEB_SERVICE" />
+                <input type="text" class="form-control" name="ws_path" aria-describedby="next" aria-label="Próximo" required />
+                <button type="button" class="btn btn-outline-secondary" id="cad-buscaCusto">Próximo</button>
+            </div>
             <table class="table" id="table-findValue">
                 <thead>
                 <tr>
@@ -270,7 +294,49 @@
                 </tbody>
             </table>
         </div>
+        <input type="hidden" name="jsonProduto" th:value="${json}" />
+        <div th:each="header : ${headers}">
+            <input type="hidden" name="key" th:value="${header.key}" />
+            <input type="hidden" name="value" th:value="${header.value}" />
+        </div>
     </div>
+    <!-- Fim do Fragmento -->
+
+    <div id="cadFieldsValues">
+        <div class="border round p-3 my-3 overflow-auto" style="max-height: 15em">
+            <pre id="value-json" th:text="${result}">
+
+            </pre>
+        </div>
+        <div class="input-group pb-1">
+            <span class="input-group-text" style="min-width: 10em">ean</span>
+            <input type="hidden" name="newName" value="ean" />
+        </div>
+        <div class="input-group pb-1">
+            <span class="input-group-text" style="min-width: 10em">descricao</span>
+            <input type="hidden" name="newName" value="descricao" />
+        </div>
+        <div class="input-group pb-1">
+            <span class="input-group-text" style="min-width: 10em">preco_de</span>
+            <input type="hidden" name="newName" value="preco_de" />
+        </div>
+        <div class="input-group pb-1">
+            <span class="input-group-text" style="min-width: 10em">preco_por</span>
+            <input type="hidden" name="newName" value="preco_por" />
+        </div>
+        <div class="input-group pb-1">
+            <span class="input-group-text" style="min-width: 10em">link_image</span>
+            <input type="hidden" name="newName" value="link_image" />
+        </div>
+        <div class="input-group pb-1">
+            <span class="input-group-text" style="min-width: 10em">sugestoes</span>
+            <input type="hidden" name="newName" value="sugestoes" />
+        </div>
+    </div>
+
+    <select th:fragment="selectFields(fields)">
+
+    </select>
 </div>
 <div th:replace="fragments :: html_foot" />
 <div th:replace="fragments :: bootstrap-js" />

@@ -74,63 +74,31 @@
             </div>
         </div>
         <!--Final da área relativa à autenticação com token fixo-->
-        <div class="tab-pane fade collapse show" id="with-auth-token" role="tabpanel" aria-labelledby="with-auth-token">
+        <div class="tab-pane fade" id="with-auth-token" role="tabpanel" aria-labelledby="with-auth-token">
             <!--  <div th:replace="fragments :: pageWebService(typeWebService='auth', action='/config/ws/auth/startConfig')" /> -->
-            <div class="row m-3 border rounded">
-                <form class="col-sm-12" method="POST" action="/config/ws/auth/startConfig" id="auth-form" enctype="application/x-www-form-urlencoded">
-                    <div class="input-group py-3">
-                        <div class="col-1">
-                            <select class="form-select bg-secondary text-white" name="method">
-                                <option selected value="GET">GET</option>
-                                <option value="POST">POST</option>
-                            </select>
-                        </div>
-                        <input type="hidden" name="integrationType" value="WEB_SERVICE" />
-                        <input type="text" class="form-control" name="ws_path" aria-describedby="next" aria-label="Próximo" required />
-                        <button type="button" class="btn btn-outline-secondary" id="auth-send">Próximo</button>
-                    </div>
-                    <div class="border rounder p-3 mb-3">
-                        <div class="nav nav-tabs" id="auth-keys" role="tablist">
-                            <button class="nav-link active" id="auth-header-tab" data-bs-toggle="tab" data-bs-target="#auth-header" type="button" role="tab" aria-controls="auth-header" aria-selected="true">Header</button>
-                            <button class="nav-link" id="auth-body-tab" data-bs-toggle="tab" data-bs-target="#auth-body" type="button" role="tab" aria-controls="auth-body" aria-selected="false">Body</button>
-                        </div>
-                        <div class="tab-content" id="auth-content">
-                            <div class="tab-pane fade show active" id="auth-header" role="tabpanel" aria-labelledby="auth-header">
-
-                                <table class="table" id="table-auth-header-keys" >
-                                    <thead>
-                                    <tr>
-                                        <th scope="col">CHAVE</th>
-                                        <th scope="col">VALOR</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr>
-                                        <td>
-                                            <input type="text" class="form-control border-0" name="headerKey" />
-                                        </td>
-                                        <td>
-                                            <input type="text" class="form-control border-0" name="headerValue" />
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-
-                                <button class="btn btn-outline-secondary" type="button" id="btn-auth-new-key">Adicionar Chave</button>
+            <div class="collapse show" id="cad-settings">
+                <div class="row m-3 border rounded">
+                    <form class="col-sm-12" method="POST" action="/config/ws/auth/startConfig" id="auth-form" enctype="application/x-www-form-urlencoded">
+                        <div class="input-group py-3">
+                            <div class="col-1">
+                                <select class="form-select bg-secondary text-white" name="method">
+                                    <option selected value="GET">GET</option>
+                                    <option value="POST">POST</option>
+                                </select>
                             </div>
-                            <div class="tab-pane fade" id="auth-body" role="tabpanel" aria-labelledby="auth-body">
-                                <div class="p-3">
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="auth-bodyType" value="x-www-form-urlencoded" id="auth-urlencoded" checked>
-                                        <label class="form-check-label" for="auth-urlencoded">x-www-form-urlencoded</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="auth-bodyType" value="raw" id="auth-raw">
-                                        <label class="form-check-label" for="auth-raw">raw</label>
-                                    </div>
-                                </div>
-                                <div id="auth-urlencoded-content">
-                                    <table class="table" id="table-auth-body-keys">
+                            <input type="hidden" name="integrationType" value="WEB_SERVICE" />
+                            <input type="text" class="form-control" name="ws_path" aria-describedby="next" aria-label="Próximo" required />
+                            <button type="button" class="btn btn-outline-secondary" id="auth-send">Próximo</button>
+                        </div>
+                        <div class="border rounder p-3 mb-3">
+                            <div class="nav nav-tabs" id="auth-keys" role="tablist">
+                                <button class="nav-link active" id="auth-header-tab" data-bs-toggle="tab" data-bs-target="#auth-header" type="button" role="tab" aria-controls="auth-header" aria-selected="true">Header</button>
+                                <button class="nav-link" id="auth-body-tab" data-bs-toggle="tab" data-bs-target="#auth-body" type="button" role="tab" aria-controls="auth-body" aria-selected="false">Body</button>
+                            </div>
+                            <div class="tab-content" id="auth-content">
+                                <div class="tab-pane fade show active" id="auth-header" role="tabpanel" aria-labelledby="auth-header">
+
+                                    <table class="table" id="table-auth-header-keys" >
                                         <thead>
                                         <tr>
                                             <th scope="col">CHAVE</th>
@@ -140,55 +108,90 @@
                                         <tbody>
                                         <tr>
                                             <td>
-                                                <input type="text" class="form-control border-0" name="bodyKey" />
+                                                <input type="text" class="form-control border-0" name="headerKey" />
                                             </td>
                                             <td>
-                                                <input type="text" class="form-control border-0" name="bodyValue" />
+                                                <input type="text" class="form-control border-0" name="headerValue" />
                                             </td>
                                         </tr>
                                         </tbody>
                                     </table>
 
-                                    <button class="btn btn-outline-secondary" type="button" id="btn-auth-new-bodyKey">Adicionar Chave</button>
+                                    <button class="btn btn-outline-secondary" type="button" id="btn-auth-new-key">Adicionar Chave</button>
                                 </div>
-                                <div id="auth-raw-content" style="display: none">
-                                    <table class="table" id="table-auth-raw-fields">
-                                        <thead>
-                                        <tr>
-                                            <th scope="col">CAMPO</th>
-                                            <th scope="col">VALOR</th>
-                                            <th scope="col">OPERADOR</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <tr>
-                                            <td><input type="text" class="form-control border-0" name="campo" /></td>
-                                            <td><input type="text" class="form-control border-0" name="valor" /></td>
-                                            <td><select class="form-select" name="operador">
-                                                <option value="IGUAL" selected>IGUAL</option>
-                                                <option value="DIFERENTE">DIFERENTE</option>
-                                                <option value="MENOR">MENOR</option>
-                                                <option value="MAIOR">MAIOR</option>
-                                            </select></td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
+                                <div class="tab-pane fade" id="auth-body" role="tabpanel" aria-labelledby="auth-body">
+                                    <div class="p-3">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="auth-bodyType" value="x-www-form-urlencoded" id="auth-urlencoded" checked>
+                                            <label class="form-check-label" for="auth-urlencoded">x-www-form-urlencoded</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="auth-bodyType" value="raw" id="auth-raw">
+                                            <label class="form-check-label" for="auth-raw">raw</label>
+                                        </div>
+                                    </div>
+                                    <div id="auth-urlencoded-content">
+                                        <table class="table" id="table-auth-body-keys">
+                                            <thead>
+                                            <tr>
+                                                <th scope="col">CHAVE</th>
+                                                <th scope="col">VALOR</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td>
+                                                    <input type="text" class="form-control border-0" name="bodyKey" />
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control border-0" name="bodyValue" />
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <button class="btn btn-outline-secondary" type="button" id="btn-auth-new-bodyKey">Adicionar Chave</button>
+                                    </div>
+                                    <div id="auth-raw-content" style="display: none">
+                                        <table class="table" id="table-auth-raw-fields">
+                                            <thead>
+                                            <tr>
+                                                <th scope="col">CAMPO</th>
+                                                <th scope="col">VALOR</th>
+                                                <th scope="col">OPERADOR</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td><input type="text" class="form-control border-0" name="campo" /></td>
+                                                <td><input type="text" class="form-control border-0" name="valor" /></td>
+                                                <td><select class="form-select" name="operador">
+                                                    <option value="IGUAL" selected>IGUAL</option>
+                                                    <option value="DIFERENTE">DIFERENTE</option>
+                                                    <option value="MENOR">MENOR</option>
+                                                    <option value="MAIOR">MAIOR</option>
+                                                </select></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div id="auth-jsonView">
+                    </form>
+                        <div id="auth-jsonView">
 
-                    </div>
-                    <div id="auth-fieldsView">
+                        </div>
+                        <div id="auth-fieldsView">
 
-                    </div>
-                </form>
+                        </div>
+                </div>
             </div>
-        </div>
-
-        <div id="cad-config" class="collapse">
-            <!-- <div th:replace="fragments :: pageWebService(typeWebService='cad', action='/config/ws/cad/startConfig')" /> -->
+            <form>
+                <div id="cad-config" class="collapse">
+                    <!-- <div th:replace="fragments :: pageWebService(typeWebService='cad', action='/config/ws/cad/startConfig')" /> -->
+                </div>
+            </form>
         </div>
     </div>
 

@@ -16,7 +16,7 @@
                                     $("#goToCadConfig").click(function() {
                                         $.post("/config/ws/cad/startConfig", $("#auth-fields-form").serialize()).done(function(data) {
 
-                                            $("#with-auth-token").toggle(false);
+                                            $("#cad-settings").toggle(false);
                                             $("#cad-config").replaceWith(data);
                                             $("#cad-config").toggle(true);
 
@@ -45,13 +45,20 @@
 
                                                     $("#cad-findProdValue").click(function() {
                                                         var jsonCadProd = $("#cad-json").text();
-                                                        $.post("/config/ws/cad/loadFieldsValue", { json: jsonCadProd } ).done(function(data) {
+                                                        $.post("/config/ws/cad/loadFields", $("#form-sendJsonToFindValue").serialize() ).done(function(data) {
                                                             $("#cad-findValue").replaceWith(data);
 
                                                             $("#cad-selectField").change(function() {
                                                                 var json = JSON.parse(jsonCadProd);
                                                                 var value = json['data'][0][$(this).val()];
                                                                 $("#cad-selectFieldValue").val(value);
+                                                            });
+
+                                                            $("#cad-buscaCusto").click(function() {
+                                                                $.post("/config/ws/cad/loadFieldsValues", $("#form-loadFieldsValue").serialize()).done(function(data) {
+
+                                                                    $("#cad-fieldsValues").replaceWith(data);
+                                                                });
                                                             });
                                                         });
                                                     });
