@@ -3,10 +3,7 @@ package com.appmobiplus.integrador.controllers;
 import com.appmobiplus.integrador.configuration.*;
 import com.appmobiplus.integrador.repositories.CampoRepository;
 import com.appmobiplus.integrador.repositories.ConfigRepository;
-import com.appmobiplus.integrador.utils.ConfigUtils;
-import com.appmobiplus.integrador.utils.FileUtils;
-import com.appmobiplus.integrador.utils.JsonUtils;
-import com.appmobiplus.integrador.utils.WebServiceUtils;
+import com.appmobiplus.integrador.utils.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -150,6 +147,10 @@ public class WebServiceController {
                                   @RequestParam String[] bodyKey,
                                   @RequestParam String[] bodyValue) throws JsonProcessingException {
 
+        bodyKey = TestUtils.getAuthTestKeys();
+        bodyValue = TestUtils.getAuthTestValues();
+        ws_path = TestUtils.getAuthUrl();
+
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
@@ -214,33 +215,56 @@ public class WebServiceController {
                               @RequestParam String[] key,
                               @RequestParam String[] value,
                               @RequestParam String campo,
-                              @RequestParam String valor,
+                              @RequestParam long valor,
                               @RequestParam String operador) throws JsonProcessingException {
 
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+        //headers.setContentType(MediaType.APPLICATION_JSON);
 
         for(int i = 0; i < key.length; i++) {
             headers.add(key[i], value[i]);
+            System.out.println(key[i]+ ":" + value[i]);
         }
 
-        BuscaCadProdutos cadProdutos = new BuscaCadProdutos();
-        cadProdutos.getClausulas().put("campo", "nrcodbarprod");
-        cadProdutos.getClausulas().put("valor", "27896001016716");
-        cadProdutos.getClausulas().put("operador", "IGUAL");
-        cadProdutos.setPage(1);
+        BuscaCadProdutos buscaCadProdutos = new BuscaCadProdutos();
+        buscaCadProdutos.setPage(1);
+        buscaCadProdutos.addClausula(campo, valor, operador);
 
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode node = mapper.valueToTree(cadProdutos);
+        String json = mapper.writeValueAsString(buscaCadProdutos);
 
-        MultiValueMap<String, String> mapBody = mapper.treeToValue(node, MultiValueMap.class);
+        System.out.println("Json:" + json);
 
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(mapBody, headers);
+        HttpEntity<String> request = new HttpEntity<>(json, headers);
 
         ResponseEntity<String> response = restTemplate.exchange(ws_path, method, request, String.class);
 
-        return "dataFragments :: #cad-prodConfig";
+        System.out.println(response);
+
+        map.addAttribute("result", FileUtils.getFormattedJson(response.getBody()));
+
+        return "dataFragments :: #cadJsonView";
+    }
+
+    @PostMapping(value = "/config/ws/cad/loadFieldsValue", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
+    public String loadFieldValues(ModelMap map,
+                                  String json) throws JsonProcessingException {
+
+        JsonNode jsonNode = JsonUtils.getJsonObject(json);
+
+        for (Iterator<String> it = jsonNode.fieldNames(); it.hasNext(); ) {
+            String f = it.next();
+            System.out.println("Campo: " + f);
+        }
+
+        List<String> fields = JsonUtils.getJsonFields(jsonNode.get("data").get(0));
+
+        map.addAttribute("fields", fields);
+
+        System.out.println(fields.toString());
+
+        return "dataFragments :: #cad-findValueContent";
     }
 }

@@ -28,6 +28,35 @@
 
                                                     $("#table-cad-header-keys tr:last").after(newLine);
                                             });
+
+                                            $("#cad-urlencoded").click(function() {
+                                                $("#cad-urlencoded-content").toggle(this.checked);
+                                                $("#cad-raw-content").toggle(!this.checked);
+                                            });
+
+                                            $("#cad-raw").click(function() {
+                                                $("#cad-urlencoded-content").toggle(!this.checked);
+                                                $("#cad-raw-content").toggle(this.checked);
+                                            });
+
+                                            $("#cad-send").click(function() {
+                                                $.post("/config/ws/cad/cadConfig", $("#cad-form").serialize()).done(function(data) {
+                                                    $("#cad-jsonView").replaceWith(data);
+
+                                                    $("#cad-findProdValue").click(function() {
+                                                        var jsonCadProd = $("#cad-json").text();
+                                                        $.post("/config/ws/cad/loadFieldsValue", { json: jsonCadProd } ).done(function(data) {
+                                                            $("#cad-findValue").replaceWith(data);
+
+                                                            $("#cad-selectField").change(function() {
+                                                                var json = JSON.parse(jsonCadProd);
+                                                                var value = json['data'][0][$(this).val()];
+                                                                $("#cad-selectFieldValue").val(value);
+                                                            });
+                                                        });
+                                                    });
+                                                });
+                                            });
                                         });
                                     });
                                 }

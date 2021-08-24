@@ -67,6 +67,7 @@
             </div>
         </div>
     </div>
+
     <div id="auth-jsonView">
         <div class="border round p-3 my-3 overflow-auto" style="max-height: 15em">
                 <pre id="auth-json" th:text="${result}">
@@ -77,6 +78,7 @@
             <button type="button" class="btn btn-outline-secondary" id="auth-getJsonFields">Carregar Campos</button>
         </div>
     </div>
+
     <div id="auth-jsonFields">
         <h5 class="text-center display-6">Escolha os campos para definir a Chave de Autorização</h5>
         <form method="post" id="auth-fields-form" enctype="application/x-www-form-urlencoded">
@@ -147,10 +149,10 @@
                                 <tbody>
                                 <tr>
                                     <td>
-                                        <input type="text" class="form-control border-0" name="headerKey" th:value="${headerKey}" />
+                                        <input type="text" class="form-control border-0" name="key" th:value="${headerKey}" />
                                     </td>
                                     <td>
-                                        <input type="text" class="form-control border-0" name="headerValue" th:value="${headerValue}" />
+                                        <input type="text" class="form-control border-0" name="value" th:value="${headerValue}" />
                                     </td>
                                 </tr>
                                 </tbody>
@@ -217,10 +219,10 @@
                         </div>
                     </div>
                 </div>
-                <div th:id="cad-jsonView">
+                <div id="cad-jsonView">
 
                 </div>
-                <div th:id="cad-fieldsView">
+                <div id="cad-findValue">
 
                 </div>
             </form>
@@ -228,7 +230,47 @@
     </div>
     <!-- Fim do Fragmento -->
 
+    <!-- Fragmento para visualização do Json dos Produtos -->
+    <div id="cadJsonView">
+        <div class="border round p-3 my-3 overflow-auto" style="max-height: 15em">
+                <pre id="cad-json" th:text="${result}">
 
+                </pre>
+        </div>
+        <div class="pb-3 d-grid justify-content-end">
+            <button type="button" class="btn btn-outline-secondary" id="cad-findProdValue">Buscar Valor do Produto</button>
+        </div>
+    </div>
+    <!-- Fim do fragmento -->
+
+    <div id="cad-findValueContent">
+        <div class="border round p-3">
+            <table class="table" id="table-findValue">
+                <thead>
+                <tr>
+                    <th scope="col">CAMPO</th>
+                    <th scope="col">VALOR</th>
+                    <th scope="col">OPERADOR</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><select class="form-select" name="campo" id="cad-selectField">
+                        <option value="0" selected name="selectField">Escolha um campo</option>
+                        <option th:each="field : ${fields}" th:value="${field}" th:text="${field}"></option>
+                    </select></td>
+                    <td><input type="text" class="form-control border-0" name="valor" th:value="${value}" id="cad-selectFieldValue" /></td>
+                    <td><select class="form-select" name="operador">
+                        <option value="IGUAL" selected>IGUAL</option>
+                        <option value="DIFERENTE">DIFERENTE</option>
+                        <option value="MENOR">MENOR</option>
+                        <option value="MAIOR">MAIOR</option>
+                    </select></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 <div th:replace="fragments :: html_foot" />
 <div th:replace="fragments :: bootstrap-js" />
