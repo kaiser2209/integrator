@@ -9,15 +9,18 @@ import java.util.Map;
 public class ConfigAuth implements Serializable {
     private String path;
     private HttpMethod methodType;
+    private HeaderAuth headerAuth;
     private Map<String, String> bodyParameters;
     private String[] authFields;
 
     public ConfigAuth(String path,
                       HttpMethod methodType,
+                      HeaderAuth headerAuth,
                       Map<String, String> bodyParameters,
                       String[] authFields) {
         this.path = path;
         this.methodType = methodType;
+        this.headerAuth = headerAuth;
         this.bodyParameters = bodyParameters;
         this.authFields = authFields;
     }
@@ -36,6 +39,14 @@ public class ConfigAuth implements Serializable {
 
     public void setMethodType(HttpMethod methodType) {
         this.methodType = methodType;
+    }
+
+    public HeaderAuth getHeaderAuth() {
+        return headerAuth;
+    }
+
+    public void setHeaderAuth(HeaderAuth headerAuth) {
+        this.headerAuth = headerAuth;
     }
 
     public Map<String, String> getBodyParameters() {

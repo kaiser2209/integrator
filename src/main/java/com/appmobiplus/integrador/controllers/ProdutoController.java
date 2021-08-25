@@ -1,10 +1,6 @@
 package com.appmobiplus.integrador.controllers;
 
-import com.appmobiplus.integrador.configuration.Produto;
-import com.appmobiplus.integrador.configuration.Config;
-import com.appmobiplus.integrador.configuration.Field;
-import com.appmobiplus.integrador.configuration.Header;
-import com.appmobiplus.integrador.configuration.IntegrationType;
+import com.appmobiplus.integrador.configuration.*;
 import com.appmobiplus.integrador.exceptions.ResourceNotFoundException;
 import com.appmobiplus.integrador.json.ProdutoJson;
 import com.appmobiplus.integrador.repositories.ProdutoRepository;
@@ -79,9 +75,9 @@ public class ProdutoController {
             }
         } else if (config.getIntegrationType() == IntegrationType.WEB_SERVICE) {
             try {
-                Set<Header> headers = config.getHeaders();
+                Set<HeaderAuth> headers = config.getHeaders();
                 HttpHeaders httpHeaders = new HttpHeaders();
-                for (Header h : headers) {
+                for (HeaderAuth h : headers) {
                     httpHeaders.add(h.getKey(), h.getValue());
                 }
 

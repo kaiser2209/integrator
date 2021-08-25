@@ -2,6 +2,7 @@ package com.appmobiplus.integrador.utils;
 
 import com.appmobiplus.integrador.configuration.Config;
 import com.appmobiplus.integrador.configuration.ConfigAuth;
+import com.appmobiplus.integrador.configuration.ConfigCadastroProdutos;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.*;
@@ -15,6 +16,7 @@ public class ConfigUtils {
     private static Config config;
     public static String lastErrorMessage;
     private static ConfigAuth configAuth;
+    private static ConfigCadastroProdutos configCadastroProdutos;
 
     public static boolean saveConfig(Config config) {
         try {
@@ -94,5 +96,21 @@ public class ConfigUtils {
 
     public static ConfigAuth getConfigAuth() {
         return configAuth;
+    }
+
+    public static void setConfigCadastroProdutos(ConfigCadastroProdutos configCadastroProdutos) {
+        ConfigUtils.configCadastroProdutos = configCadastroProdutos;
+    }
+
+    public static ConfigCadastroProdutos getConfigCadastroProdutos() {
+        return configCadastroProdutos;
+    }
+
+    public static Config getConfig() {
+        return config;
+    }
+
+    public static void setConfig(Config config) {
+        ConfigUtils.config = config;
     }
 }

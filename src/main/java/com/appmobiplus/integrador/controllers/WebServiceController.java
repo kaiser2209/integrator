@@ -117,9 +117,9 @@ public class WebServiceController {
             }
         }
 
-        Set<Header> headers = new HashSet<>();
+        Set<HeaderAuth> headers = new HashSet<>();
         for(int i = 0; i < key.length; i++) {
-            Header h = new HeaderBuilder()
+            HeaderAuth h = new HeaderAuthBuilder()
                     .setKey(key[i])
                     .setValue(value[i])
                     .build();
@@ -168,24 +168,19 @@ public class WebServiceController {
         ResponseEntity<String> response = restTemplate.exchange(ws_path, method, request, String.class);
 
         map.addAttribute("result", FileUtils.getFormattedJson(response.getBody()));
-        map.addAttribute("authMethod", method);
-        map.addAttribute("authPath", ws_path);
-        map.addAttribute("authHeaderKey", headerKey);
-        map.addAttribute("authHeaderValue", headerValue);
-        map.addAttribute("authBodyKey", bodyKey);
-        map.addAttribute("authBodyValue", bodyValue);
 
         Map<String, String> authBodyKeys = new HashMap<>();
         for(int i = 0; i < bodyKey.length; i++) {
             authBodyKeys.put(bodyKey[i], bodyValue[i]);
         }
 
-        ConfigUtils.setConfigAuth(new ConfigAuthBuilder()
-                .setMethodType(method)
-                .setPath(ws_path)
-                .setBodyParameters(authBodyKeys)
+        ConfigUtils.setConfig(new ConfigBuilder()
+                .setConfigAuth(new ConfigAuthBuilder()
+                        .setMethodType(method)
+                        .setPath(ws_path)
+                        .setBodyParameters(authBodyKeys)
+                        .build())
                 .build());
-
 
         System.out.println(FileUtils.getFormattedJson(response.getBody()));
 
@@ -222,6 +217,13 @@ public class WebServiceController {
 
         authorizationValue = authorizationValue.trim();
 
+        HeaderAuth headerAuth = new HeaderAuthBuilder()
+                .setKey(key)
+                .setFieldsUsedInValue(value)
+                .build();
+
+        ConfigUtils.getConfig().getConfigAuth().setHeaderAuth(headerAuth);
+
         map.addAttribute("headerKey", key);
         map.addAttribute("headerValue", authorizationValue);
 
@@ -257,6 +259,13 @@ public class WebServiceController {
         HttpEntity<String> request = new HttpEntity<>(json, headers);
 
         ResponseEntity<String> response = restTemplate.exchange(ws_path, method, request, String.class);
+
+        ConfigUtils.getConfig().setConfigCadastroProdutos(new ConfigCadastroProdutosBuilder()
+                .setPath(ws_path)
+                .setMethod(method)
+                .build());
+
+        System.out.println(ConfigUtils.getConfig());
 
         map.addAttribute("result", FileUtils.getFormattedJson(response.getBody()));
         map.addAttribute("headers", headers);
@@ -336,8 +345,6 @@ public class WebServiceController {
         System.out.println(fields.toString());
 
         map.addAttribute("fields", fields);
-
-        System.out.println(ConfigUtils.getConfigAuth().toString());
 
         return "dataFragments :: #cadFieldsValues";
     }

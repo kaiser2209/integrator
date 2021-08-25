@@ -8,15 +8,18 @@ import java.util.Map;
 public class ConfigAuthBuilder {
     private String path;
     private HttpMethod methodType;
+    private HeaderAuth headerAuth;
     private Map<String, String> bodyParameters = new HashMap<>();
     private String[] authFields;
 
     public ConfigAuthBuilder(String path,
                              HttpMethod methodType,
+                             HeaderAuth headerAuth,
                              Map<String, String> bodyParameters,
                              String[] authFields) {
         this.path = path;
         this.methodType = methodType;
+        this.headerAuth = headerAuth;
         this.bodyParameters = bodyParameters;
         this.authFields = authFields;
     }
@@ -32,6 +35,11 @@ public class ConfigAuthBuilder {
 
     public ConfigAuthBuilder setMethodType(HttpMethod methodType) {
         this.methodType = methodType;
+        return this;
+    }
+
+    public ConfigAuthBuilder setHeaderAuth(HeaderAuth headerAuth) {
+        this.headerAuth = headerAuth;
         return this;
     }
 
@@ -51,6 +59,6 @@ public class ConfigAuthBuilder {
     }
 
     public ConfigAuth build() {
-        return new ConfigAuth(path, methodType, bodyParameters, authFields);
+        return new ConfigAuth(path, methodType, headerAuth, bodyParameters, authFields);
     }
 }

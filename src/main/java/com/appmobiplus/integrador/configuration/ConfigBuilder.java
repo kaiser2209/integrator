@@ -11,7 +11,7 @@ public class ConfigBuilder {
     private IntegrationType integrationType;
     private String path;
     private Set<Field> fields = new HashSet<>();
-    private Set<Header> headers = new HashSet<>();
+    private Set<HeaderAuth> headers = new HashSet<>();
     private Map<String, String> parameters = new HashMap<>();
     private boolean hasDelimiter;
     private String delimiter;
@@ -23,7 +23,7 @@ public class ConfigBuilder {
     public ConfigBuilder(IntegrationType integrationType,
                          String path,
                          Set<Field> fields,
-                         Set<Header> headers,
+                         Set<HeaderAuth> headers,
                          Map<String, String> parameters,
                          boolean hasDelimiter,
                          String delimiter,
@@ -72,12 +72,12 @@ public class ConfigBuilder {
         return this;
     }
 
-    public ConfigBuilder setHeaders(Set<Header> headers) {
+    public ConfigBuilder setHeaders(Set<HeaderAuth> headers) {
         this.headers = headers;
         return this;
     }
 
-    public ConfigBuilder addHeaders(Header header) {
+    public ConfigBuilder addHeaders(HeaderAuth header) {
         this.headers.add(header);
         return this;
     }

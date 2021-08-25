@@ -9,7 +9,7 @@ public class Config implements Serializable {
     private String path;
     private Map<String, String> parameters;
     private Set<Field> fields;
-    private Set<Header> headers;
+    private Set<HeaderAuth> headers;
     private boolean hasDelimiter;
     private String delimiter;
     private long fileLastModified;
@@ -20,7 +20,7 @@ public class Config implements Serializable {
     protected Config(IntegrationType integrationType,
                      String path,
                      Set<Field> fields,
-                     Set<Header> headers,
+                     Set<HeaderAuth> headers,
                      Map<String, String> parameters,
                      boolean hasDelimiter,
                      String delimiter,
@@ -65,11 +65,11 @@ public class Config implements Serializable {
         this.fields = fields;
     }
 
-    public Set<Header> getHeaders() {
+    public Set<HeaderAuth> getHeaders() {
         return headers;
     }
 
-    public void setHeaders(Set<Header> headers) {
+    public void setHeaders(Set<HeaderAuth> headers) {
         this.headers = headers;
     }
 
@@ -134,6 +134,7 @@ public class Config implements Serializable {
         return "IntegrationType: " + integrationType + "\n" +
                 "Path: " + path + "\n" +
                 "Fields: " + fields.toString() + "\n" +
-                "Headers: " + headers.toString();
+                "Headers: " + headers.toString() + "\n" +
+                "ConfigAuth: " + configAuth.toString();
     }
 }
