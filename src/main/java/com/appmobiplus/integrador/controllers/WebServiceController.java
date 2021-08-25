@@ -31,6 +31,8 @@ public class WebServiceController {
     @Autowired
     CampoRepository campoRepository;
 
+
+
     @PostMapping(value = "/config/ws/startConfig", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
     public String teste(ModelMap map,
                         @RequestParam String[] key,
@@ -166,6 +168,24 @@ public class WebServiceController {
         ResponseEntity<String> response = restTemplate.exchange(ws_path, method, request, String.class);
 
         map.addAttribute("result", FileUtils.getFormattedJson(response.getBody()));
+        map.addAttribute("authMethod", method);
+        map.addAttribute("authPath", ws_path);
+        map.addAttribute("authHeaderKey", headerKey);
+        map.addAttribute("authHeaderValue", headerValue);
+        map.addAttribute("authBodyKey", bodyKey);
+        map.addAttribute("authBodyValue", bodyValue);
+
+        Map<String, String> authBodyKeys = new HashMap<>();
+        for(int i = 0; i < bodyKey.length; i++) {
+            authBodyKeys.put(bodyKey[i], bodyValue[i]);
+        }
+
+        ConfigUtils.setConfigAuth(new ConfigAuthBuilder()
+                .setMethodType(method)
+                .setPath(ws_path)
+                .setBodyParameters(authBodyKeys)
+                .build());
+
 
         System.out.println(FileUtils.getFormattedJson(response.getBody()));
 
@@ -315,6 +335,16 @@ public class WebServiceController {
 
         System.out.println(fields.toString());
 
+        map.addAttribute("fields", fields);
+
+        System.out.println(ConfigUtils.getConfigAuth().toString());
+
         return "dataFragments :: #cadFieldsValues";
+    }
+
+    @PostMapping(value = "/config/ws/cad/saveConfig", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
+    public String loadFieldsValues(ModelMap map) {
+
+        return "dataFragments :: #cadSaveValues";
     }
 }

@@ -1,6 +1,7 @@
 package com.appmobiplus.integrador.configuration;
 
 import org.springframework.http.HttpMethod;
+import org.thymeleaf.util.ArrayUtils;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -9,13 +10,16 @@ public class ConfigAuth implements Serializable {
     private String path;
     private HttpMethod methodType;
     private Map<String, String> bodyParameters;
+    private String[] authFields;
 
     public ConfigAuth(String path,
                       HttpMethod methodType,
-                      Map<String, String> bodyParameters) {
+                      Map<String, String> bodyParameters,
+                      String[] authFields) {
         this.path = path;
         this.methodType = methodType;
         this.bodyParameters = bodyParameters;
+        this.authFields = authFields;
     }
 
     public String getPath() {
@@ -40,5 +44,20 @@ public class ConfigAuth implements Serializable {
 
     public void setBodyParameters(Map<String, String> bodyParameters) {
         this.bodyParameters = bodyParameters;
+    }
+
+    public String[] getAuthFields() {
+        return authFields;
+    }
+
+    public void setAuthFields(String[] authFields) {
+        this.authFields = authFields;
+    }
+
+    public String toString() {
+        return "[Path= " + this.path +
+                this.methodType +
+                this.bodyParameters.toString() +
+                "]";
     }
 }

@@ -311,31 +311,41 @@
         <div class="input-group pb-1">
             <span class="input-group-text" style="min-width: 10em">ean</span>
             <input type="hidden" name="newName" value="ean" />
+            <select th:replace="dataFragments :: selectFields(fields = ${fields}, name = 'originalName')" />
         </div>
         <div class="input-group pb-1">
             <span class="input-group-text" style="min-width: 10em">descricao</span>
             <input type="hidden" name="newName" value="descricao" />
+            <select th:replace="dataFragments :: selectFields(fields = ${fields}, name = 'originalName')" />
         </div>
         <div class="input-group pb-1">
             <span class="input-group-text" style="min-width: 10em">preco_de</span>
             <input type="hidden" name="newName" value="preco_de" />
+            <select th:replace="dataFragments :: selectFields(fields = ${fields}, name = 'originalName')" />
         </div>
         <div class="input-group pb-1">
             <span class="input-group-text" style="min-width: 10em">preco_por</span>
             <input type="hidden" name="newName" value="preco_por" />
+            <select th:replace="dataFragments :: selectFields(fields = ${fields}, name = 'originalName')" />
         </div>
         <div class="input-group pb-1">
             <span class="input-group-text" style="min-width: 10em">link_image</span>
             <input type="hidden" name="newName" value="link_image" />
+            <select th:replace="dataFragments :: selectFields(fields = ${fields}, name = 'originalName')" />
         </div>
         <div class="input-group pb-1">
             <span class="input-group-text" style="min-width: 10em">sugestoes</span>
             <input type="hidden" name="newName" value="sugestoes" />
+            <select th:replace="dataFragments :: selectFields(fields = ${fields}, name = 'originalName')" />
+        </div>
+        <div class="pb-3 d-grid justify-content-end">
+            <button class="btn btn-outline-secondary" id="cad-saveConfig">Salvar</button>
         </div>
     </div>
 
-    <select th:fragment="selectFields(fields)">
-
+    <select class="form-select" th:fragment="selectFields(fields, name)" th:name="${name}">
+        <option value="0">Não usado</option>
+        <option th:each="field : ${fields}" th:value="${field}" th:text="${field}"></option>
     </select>
 </div>
 <div th:replace="fragments :: html_foot" />

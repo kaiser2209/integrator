@@ -1,6 +1,7 @@
 package com.appmobiplus.integrador.utils;
 
 import com.appmobiplus.integrador.configuration.Config;
+import com.appmobiplus.integrador.configuration.ConfigAuth;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.*;
@@ -13,6 +14,7 @@ public class ConfigUtils {
     private static final String configFileName = "integrador.config";
     private static Config config;
     public static String lastErrorMessage;
+    private static ConfigAuth configAuth;
 
     public static boolean saveConfig(Config config) {
         try {
@@ -84,5 +86,13 @@ public class ConfigUtils {
         }
 
         return "";
+    }
+
+    public static void setConfigAuth(ConfigAuth configAuth) {
+        ConfigUtils.configAuth = configAuth;
+    }
+
+    public static ConfigAuth getConfigAuth() {
+        return configAuth;
     }
 }
