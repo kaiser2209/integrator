@@ -9,7 +9,7 @@ public class Config implements Serializable {
     private String path;
     private Map<String, String> parameters;
     private Set<Field> fields;
-    private Set<HeaderAuth> headers;
+    private Set<Header> headers;
     private boolean hasDelimiter;
     private String delimiter;
     private long fileLastModified;
@@ -20,7 +20,7 @@ public class Config implements Serializable {
     protected Config(IntegrationType integrationType,
                      String path,
                      Set<Field> fields,
-                     Set<HeaderAuth> headers,
+                     Set<Header> headers,
                      Map<String, String> parameters,
                      boolean hasDelimiter,
                      String delimiter,
@@ -65,11 +65,11 @@ public class Config implements Serializable {
         this.fields = fields;
     }
 
-    public Set<HeaderAuth> getHeaders() {
+    public Set<Header> getHeaders() {
         return headers;
     }
 
-    public void setHeaders(Set<HeaderAuth> headers) {
+    public void setHeaders(Set<Header> headers) {
         this.headers = headers;
     }
 
@@ -121,6 +121,14 @@ public class Config implements Serializable {
         this.configCadastroProdutos = configCadastroProdutos;
     }
 
+    public void addHeader(String key, String value) {
+        Header h = HeaderBuilder.get()
+                .addKeySet(key, value)
+                .build();
+
+        this.headers.add(h);
+    }
+
     public ConfigCustosProdutos getConfigCustosProdutos() {
         return configCustosProdutos;
     }
@@ -135,6 +143,8 @@ public class Config implements Serializable {
                 "Path: " + path + "\n" +
                 "Fields: " + fields.toString() + "\n" +
                 "Headers: " + headers.toString() + "\n" +
-                "ConfigAuth: " + configAuth.toString();
+                "ConfigAuth: " + ((configAuth != null) ? configAuth.toString() : "Sem ConfigAuth") + "\n" +
+                "ConfigCadastroProdutos: " + ((configCadastroProdutos != null) ? configCadastroProdutos.toString() : "Sem ConfigCadastroProdutos") + "\n" +
+                "ConfigCustosProdutos: " + ((configCustosProdutos != null) ? configCustosProdutos.toString() : "Sem ConfigCustosProdutos");
     }
 }

@@ -35,6 +35,10 @@ public class ConfigUtils {
         return false;
     }
 
+    public static boolean saveConfig() {
+        return saveConfig(config);
+    }
+
     public static Config loadConfig() {
         if (!fileExists(configFolder + configFileName)) {
             return null;

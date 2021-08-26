@@ -80,6 +80,15 @@ public class Produto {
         this.sugestoes = sugestoes;
     }
 
+    public boolean set(String field, Object value) {
+        if(field.equals("ean")) {
+            this.ean = (String) value;
+            return true;
+        }
+
+        return false;
+    }
+
     @Override
     public String toString() {
         return "ean: " + ean +

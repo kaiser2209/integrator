@@ -4,25 +4,26 @@ import org.springframework.http.HttpMethod;
 import org.thymeleaf.util.ArrayUtils;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Map;
 
 public class ConfigAuth implements Serializable {
     private String path;
-    private HttpMethod methodType;
-    private HeaderAuth headerAuth;
+    private HttpMethod method;
     private Map<String, String> bodyParameters;
-    private String[] authFields;
+    private String[] fieldsUsedInAuth;
+    private String authField;
 
     public ConfigAuth(String path,
-                      HttpMethod methodType,
-                      HeaderAuth headerAuth,
+                      HttpMethod method,
                       Map<String, String> bodyParameters,
-                      String[] authFields) {
+                      String[] fieldsUsedInAuth,
+                      String authField) {
         this.path = path;
-        this.methodType = methodType;
-        this.headerAuth = headerAuth;
+        this.method = method;
         this.bodyParameters = bodyParameters;
-        this.authFields = authFields;
+        this.fieldsUsedInAuth = fieldsUsedInAuth;
+        this.authField = authField;
     }
 
     public String getPath() {
@@ -33,20 +34,12 @@ public class ConfigAuth implements Serializable {
         this.path = path;
     }
 
-    public HttpMethod getMethodType() {
-        return methodType;
+    public HttpMethod getMethod() {
+        return method;
     }
 
-    public void setMethodType(HttpMethod methodType) {
-        this.methodType = methodType;
-    }
-
-    public HeaderAuth getHeaderAuth() {
-        return headerAuth;
-    }
-
-    public void setHeaderAuth(HeaderAuth headerAuth) {
-        this.headerAuth = headerAuth;
+    public void setMethod(HttpMethod method) {
+        this.method = method;
     }
 
     public Map<String, String> getBodyParameters() {
@@ -57,18 +50,27 @@ public class ConfigAuth implements Serializable {
         this.bodyParameters = bodyParameters;
     }
 
-    public String[] getAuthFields() {
-        return authFields;
+    public String[] getFieldsUsedInAuth() {
+        return fieldsUsedInAuth;
     }
 
-    public void setAuthFields(String[] authFields) {
-        this.authFields = authFields;
+    public void setFieldsUsedInAuth(String[] fieldsUsedInAuth) {
+        this.fieldsUsedInAuth = fieldsUsedInAuth;
+    }
+
+    public String getAuthField() {
+        return authField;
+    }
+
+    public void setAuthField(String authField) {
+        this.authField = authField;
     }
 
     public String toString() {
-        return "[Path= " + this.path +
-                this.methodType +
-                this.bodyParameters.toString() +
-                "]";
+        return "[Path= " + this.path + "\n" +
+                "Method: " + this.method + "\n" +
+                "BodyParameters: " + this.bodyParameters.toString() + "\n" +
+                "FieldsUsedInAuth: " + Arrays.toString(this.fieldsUsedInAuth) + "\n" +
+                "AuthField: " + this.authField + "]";
     }
 }

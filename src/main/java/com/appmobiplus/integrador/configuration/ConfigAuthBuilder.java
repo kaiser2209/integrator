@@ -7,21 +7,21 @@ import java.util.Map;
 
 public class ConfigAuthBuilder {
     private String path;
-    private HttpMethod methodType;
-    private HeaderAuth headerAuth;
+    private HttpMethod method;
     private Map<String, String> bodyParameters = new HashMap<>();
-    private String[] authFields;
+    private String[] fieldsUsedInAuth = new String[0];
+    private String authField;
 
     public ConfigAuthBuilder(String path,
-                             HttpMethod methodType,
-                             HeaderAuth headerAuth,
+                             HttpMethod method,
                              Map<String, String> bodyParameters,
-                             String[] authFields) {
+                             String[] fieldsUsedInAuth,
+                             String authField) {
         this.path = path;
-        this.methodType = methodType;
-        this.headerAuth = headerAuth;
+        this.method = method;
         this.bodyParameters = bodyParameters;
-        this.authFields = authFields;
+        this.fieldsUsedInAuth = fieldsUsedInAuth;
+        this.authField = authField;
     }
 
     public ConfigAuthBuilder() {
@@ -33,13 +33,8 @@ public class ConfigAuthBuilder {
         return this;
     }
 
-    public ConfigAuthBuilder setMethodType(HttpMethod methodType) {
-        this.methodType = methodType;
-        return this;
-    }
-
-    public ConfigAuthBuilder setHeaderAuth(HeaderAuth headerAuth) {
-        this.headerAuth = headerAuth;
+    public ConfigAuthBuilder setMethodType(HttpMethod method) {
+        this.method = method;
         return this;
     }
 
@@ -53,12 +48,17 @@ public class ConfigAuthBuilder {
         return this;
     }
 
-    public ConfigAuthBuilder addAuthFields(String[] authFields) {
-        this.authFields = authFields;
+    public ConfigAuthBuilder setFieldsUsedInAuth(String[] fieldsUsedInAuth) {
+        this.fieldsUsedInAuth = fieldsUsedInAuth;
+        return this;
+    }
+
+    public ConfigAuthBuilder setAuthField(String authField) {
+        this.authField = authField;
         return this;
     }
 
     public ConfigAuth build() {
-        return new ConfigAuth(path, methodType, headerAuth, bodyParameters, authFields);
+        return new ConfigAuth(path, method, bodyParameters, fieldsUsedInAuth, authField);
     }
 }

@@ -117,9 +117,9 @@ public class WebServiceController {
             }
         }
 
-        Set<HeaderAuth> headers = new HashSet<>();
+        Set<Header> headers = new HashSet<>();
         for(int i = 0; i < key.length; i++) {
-            HeaderAuth h = new HeaderAuthBuilder()
+            Header h = new HeaderBuilder()
                     .setKey(key[i])
                     .setValue(value[i])
                     .build();
@@ -184,6 +184,8 @@ public class WebServiceController {
 
         System.out.println(FileUtils.getFormattedJson(response.getBody()));
 
+        System.out.println(ConfigUtils.getConfig().toString());
+
         return "dataFragments :: #auth-jsonView";
     }
 
@@ -217,15 +219,13 @@ public class WebServiceController {
 
         authorizationValue = authorizationValue.trim();
 
-        HeaderAuth headerAuth = new HeaderAuthBuilder()
-                .setKey(key)
-                .setFieldsUsedInValue(value)
-                .build();
-
-        ConfigUtils.getConfig().getConfigAuth().setHeaderAuth(headerAuth);
-
         map.addAttribute("headerKey", key);
         map.addAttribute("headerValue", authorizationValue);
+
+        ConfigUtils.getConfig().getConfigAuth().setFieldsUsedInAuth(value);
+        ConfigUtils.getConfig().getConfigAuth().setAuthField(key);
+
+        System.out.println(ConfigUtils.getConfig().toString());
 
         return "dataFragments :: #cad-config";
     }
@@ -243,7 +243,6 @@ public class WebServiceController {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
-        //headers.setContentType(MediaType.APPLICATION_JSON);
 
         for(int i = 0; i < key.length; i++) {
             headers.add(key[i], value[i]);
@@ -263,7 +262,18 @@ public class WebServiceController {
         ConfigUtils.getConfig().setConfigCadastroProdutos(new ConfigCadastroProdutosBuilder()
                 .setPath(ws_path)
                 .setMethod(method)
+                .setSearchParameters(buscaCadProdutos)
                 .build());
+
+        Set<Header> configHeaders = new HashSet<>();
+        for(int i = 0; i < key.length; i++) {
+            Header h = HeaderBuilder.get()
+                    .addKeySet(key[i], value[i])
+                    .build();
+            configHeaders.add(h);
+        }
+
+        ConfigUtils.getConfig().setHeaders(configHeaders);
 
         System.out.println(ConfigUtils.getConfig());
 
@@ -340,9 +350,15 @@ public class WebServiceController {
             }
         }
 
-        fields.addAll(fieldsToAdd);
+        ConfigUtils.getConfig().setConfigCustosProdutos(new ConfigCustosProdutosBuilder()
+                .setPath(ws_path)
+                .setSearchParameters(buscaCadProdutos)
+                .setMethod(method)
+                .build());
 
-        System.out.println(fields.toString());
+        System.out.println(ConfigUtils.getConfig().toString());
+
+        fields.addAll(fieldsToAdd);
 
         map.addAttribute("fields", fields);
 
@@ -350,8 +366,27 @@ public class WebServiceController {
     }
 
     @PostMapping(value = "/config/ws/cad/saveConfig", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
-    public String loadFieldsValues(ModelMap map) {
+    public String loadFieldsValues(ModelMap map,
+                                   @RequestParam IntegrationType integrationType,
+                                   @RequestParam String[] originalName,
+                                   @RequestParam String[] newName) {
 
-        return "dataFragments :: #cadSaveValues";
+        ConfigUtils.getConfig().setIntegrationType(integrationType);
+
+        Set<Field> fields = new HashSet<>();
+
+        for(int i = 0; i < originalName.length; i++) {
+            if (!originalName[i].equals("0")) {
+                fields.add(FieldBuilder.get()
+                        .setOriginalName(originalName[i])
+                        .setNewName(newName[i])
+                        .build());
+            }
+        }
+
+        ConfigUtils.getConfig().setFields(fields);
+        ConfigUtils.saveConfig();
+
+        return "dataFragments :: #save-complete";
     }
 }

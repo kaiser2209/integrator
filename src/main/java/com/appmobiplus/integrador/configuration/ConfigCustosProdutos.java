@@ -1,19 +1,21 @@
 package com.appmobiplus.integrador.configuration;
 
+import org.springframework.http.HttpMethod;
+
 import java.io.Serializable;
 import java.util.Set;
 
 public class ConfigCustosProdutos implements Serializable {
     private String path;
-    private Set<Header> headers;
-    private String bodyJson;
+    private HttpMethod method;
+    private BuscaCadProdutos searchParameters;
 
     public ConfigCustosProdutos(String path,
-                                  Set<Header> headers,
-                                  String bodyJson) {
+                                HttpMethod method,
+                                BuscaCadProdutos searchParameters) {
         this.path = path;
-        this.headers = headers;
-        this.bodyJson = bodyJson;
+        this.method = method;
+        this.searchParameters = searchParameters;
     }
 
     public String getPath() {
@@ -24,19 +26,26 @@ public class ConfigCustosProdutos implements Serializable {
         this.path = path;
     }
 
-    public Set<Header> getHeaders() {
-        return headers;
+    public HttpMethod getMethod() {
+        return method;
     }
 
-    public void setHeaders(Set<Header> headers) {
-        this.headers = headers;
+    public void setMethod(HttpMethod method) {
+        this.method = method;
     }
 
-    public String getBodyJson() {
-        return bodyJson;
+    public BuscaCadProdutos getSearchParameters() {
+        return searchParameters;
     }
 
-    public void setBodyJson(String bodyJson) {
-        this.bodyJson = bodyJson;
+    public void setSearchParameters(BuscaCadProdutos searchParameters) {
+        this.searchParameters = searchParameters;
+    }
+
+
+    public String toString() {
+        return "[Path: " + this.path + "\n" +
+                "HttpMethod: " + this.method + "\n" +
+                "SearchParameters: " + this.searchParameters + "]";
     }
 }

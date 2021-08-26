@@ -48,7 +48,7 @@ public class ProdutoController {
     }
 
     @GetMapping(path="/buscapreco")
-    public @ResponseBody Object get(@RequestParam Map<String, String> parameters) throws JsonProcessingException {
+    public @ResponseBody Object get(@RequestParam Map<String, String> parameters) throws JsonProcessingException, NoSuchFieldException, IllegalAccessException {
         Config config = ConfigUtils.getCurrentConfig();
         com.appmobiplus.integrador.models.Produto p;
         String message = "Busca realizada com ean=" + parameters.get("ean");
@@ -74,55 +74,129 @@ public class ProdutoController {
                 return WebServiceUtils.getProdutoFromModel(p);
             }
         } else if (config.getIntegrationType() == IntegrationType.WEB_SERVICE) {
-            try {
-                Set<HeaderAuth> headers = config.getHeaders();
-                HttpHeaders httpHeaders = new HttpHeaders();
-                for (HeaderAuth h : headers) {
-                    httpHeaders.add(h.getKey(), h.getValue());
-                }
+            if(config.getConfigAuth() == null) {
+                try {
+                    Set<Header> headers = config.getHeaders();
+                    HttpHeaders httpHeaders = new HttpHeaders();
+                    for (Header h : headers) {
+                        httpHeaders.add(h.getKey(), h.getValue());
+                    }
 
-                HttpEntity<String> request = new HttpEntity<>(httpHeaders);
+                    HttpEntity<String> request = new HttpEntity<>(httpHeaders);
+                    RestTemplate restTemplate = new RestTemplate();
+
+                    for (String key : parameters.keySet()) {
+                        config.getParameters().put(key, parameters.get(key));
+                    }
+
+                    ResponseEntity<String> responseEntity = restTemplate.exchange(
+                            WebServiceUtils.getWebServiceURL(config.getPath(), config.getParameters()), HttpMethod.GET,
+                            request, String.class);
+
+                    String finalJson = responseEntity.getBody();
+
+                    Set<Field> fields = config.getFields();
+
+                    for (Field f : fields) {
+                        if (!(f.getNewName().isEmpty() && f.getOriginalName().equals(f.getNewName()))) {
+                            finalJson = finalJson.replaceAll(f.getOriginalName(), f.getNewName());
+                        }
+                    }
+
+                    ObjectMapper mapper = new ObjectMapper();
+
+                    Produto produto = mapper.readValue(finalJson, com.appmobiplus.integrador.configuration.Produto.class);
+                    produto.setLink_image(ImageUtils.downloadImage(produto.getLink_image(), produto.getEan(), ImageUtils.getLocalPath()));
+
+                    Set<Produto> sugestoes = produto.getSugestoes();
+                    for (Produto product : sugestoes) {
+                        product.setLink_image(ImageUtils.downloadImage(product.getLink_image(), product.getEan(), ImageUtils.getLocalPath()));
+                    }
+
+                    message = HttpStatus.OK + " - Produto encontrado";
+                    LogUtils.saveLog(message);
+                    return produto;
+                } catch (HttpClientErrorException e) {
+                    message = HttpStatus.NOT_FOUND + " - Produto não encontrado";
+                    LogUtils.saveLog(message);
+                    Map<String, String> erro = new HashMap<>();
+                    erro.put("errorMessage", "Produto não econtrado!");
+                    erro.put("errorCode", HttpStatus.NOT_FOUND.toString());
+
+                    return erro;
+                }
+            } else {
+                System.out.println("Está aqui!");
+
                 RestTemplate restTemplate = new RestTemplate();
 
-                for(String key : parameters.keySet()) {
-                    config.getParameters().put(key, parameters.get(key));
+                HttpHeaders headers = new HttpHeaders();
+
+                MultiValueMap<String, String> postParameters = new LinkedMultiValueMap<>();
+
+                for(String key : config.getConfigAuth().getBodyParameters().keySet()) {
+                    postParameters.add(key, config.getConfigAuth().getBodyParameters().get(key));
                 }
 
-                ResponseEntity<String> responseEntity = restTemplate.exchange(
-                        WebServiceUtils.getWebServiceURL(config.getPath(), config.getParameters()), HttpMethod.GET,
-                        request, String.class);
+                HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(postParameters, headers);
 
-                String finalJson = responseEntity.getBody();
+                ResponseEntity<String> response = restTemplate.exchange(config.getConfigAuth().getPath(), config.getConfigAuth().getMethod(), request, String.class);
 
-                Set<Field> fields = config.getFields();
+                JsonNode jsonNode = JsonUtils.getJsonObject(response.getBody());
 
-                for (Field f : fields) {
-                    if (!(f.getNewName().isEmpty() && f.getOriginalName().equals(f.getNewName()))) {
-                        finalJson = finalJson.replaceAll(f.getOriginalName(), f.getNewName());
+                String authorizationValue = "";
+
+                for(String v : config.getConfigAuth().getFieldsUsedInAuth()) {
+                    authorizationValue += jsonNode.get(v).textValue() + " ";
+                }
+
+                authorizationValue = authorizationValue.trim();
+
+                Set<Header> authHeaders = config.getHeaders();
+                for(Header h : authHeaders) {
+                    if(h.getKey().equals(config.getConfigAuth().getAuthField())) {
+                        h.setValue(authorizationValue);
                     }
                 }
 
-                ObjectMapper mapper = new ObjectMapper();
+                HttpHeaders httpHeaders = new HttpHeaders();
 
-                Produto produto = mapper.readValue(finalJson, com.appmobiplus.integrador.configuration.Produto.class);
-                produto.setLink_image(ImageUtils.downloadImage(produto.getLink_image(), produto.getEan(), ImageUtils.getLocalPath()));
-
-                Set<Produto> sugestoes = produto.getSugestoes();
-                for(Produto product : sugestoes) {
-                    product.setLink_image(ImageUtils.downloadImage(product.getLink_image(), product.getEan(), ImageUtils.getLocalPath()));
+                for(Header h : config.getHeaders()) {
+                    httpHeaders.add(h.getKey(), h.getValue());
                 }
 
-                message = HttpStatus.OK + " - Produto encontrado";
-                LogUtils.saveLog(message);
-                return produto;
-            } catch (HttpClientErrorException e) {
-                message = HttpStatus.NOT_FOUND + " - Produto não encontrado";
-                LogUtils.saveLog(message);
-                Map<String, String> erro = new HashMap<>();
-                erro.put("errorMessage", "Produto não econtrado!");
-                erro.put("errorCode", HttpStatus.NOT_FOUND.toString());
+                ObjectMapper mapper = new ObjectMapper();
+                config.getConfigCadastroProdutos().getSearchParameters().changeValue(Long.valueOf(parameters.get("ean")));
+                String jsonBuscaProduto = mapper.writeValueAsString(config.getConfigCadastroProdutos().getSearchParameters());
 
-                return erro;
+                HttpEntity<String> produtoRequest = new HttpEntity<>(jsonBuscaProduto, httpHeaders);
+
+                ResponseEntity<String> produtoResponse = restTemplate.exchange(config.getConfigCadastroProdutos().getPath(), config.getConfigCadastroProdutos().getMethod(), produtoRequest, String.class);
+
+                BuscaCadProdutos busca = config.getConfigCustosProdutos().getSearchParameters();
+                String field = busca.getCampo();
+
+                JsonNode jsonNodeCusto = JsonUtils.getJsonObject(produtoResponse.getBody());
+
+                busca.changeValue(jsonNodeCusto.get("data").get(0).get(field).longValue());
+
+                String jsonBuscaCusto = mapper.writeValueAsString(busca);
+
+                HttpEntity<String> custoRequest = new HttpEntity<>(jsonBuscaCusto, httpHeaders);
+
+                ResponseEntity<String> custoResponse = restTemplate.exchange(config.getConfigCustosProdutos().getPath(), config.getConfigCustosProdutos().getMethod(), custoRequest, String.class);
+
+                System.out.println(custoResponse.getBody());
+
+                Produto produto = new Produto();
+
+                System.out.println(jsonNodeCusto.get("data").get(0).get("nrcodbarprod"));
+
+                java.lang.reflect.Field eanField = produto.getClass().getDeclaredField("ean");
+                eanField.setAccessible(true);
+                eanField.set(produto, String.valueOf(jsonNodeCusto.get("data").get(0).get("nrcodbarprod")));
+
+                return produto;
             }
 
         } else if (config.getIntegrationType() == IntegrationType.DATABASE) {

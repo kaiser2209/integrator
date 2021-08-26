@@ -225,14 +225,17 @@
 
                 </div>
             </form>
-            <form id="form-loadFieldsValue">
+            <form id="form-loadFieldsValue" method="post">
                 <div id="cad-findValue">
 
                 </div>
             </form>
-            <div id="cad-fieldsValues">
+            <form id="form-saveConfig"  method="post">
+                <div id="cad-fieldsValues">
 
-            </div>
+                </div>
+                <input type="hidden" name="integrationType" value="WEB_SERVICE" />
+            </form>
         </div>
     </div>
     <!-- Fim do Fragmento -->
@@ -339,7 +342,7 @@
             <select th:replace="dataFragments :: selectFields(fields = ${fields}, name = 'originalName')" />
         </div>
         <div class="pb-3 d-grid justify-content-end">
-            <button class="btn btn-outline-secondary" id="cad-saveConfig">Salvar</button>
+            <button class="btn btn-outline-secondary" id="cad-saveConfig" type="button">Salvar</button>
         </div>
     </div>
 
@@ -347,6 +350,10 @@
         <option value="0">Não usado</option>
         <option th:each="field : ${fields}" th:value="${field}" th:text="${field}"></option>
     </select>
+
+    <div id="cadSaveValues">
+
+    </div>
 </div>
 <div th:replace="fragments :: html_foot" />
 <div th:replace="fragments :: bootstrap-js" />

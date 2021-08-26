@@ -8,17 +8,14 @@ import java.util.Set;
 public class ConfigCadastroProdutos implements Serializable {
     private String path;
     private HttpMethod method;
-    private Set<Header> headers;
-    private String bodyJson;
+    private BuscaCadProdutos searchParameters;
 
     public ConfigCadastroProdutos(String path,
                                   HttpMethod httpMethod,
-                                  Set<Header> headers,
-                                  String bodyJson) {
+                                  BuscaCadProdutos searchParameters) {
         this.path = path;
         this.method = httpMethod;
-        this.headers = headers;
-        this.bodyJson = bodyJson;
+        this.searchParameters = searchParameters;
     }
 
     public String getPath() {
@@ -37,19 +34,17 @@ public class ConfigCadastroProdutos implements Serializable {
         this.method = method;
     }
 
-    public Set<Header> getHeaders() {
-        return headers;
+    public BuscaCadProdutos getSearchParameters() {
+        return searchParameters;
     }
 
-    public void setHeaders(Set<Header> headers) {
-        this.headers = headers;
+    public void setSearchParameters(BuscaCadProdutos searchParameters) {
+        this.searchParameters = searchParameters;
     }
 
-    public String getBodyJson() {
-        return bodyJson;
-    }
-
-    public void setBodyJson(String bodyJson) {
-        this.bodyJson = bodyJson;
+    public String toString() {
+        return "[Path: " + this.path + "\n" +
+                "HttpMethod: " + this.method + "\n" +
+                "SearchParameters: " + this.searchParameters + "]";
     }
 }

@@ -58,6 +58,17 @@
                                                                 $.post("/config/ws/cad/loadFieldsValues", $("#form-loadFieldsValue").serialize()).done(function(data) {
 
                                                                     $("#cad-fieldsValues").replaceWith(data);
+
+                                                                    $("#cad-saveConfig").click(function() {
+                                                                        $.post("/config/ws/cad/saveConfig", $("#form-saveConfig").serialize()).done(function(data) {
+                                                                            $("#dialog-success").replaceWith(data);
+                                                                            $("#save-complete").modal('show');
+                                                                            $(".redirect-button").off();
+                                                                            $(".redirect-button").click(function() {
+                                                                                $(location).attr("href", "/config/ws");
+                                                                            });
+                                                                        });
+                                                                    });
                                                                 });
                                                             });
                                                         });
@@ -69,7 +80,6 @@
                                 }
 
             var selectField = function() {
-                                goToCadConfig();
                                 $(".btn-auth-field").off();
                                 $(".btn-auth-field").click(function() {
                                     var oldButton = this;
@@ -89,6 +99,8 @@
                                         $(inputForRemove).remove();
                                     });
                                 });
+
+                                goToCadConfig();
                             }
             var deselectField = function() {
                                 $(".btn-auth-field-remove").off();
@@ -240,7 +252,6 @@
                         $.post("/config/ws/auth/configAuth", { json: jsonValue } ).done(function(data) {
                             $("#auth-fieldsView").replaceWith(data);
 
-                            //$(".btn-auth-field").off();
                             selectField();
                         });
                     });

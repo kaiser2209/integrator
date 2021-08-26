@@ -8,17 +8,14 @@ import java.util.Set;
 public class ConfigCadastroProdutosBuilder {
     private String path;
     private HttpMethod method;
-    private Set<Header> headers = new HashSet<>();
-    private String bodyJson;
+    private BuscaCadProdutos searchParameters;
 
     public ConfigCadastroProdutosBuilder(String path,
                                          HttpMethod method,
-                                         Set<Header> headers,
-                                         String bodyJson) {
+                                         BuscaCadProdutos searchParameters) {
         this.path = path;
         this.method = method;
-        this.headers = headers;
-        this.bodyJson = bodyJson;
+        this.searchParameters = searchParameters;
     }
 
     public ConfigCadastroProdutosBuilder() {
@@ -35,18 +32,12 @@ public class ConfigCadastroProdutosBuilder {
         return this;
     }
 
-    public ConfigCadastroProdutosBuilder setHeaders(Set<Header> headers) {
-        this.headers = headers;
-        return this;
-    }
-
-    public ConfigCadastroProdutosBuilder addHeader(String key, String value) {
-        Header h = new HeaderBuilder().setKey(key).setValue(value).build();
-        this.headers.add(h);
+    public ConfigCadastroProdutosBuilder setSearchParameters(BuscaCadProdutos searchParameters) {
+        this.searchParameters = searchParameters;
         return this;
     }
 
     public ConfigCadastroProdutos build() {
-        return new ConfigCadastroProdutos(path, method, headers, bodyJson);
+        return new ConfigCadastroProdutos(path, method, searchParameters);
     }
 }
