@@ -212,34 +212,62 @@
 
             $("#btn-auth-new-key").click(function() {
                 var newLine = '<tr>' +
-                    '<th><input type="text" class="form-control border-0" name="headerKey" /></th>' +
-                    '<th><input type="text" class="form-control border-0" name="headerValue" /></th>' +
+                    '<td><input type="text" class="form-control border-0" name="headerKey" /></td>' +
+                    '<td><input type="text" class="form-control border-0" name="headerValue" /></td>' +
+                    '<td><button type="button" class="btn"><i class="fas fa-backspace text-danger"></i></button></td>' +
                     '</tr>';
                 $("#table-auth-header-keys tr:last").after(newLine);
+                var line = $("#table-auth-header-keys").find("tr").last();
+                var button = $(line).find("button").last();
+
+                $(button).click(function() {
+                    $(line).remove();
+                });
             });
 
             $("#btn-cad-new-key").click(function() {
                 var newLine = '<tr>' +
-                    '<th><input type="text" class="form-control border-0" name="headerKey" /></th>' +
-                    '<th><input type="text" class="form-control border-0" name="headerValue" /></th>' +
+                    '<td><input type="text" class="form-control border-0" name="headerKey" /></td>' +
+                    '<td><input type="text" class="form-control border-0" name="headerValue" /></td>' +
+                    '<td><button type="button" class="btn"><i class="fas fa-backspace text-danger"></i></button></td>' +
                     '</tr>';
                 $("#table-cad-header-keys tr:last").after(newLine);
+                var line = $("#table-cad-header-keys").find("tr").last();
+                var button = $(line).find("button").last();
+
+                $(button).click(function() {
+                    $(line).remove();
+                });
             });
 
             $("#btn-auth-new-bodyKey").click(function() {
                 var newLine = '<tr>' +
-                    '<th><input type="text" class="form-control border-0" name="bodyKey" /></th>' +
-                    '<th><input type="text" class="form-control border-0" name="bodyValue" /></th>' +
+                    '<td><input type="text" class="form-control border-0" name="bodyKey" /></td>' +
+                    '<td><input type="text" class="form-control border-0" name="bodyValue" /></td>' +
+                    '<td><button type="button" class="btn"><i class="fas fa-backspace text-danger"></i></button></td>' +
                     '</tr>';
                 $("#table-auth-body-keys tr:last").after(newLine);
+                var line = $("#table-auth-body-keys").find("tr").last();
+                var button = $(line).find("button").last();
+
+                $(button).click(function() {
+                    $(line).remove();
+                });
             });
 
             $("#btn-cad-new-bodyKey").click(function() {
                 var newLine = '<tr>' +
-                    '<th><input type="text" class="form-control border-0" name="bodyKey" /></th>' +
-                    '<th><input type="text" class="form-control border-0" name="bodyValue" /></th>' +
+                    '<td><input type="text" class="form-control border-0" name="bodyKey" /></td>' +
+                    '<td><input type="text" class="form-control border-0" name="bodyValue" /></td>' +
+                    '<td><button type="button" class="btn"><i class="fas fa-backspace text-danger"></i></button></td>' +
                     '</tr>';
                 $("#table-cad-body-keys tr:last").after(newLine);
+                var line = $("#table-cad-body-keys").find("tr").last();
+                var button = $(line).find("button").last();
+
+                $(button).click(function() {
+                    $(line).remove();
+                });
             });
 
             $("#auth-send").click(function() {

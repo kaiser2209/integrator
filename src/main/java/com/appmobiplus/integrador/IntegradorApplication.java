@@ -1,6 +1,7 @@
 package com.appmobiplus.integrador;
 
 import com.appmobiplus.integrador.configuration.Config;
+import com.appmobiplus.integrador.configuration.Header;
 import com.appmobiplus.integrador.configuration.IntegrationType;
 import com.appmobiplus.integrador.models.Produto;
 import com.appmobiplus.integrador.repositories.ConfigRepository;
@@ -56,8 +57,6 @@ public class IntegradorApplication implements CommandLineRunner {
 
 		storageService.deleteAll();
 		storageService.init();
-
-		Config config = ConfigUtils.getCurrentConfig();
 
 		Runnable compare = new Runnable() {
 			@Override

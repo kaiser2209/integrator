@@ -5,7 +5,7 @@ import org.springframework.http.HttpMethod;
 import java.io.Serializable;
 import java.util.Set;
 
-public class ConfigCadastroProdutos implements Serializable {
+public class ConfigCadastroProdutos implements Serializable, ConfigBuscaProduto {
     private String path;
     private HttpMethod method;
     private BuscaCadProdutos searchParameters;

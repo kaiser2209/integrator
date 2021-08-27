@@ -127,8 +127,36 @@ public class ProdutoController {
                     return erro;
                 }
             } else {
-                System.out.println("Está aqui!");
+                config.getConfigCadastroProdutos().getSearchParameters().changeValue(Long.valueOf(parameters.get("ean")));
+                ConfigUtils.verifyAndRenewToken(config.getHeaders(), config.getConfigCadastroProdutos(), config.getConfigAuth());
+                String responseProduto = ConfigUtils.getResponse(config.getHeaders(), config.getConfigCadastroProdutos(), config.getConfigAuth()).getBody();
 
+                JsonNode jsonProduto = JsonUtils.getJsonObject(responseProduto).get("data").get(0);
+
+                BuscaCadProdutos busca = config.getConfigCustosProdutos().getSearchParameters();
+                String field = busca.getCampo();
+
+                busca.changeValue(jsonProduto.get(field).longValue());
+
+                String responseCusto = ConfigUtils.getResponse(config.getHeaders(), config.getConfigCustosProdutos(), config.getConfigAuth()).getBody();
+
+                JsonNode jsonCusto = JsonUtils.getJsonObject(responseCusto).get("data").get(0);
+
+                Produto produto = new Produto();
+
+                Set<Field> fields = config.getFields();
+
+                for(Field f : fields) {
+                    if(jsonProduto.has(f.getOriginalName())) {
+                        produto.set(f.getNewName(), TypeUtils.getValue(jsonProduto.get(f.getOriginalName())));
+                    } else {
+                        produto.set(f.getNewName(), TypeUtils.getValue(jsonCusto.get(f.getOriginalName())));
+                    }
+                }
+
+                return produto;
+
+/*
                 RestTemplate restTemplate = new RestTemplate();
 
                 HttpHeaders headers = new HttpHeaders();
@@ -213,6 +241,8 @@ public class ProdutoController {
                 }
 
                 return produto;
+
+ */
             }
 
         } else if (config.getIntegrationType() == IntegrationType.DATABASE) {

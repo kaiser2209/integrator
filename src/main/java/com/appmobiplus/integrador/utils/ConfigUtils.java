@@ -1,14 +1,24 @@
 package com.appmobiplus.integrador.utils;
 
-import com.appmobiplus.integrador.configuration.Config;
-import com.appmobiplus.integrador.configuration.ConfigAuth;
-import com.appmobiplus.integrador.configuration.ConfigCadastroProdutos;
+import com.appmobiplus.integrador.configuration.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.*;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.UnknownHostException;
+import java.util.Map;
+import java.util.Set;
 
 public class ConfigUtils {
     private static final String configFolder = "config/";
@@ -116,5 +126,100 @@ public class ConfigUtils {
 
     public static void setConfig(Config config) {
         ConfigUtils.config = config;
+    }
+
+    public static ResponseEntity<String> getResponseProduto(Set<Header> authHeaders, ConfigBuscaProduto configBusca) throws JsonProcessingException {
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = getHttpHeaders(authHeaders);
+
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonBusca = mapper.writeValueAsString(configBusca.getSearchParameters());
+
+        HttpEntity<String> request = new HttpEntity<>(jsonBusca, headers);
+
+        return restTemplate.exchange(configBusca.getPath(), configBusca.getMethod(), request, String.class);
+    }
+
+    public static boolean verifyAndRenewToken(Set<Header> authHeaders, ConfigBuscaProduto configBusca, ConfigAuth configAuth) throws JsonProcessingException {
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = getHttpHeaders(authHeaders);
+
+        HttpEntity<String> request = new HttpEntity<>(headers);
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(configBusca.getPath(), configBusca.getMethod(), request, String.class);
+        } catch (HttpClientErrorException e) {
+            if(e.getRawStatusCode() == 401) {
+                System.out.println(e.getStatusCode());
+                renewToken(configAuth, authHeaders);
+            }
+            else
+                return true;
+
+        }
+
+        return false;
+    }
+
+    public static ResponseEntity<String> getResponse(Set<Header> authHeaders, ConfigBuscaProduto configBusca, ConfigAuth configAuth) throws JsonProcessingException {
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = getHttpHeaders(authHeaders);
+
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonBusca = mapper.writeValueAsString(configBusca.getSearchParameters());
+
+        HttpEntity<String> request = new HttpEntity<>(jsonBusca, headers);
+
+        return restTemplate.exchange(configBusca.getPath(), configBusca.getMethod(), request, String.class);
+    }
+
+    public static boolean renewToken(ConfigAuth configAuth, Set<Header> authHeaders) throws JsonProcessingException {
+        RestTemplate restTemplate = new RestTemplate();
+
+        MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
+
+        HttpHeaders headers = new HttpHeaders();
+
+        for(String key : configAuth.getBodyParameters().keySet()) {
+            parameters.add(key, configAuth.getBodyParameters().get(key));
+        }
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(parameters, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(configAuth.getPath(), configAuth.getMethod(), request, String.class);
+
+        JsonNode authJson = JsonUtils.getJsonObject(response.getBody());
+        String authorization = "";
+        for(String field : configAuth.getFieldsUsedInAuth()) {
+            authorization += authJson.get(field).textValue() + " ";
+        }
+
+        authorization = authorization.trim();
+
+        System.out.println(authHeaders);
+
+        for(Header h : authHeaders) {
+            if(h.getKey().equals(configAuth.getAuthField())) {
+                h.setValue(authorization);
+            }
+        }
+
+        System.out.println(authHeaders);
+
+        ConfigUtils.saveConfig();
+
+        return true;
+    }
+
+    public static HttpHeaders getHttpHeaders(Set<Header> headers) {
+        HttpHeaders h = new HttpHeaders();
+        for(Header header : headers) {
+            h.add(header.getKey(), header.getValue());
+        }
+
+        return h;
     }
 }
