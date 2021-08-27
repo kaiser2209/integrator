@@ -6,6 +6,7 @@ import com.appmobiplus.integrador.json.ProdutoJson;
 import com.appmobiplus.integrador.repositories.ProdutoRepository;
 import com.appmobiplus.integrador.utils.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -176,9 +177,9 @@ public class ProdutoController {
                 BuscaCadProdutos busca = config.getConfigCustosProdutos().getSearchParameters();
                 String field = busca.getCampo();
 
-                JsonNode jsonNodeCusto = JsonUtils.getJsonObject(produtoResponse.getBody());
+                JsonNode jsonNodeProduto = JsonUtils.getJsonObject(produtoResponse.getBody());
 
-                busca.changeValue(jsonNodeCusto.get("data").get(0).get(field).longValue());
+                busca.changeValue(jsonNodeProduto.get("data").get(0).get(field).longValue());
 
                 String jsonBuscaCusto = mapper.writeValueAsString(busca);
 
@@ -186,15 +187,30 @@ public class ProdutoController {
 
                 ResponseEntity<String> custoResponse = restTemplate.exchange(config.getConfigCustosProdutos().getPath(), config.getConfigCustosProdutos().getMethod(), custoRequest, String.class);
 
+                JsonNode jsonNodeCusto = JsonUtils.getJsonObject(custoResponse.getBody());
+
                 System.out.println(custoResponse.getBody());
 
                 Produto produto = new Produto();
 
-                System.out.println(jsonNodeCusto.get("data").get(0).get("nrcodbarprod"));
+                System.out.println(jsonNodeProduto.get("data").get(0).get("nrcodbarprod"));
 
-                java.lang.reflect.Field eanField = produto.getClass().getDeclaredField("ean");
-                eanField.setAccessible(true);
-                eanField.set(produto, String.valueOf(jsonNodeCusto.get("data").get(0).get("nrcodbarprod")));
+                Map<String, String> savedFields = new HashMap<>();
+                Set<Field> fields = config.getFields();
+                for(Field f : fields) {
+                    savedFields.put(f.getNewName(), f.getOriginalName());
+                }
+
+                JsonNode jsonProdutos = jsonNodeProduto.get("data").get(0);
+                JsonNode jsonCustos = jsonNodeCusto.get("data").get(0);
+
+                for(String key : savedFields.keySet()) {
+                    if(jsonProdutos.has(savedFields.get(key))) {
+                        produto.set(key, TypeUtils.getValue(jsonProdutos.get(savedFields.get(key))));
+                    } else {
+                        produto.set(key, TypeUtils.getValue(jsonCustos.get(savedFields.get(key))));
+                    }
+                }
 
                 return produto;
             }

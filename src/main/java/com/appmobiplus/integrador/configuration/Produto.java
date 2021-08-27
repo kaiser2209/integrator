@@ -2,6 +2,8 @@ package com.appmobiplus.integrador.configuration;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -38,6 +40,10 @@ public class Produto {
 
     public void setEan(String ean) {
         this.ean = ean;
+    }
+
+    public void setEan(long ean) {
+        this.ean = String.valueOf(ean);
     }
 
     public String getDescricao() {
@@ -81,9 +87,16 @@ public class Produto {
     }
 
     public boolean set(String field, Object value) {
-        if(field.equals("ean")) {
-            this.ean = (String) value;
+        try {
+            Field f = this.getClass().getDeclaredField(field);
+            f.setAccessible(true);
+            if (field.equals("ean"))
+                f.set(this, String.valueOf(value));
+            else
+                f.set(this, value);
             return true;
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
         }
 
         return false;
