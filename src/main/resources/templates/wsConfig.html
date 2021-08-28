@@ -30,11 +30,34 @@
                 <div class="p-3 border rounded">
                     <nav>
                         <div class="nav nav-tabs" id="nav-tabs" role="tablist">
-                            <button class="nav-link active" id="nav-header-tab" data-bs-toggle="tab" data-bs-target="#nav-header" type="button" role="tab" aria-controls="nav-header" aria-selected="true">Header</button>
+                            <button class="nav-link active" id="nav-parameter-tab" data-bs-toggle="tab" data-bs-target="#nav-parameter" type="button" role="tab" aria-controls="nav-parameter" aria-selected="true">Parameters</button>
+                            <button class="nav-link" id="nav-header-tab" data-bs-toggle="tab" data-bs-target="#nav-header" type="button" role="tab" aria-controls="nav-header" aria-selected="true">Header</button>
                             <button class="nav-link" id="nav-body-tab" data-bs-toggle="tab" data-bs-target="#nav-body" type="button" role="tab" aria-controls="nav-body" aria-selected="false">Body</button>
                         </div>
                         <div class="tab-content" id="nav-tabContent">
-                            <div class="tab-pane fade show active" id="nav-header" role="tabpanel" aria-labelledby="nav-header-tab">
+                            <div class="tab-pane fade show active" id="nav-parameter" role="tabpanel" aria-labelledby="nav-parameter-tab">
+                                <table class="table" id="table-parameters-keys">
+                                    <thead>
+                                        <th scope="col">CHAVE</th>
+                                        <th scope="col">VALOR</th>
+                                        <th scope="col"></th>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <input type="text" class="form-control border-0" name="parameterKey" id="parameterKey" />
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control border-0" name="parameterValue" id="parameterValue" />
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <button class="btn btn-outline-secondary" type="button" id="btn-new-parameter-key">Adicionar Chave</button>
+                            </div>
+                            <div class="tab-pane fade" id="nav-header" role="tabpanel" aria-labelledby="nav-header-tab">
 
                                 <table class="table" id="table-header-keys">
                                     <thead>
