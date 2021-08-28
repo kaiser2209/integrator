@@ -299,15 +299,29 @@
                 });
             });
 
+            var lines = [];
+            lines[0] = $("#table-parameters-keys tr")[1];
+
             $("#ws_path").on('input', function() {
                 var value = $(this).val();
                 if(value.indexOf('?') > -1) {
                     var parameters = value.substr(value.indexOf('?') + 1);
                     var parameters = parameters.split('&');
+
                     $.each(parameters, function(index, val) {
+                        if(lines.length < index + 1) {
+                            lines.push('<tr>' +
+                                '<td><input type="text" class="form-control border-0" name="parameterKey" /></td>' +
+                                '<td><input type="text" class="form-control border-0" name="parameterValue" /></td>' +
+                            '</tr>');
+                            $("#table-parameters-keys tr:last").after(lines[index]);
+                            lines[index] = $("#table-parameters-keys tr")[index + 1];
+                        }
+
+                        var inputs = $(lines[index]).find('input');
                         var pairKeyValue = val.split('=');
-                        $("#parameterKey").val(pairKeyValue[0]);
-                        $("#parameterValue").val(pairKeyValue[1]);
+                        $(inputs[0]).val(pairKeyValue[0]);
+                        $(inputs[1]).val(pairKeyValue[1]);
                     });
 
                 }
