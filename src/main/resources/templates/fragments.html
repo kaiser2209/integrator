@@ -326,6 +326,23 @@
 
                 }
             });
+
+            $("#table-parameters-keys").on('input', 'input', function() {
+                var url = $("#ws_path").val().split('?')[0];
+                var lines = $("#table-parameters-keys tr");
+                var parameters = "?";
+                $.each(lines, function(index, val) {
+                    if(index > 0) {
+                        var inputs = $(val).find('input');
+                        parameters = parameters + $(inputs[0]).val() + "=" + $(inputs[1]).val();
+                    }
+                    if(index < lines.length - 1) {
+                        parameters = parameters + "&";
+                    }
+                });
+
+                $("#ws_path").val(url + parameters);
+            });
         });
     </script>
 </head>
