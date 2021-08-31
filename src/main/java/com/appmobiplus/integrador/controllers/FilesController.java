@@ -12,7 +12,9 @@ import com.appmobiplus.integrador.repositories.ProdutoRepository;
 import com.appmobiplus.integrador.service.FileStorageService;
 import com.appmobiplus.integrador.utils.ConfigUtils;
 import com.appmobiplus.integrador.utils.FileUtils;
+import com.appmobiplus.integrador.utils.LogUtils;
 import org.apache.coyote.Response;
+import org.apache.juli.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -68,7 +70,8 @@ public class FilesController {
     }
 
     @PostMapping("/config/file/send")
-    public ModelAndView upload(@RequestParam ("path")String path, @RequestParam ("integrationType") String integrationType) {
+    public ModelAndView upload(@RequestParam ("path")String path,
+                               @RequestParam ("integrationType") String integrationType) {
         String message = "";
         List<String> preview = new ArrayList<>();
         try {
@@ -80,9 +83,12 @@ public class FilesController {
             modelAndView.addObject("path", path);
             modelAndView.addObject("integrationType", integrationType);
             modelAndView.setViewName("filePreview");
+            LogUtils.saveLog("Configuração iniciada. Tipo:" + integrationType);
+            LogUtils.saveLog("Caminho do arquivo definido: " + path);
             return modelAndView;
 
         } catch (Exception e) {
+            LogUtils.saveLog(e.getMessage());
             message = "Erro";
             return null;
         }
@@ -102,7 +108,9 @@ public class FilesController {
         List<Produto> produtos = new ArrayList<>();
         try {
             produtos = FileUtils.getProdutos(path, hasDelimiter, delimiter, fields, posBegin, posEnd, fieldPrice, decimalPoint);
+            LogUtils.saveLog("Lista de produtos recuperada do arquivo.");
         } catch (IOException e) {
+            LogUtils.saveLog(e.getMessage() + " - FilesController.java:112");
             e.printStackTrace();
         }
 
@@ -163,16 +171,19 @@ public class FilesController {
                 .build();
 
         ConfigUtils.saveConfig(config);
+        LogUtils.saveLog("Configurações salvas com sucesso. Tipo:" + integrationType);
 
         List<Produto> produtos = new ArrayList<>();
         try {
             produtos = FileUtils.getProdutos(path, hasDelimiter, delimiter, fields, posBegin, posEnd, fieldPrice, decimalPoint);
         } catch (IOException e) {
+            LogUtils.saveLog(e.getMessage() + this.getClass().getName());
             e.printStackTrace();
         }
 
         produtoRepository.deleteAll();
         produtoRepository.saveAll(produtos);
+        LogUtils.saveLog("Lista de produtos salva com sucesso!");
 
         modelAndView.setViewName("fileSave");
 

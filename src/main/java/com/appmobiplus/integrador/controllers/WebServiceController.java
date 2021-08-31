@@ -37,55 +37,68 @@ public class WebServiceController {
     public String teste(ModelMap map,
                         @RequestParam String[] key,
                         @RequestParam String[] value,
-                        @RequestParam String ws_path) throws JsonProcessingException {
+                        @RequestParam String ws_path) {
         map.addAttribute("teste", "Agora é um teste válido!");
 
-        RestTemplate restTemplate = new RestTemplate();
+        try {
 
-        HttpHeaders headers = new HttpHeaders();
-        for(int i = 0; i < key.length; i++) {
-            headers.add(key[i], value[i]);
+            RestTemplate restTemplate = new RestTemplate();
+
+            HttpHeaders headers = new HttpHeaders();
+            for (int i = 0; i < key.length; i++) {
+                headers.add(key[i], value[i]);
+            }
+
+            HttpEntity<String> request = new HttpEntity<>(headers);
+
+            ResponseEntity<String> responseEntity = restTemplate.exchange(ws_path, HttpMethod.GET, request, String.class);
+
+            Map<String, String> mapHeader = new HashMap<>();
+            for (int i = 0; i < key.length; i++) {
+                mapHeader.put(key[i], value[i]);
+            }
+
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonHeader = mapper.writeValueAsString(mapHeader);
+            map.addAttribute("result", FileUtils.getFormattedJson(responseEntity.getBody()));
+            map.addAttribute("jsonHeader", jsonHeader);
+
+        } catch (Exception e) {
+            LogUtils.saveLog(e.getMessage() + " - WebServiceController.java:67");
         }
 
-        HttpEntity<String> request = new HttpEntity<>(headers);
+            return "dataFragments :: #json-view";
 
-        ResponseEntity<String> responseEntity = restTemplate.exchange(ws_path, HttpMethod.GET, request, String.class);
-
-        Map<String, String> mapHeader = new HashMap<>();
-        for(int i = 0; i < key.length; i++) {
-            mapHeader.put(key[i], value[i]);
-        }
-
-        ObjectMapper mapper = new ObjectMapper();
-        String jsonHeader = mapper.writeValueAsString(mapHeader);
-
-        map.addAttribute("result", FileUtils.getFormattedJson(responseEntity.getBody()));
-        map.addAttribute("jsonHeader", jsonHeader);
-
-        return "dataFragments :: #json-view";
     }
 
     @PostMapping("/config/ws/fields")
     public String getFields(ModelMap map,
                             @RequestParam String json,
-                            @RequestParam String header) throws JsonProcessingException {
+                            @RequestParam String header) {
 
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode jsonNode = mapper.readTree(json);
+        try {
 
-        List<String> fields = new ArrayList<>();
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode jsonNode = mapper.readTree(json);
 
-        TypeReference<HashMap<String, String>> typeRef = new TypeReference<HashMap<String, String>>() {};
-        Map<String, String> mapHeader = mapper.readValue(header, typeRef);
+            List<String> fields = new ArrayList<>();
 
-        for (Iterator<String> it = jsonNode.fieldNames(); it.hasNext(); ) {
-            String field = it.next();
-            fields.add(field);
+            TypeReference<HashMap<String, String>> typeRef = new TypeReference<HashMap<String, String>>() {
+            };
+            Map<String, String> mapHeader = mapper.readValue(header, typeRef);
 
+            for (Iterator<String> it = jsonNode.fieldNames(); it.hasNext(); ) {
+                String field = it.next();
+                fields.add(field);
+
+            }
+
+            map.addAttribute("fields", fields);
+            map.addAttribute("header", mapHeader);
+
+        } catch (Exception e) {
+            LogUtils.saveLog(e.getMessage() + " - WebServiceController.java:100");
         }
-
-        map.addAttribute("fields", fields);
-        map.addAttribute("header", mapHeader);
 
         return "dataFragments :: #json-fields";
     }
@@ -101,41 +114,47 @@ public class WebServiceController {
                        @RequestParam String[] key,
                        @RequestParam String[] value) {
 
-        Set<Field> fields = new HashSet<>();
+        try {
 
-        String absolutUrl = WebServiceUtils.getAbsolutUrl(url);
-        Map<String, String> parameters = WebServiceUtils.getParameters(url);
+            Set<Field> fields = new HashSet<>();
 
-        for(int i = 0; i < enable.length; i++) {
-            if (enable[i]) {
-                Field f = FieldBuilder.get()
-                        .setOriginalName(originalName[i])
-                        .setNewName(newName[i])
+            String absolutUrl = WebServiceUtils.getAbsolutUrl(url);
+            Map<String, String> parameters = WebServiceUtils.getParameters(url);
+
+            for (int i = 0; i < enable.length; i++) {
+                if (enable[i]) {
+                    Field f = FieldBuilder.get()
+                            .setOriginalName(originalName[i])
+                            .setNewName(newName[i])
+                            .build();
+
+                    fields.add(f);
+                }
+            }
+
+            Set<Header> headers = new HashSet<>();
+            for (int i = 0; i < key.length; i++) {
+                Header h = new HeaderBuilder()
+                        .setKey(key[i])
+                        .setValue(value[i])
                         .build();
 
-                fields.add(f);
+                headers.add(h);
             }
-        }
 
-        Set<Header> headers = new HashSet<>();
-        for(int i = 0; i < key.length; i++) {
-            Header h = new HeaderBuilder()
-                    .setKey(key[i])
-                    .setValue(value[i])
+            Config config = ConfigBuilder.get()
+                    .setPath(absolutUrl)
+                    .setFields(fields)
+                    .setIntegrationType(integrationType)
+                    .setParameters(parameters)
+                    .setHeaders(headers)
                     .build();
 
-            headers.add(h);
+            ConfigUtils.saveConfig(config);
+
+        } catch (Exception e) {
+            LogUtils.saveLog(e.getMessage() +  " - WebServiceController.java:156");
         }
-
-        Config config = ConfigBuilder.get()
-                .setPath(absolutUrl)
-                .setFields(fields)
-                .setIntegrationType(integrationType)
-                .setParameters(parameters)
-                .setHeaders(headers)
-                .build();
-
-        ConfigUtils.saveConfig(config);
 
         return "dataFragments :: #save-complete";
     }
@@ -149,9 +168,9 @@ public class WebServiceController {
                                   @RequestParam String[] bodyKey,
                                   @RequestParam String[] bodyValue) throws JsonProcessingException {
 
-        bodyKey = TestUtils.getAuthTestKeys();
-        bodyValue = TestUtils.getAuthTestValues();
-        ws_path = TestUtils.getAuthUrl();
+        //bodyKey = TestUtils.getAuthTestKeys();
+        //bodyValue = TestUtils.getAuthTestValues();
+        //ws_path = TestUtils.getAuthUrl();
 
         RestTemplate restTemplate = new RestTemplate();
 
@@ -330,6 +349,8 @@ public class WebServiceController {
 
         ObjectMapper mapper = new ObjectMapper();
         String json = mapper.writeValueAsString(buscaCadProdutos);
+
+        System.out.println(json);
 
         HttpEntity<String> request = new HttpEntity<>(json, httpHeaders);
 

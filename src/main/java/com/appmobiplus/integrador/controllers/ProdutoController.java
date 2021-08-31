@@ -127,34 +127,45 @@ public class ProdutoController {
                     return erro;
                 }
             } else {
-                config.getConfigCadastroProdutos().getSearchParameters().changeValue(Long.valueOf(parameters.get("ean")));
-                ConfigUtils.verifyAndRenewToken(config.getHeaders(), config.getConfigCadastroProdutos(), config.getConfigAuth());
-                String responseProduto = ConfigUtils.getResponse(config.getHeaders(), config.getConfigCadastroProdutos(), config.getConfigAuth()).getBody();
+                try {
+                    config.getConfigCadastroProdutos().getSearchParameters().changeValue(Long.valueOf(parameters.get("ean")));
+                    ConfigUtils.verifyAndRenewToken(config.getHeaders(), config.getConfigCadastroProdutos(), config.getConfigAuth());
+                    String responseProduto = ConfigUtils.getResponse(config.getHeaders(), config.getConfigCadastroProdutos(), config.getConfigAuth()).getBody();
 
-                JsonNode jsonProduto = JsonUtils.getJsonObject(responseProduto).get("data").get(0);
+                    int total = JsonUtils.getJsonObject(responseProduto).get("total").intValue();
 
-                BuscaCadProdutos busca = config.getConfigCustosProdutos().getSearchParameters();
-                String field = busca.getCampo();
+                    Produto produto = new Produto();
 
-                busca.changeValue(jsonProduto.get(field).longValue());
+                    JsonNode jsonProduto = JsonUtils.getJsonObject(responseProduto).get("data").get(0);
 
-                String responseCusto = ConfigUtils.getResponse(config.getHeaders(), config.getConfigCustosProdutos(), config.getConfigAuth()).getBody();
+                    BuscaCadProdutos busca = config.getConfigCustosProdutos().getSearchParameters();
+                    String field = busca.getCampo();
 
-                JsonNode jsonCusto = JsonUtils.getJsonObject(responseCusto).get("data").get(0);
+                    busca.changeValue(jsonProduto.get(field).longValue());
 
-                Produto produto = new Produto();
+                    String responseCusto = ConfigUtils.getResponse(config.getHeaders(), config.getConfigCustosProdutos(), config.getConfigAuth()).getBody();
 
-                Set<Field> fields = config.getFields();
+                    JsonNode jsonCusto = JsonUtils.getJsonObject(responseCusto).get("data").get(0);
 
-                for(Field f : fields) {
-                    if(jsonProduto.has(f.getOriginalName())) {
-                        produto.set(f.getNewName(), TypeUtils.getValue(jsonProduto.get(f.getOriginalName())));
-                    } else {
-                        produto.set(f.getNewName(), TypeUtils.getValue(jsonCusto.get(f.getOriginalName())));
+                    Set<Field> fields = config.getFields();
+
+                    for (Field f : fields) {
+                        if (jsonProduto.has(f.getOriginalName())) {
+                            produto.set(f.getNewName(), TypeUtils.getValue(jsonProduto.get(f.getOriginalName())));
+                        } else {
+                            produto.set(f.getNewName(), TypeUtils.getValue(jsonCusto.get(f.getOriginalName())));
+                        }
                     }
-                }
 
-                return produto;
+                    return produto;
+
+                } catch (NullPointerException e) {
+                    Map<String, String> erro = new HashMap<>();
+                    erro.put("errorMessage", "Produto não econtrado!");
+                    erro.put("errorCode", HttpStatus.NOT_FOUND.toString());
+
+                    return erro;
+                }
 
 /*
                 RestTemplate restTemplate = new RestTemplate();
