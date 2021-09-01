@@ -63,38 +63,49 @@
 
                                             $("#cad-send").click(function() {
                                                 $.post("/config/ws/cad/cadConfig", $("#cad-form").serialize()).done(function(data) {
-                                                    $("#cad-jsonView").replaceWith(data);
+                                                    if ($(data).attr('id') === "dialog-error") {
+                                                        $("#dialog-error").replaceWith(data);
+                                                        $("#dialog-error").modal("show");
+                                                    } else {
+                                                        $("#cad-jsonView").replaceWith(data);
 
-                                                    $("#cad-findProdValue").click(function() {
-                                                        var jsonCadProd = $("#cad-json").text();
-                                                        $.post("/config/ws/cad/loadFields", $("#form-sendJsonToFindValue").serialize() ).done(function(data) {
-                                                            $("#cad-findValue").replaceWith(data);
+                                                        $("#cad-findProdValue").click(function() {
+                                                            var jsonCadProd = $("#cad-json").text();
+                                                            $.post("/config/ws/cad/loadFields", $("#form-sendJsonToFindValue").serialize() ).done(function(data) {
+                                                                $("#cad-findValue").replaceWith(data);
 
-                                                            $("#cad-selectField").change(function() {
-                                                                var json = JSON.parse(jsonCadProd);
-                                                                var value = json['data'][0][$(this).val()];
-                                                                $("#cad-selectFieldValue").val(value);
-                                                            });
+                                                                $("#cad-selectField").change(function() {
+                                                                    var json = JSON.parse(jsonCadProd);
+                                                                    var value = json['data'][0][$(this).val()];
+                                                                    $("#cad-selectFieldValue").val(value);
+                                                                });
 
-                                                            $("#cad-buscaCusto").click(function() {
-                                                                $.post("/config/ws/cad/loadFieldsValues", $("#form-loadFieldsValue").serialize()).done(function(data) {
+                                                                $("#cad-buscaCusto").click(function() {
+                                                                    $.post("/config/ws/cad/loadFieldsValues", $("#form-loadFieldsValue").serialize()).done(function(data) {
+                                                                        if ($(data).attr('id') === "dialog-error") {
+                                                                            $("#dialog-error").replaceWith(data);
+                                                                            $("#dialog-error").modal("show");
+                                                                        } else {
 
-                                                                    $("#cad-fieldsValues").replaceWith(data);
+                                                                            $("#cadFieldsValues").replaceWith('<div id="cad-fieldsValues"></div>');
+                                                                            $("#cad-fieldsValues").replaceWith(data);
 
-                                                                    $("#cad-saveConfig").click(function() {
-                                                                        $.post("/config/ws/cad/saveConfig", $("#form-saveConfig").serialize()).done(function(data) {
-                                                                            $("#dialog-success").replaceWith(data);
-                                                                            $("#save-complete").modal('show');
-                                                                            $(".redirect-button").off();
-                                                                            $(".redirect-button").click(function() {
-                                                                                $(location).attr("href", "/config/ws");
+                                                                            $("#cad-saveConfig").click(function() {
+                                                                                $.post("/config/ws/cad/saveConfig", $("#form-saveConfig").serialize()).done(function(data) {
+                                                                                    $("#dialog-success").replaceWith(data);
+                                                                                    $("#save-complete").modal('show');
+                                                                                    $(".redirect-button").off();
+                                                                                    $(".redirect-button").click(function() {
+                                                                                        $(location).attr("href", "/config/ws");
+                                                                                    });
+                                                                                });
                                                                             });
-                                                                        });
+                                                                        }
                                                                     });
                                                                 });
                                                             });
                                                         });
-                                                    });
+                                                    }
                                                 });
                                             });
                                         });
@@ -279,17 +290,23 @@
 
             $("#auth-send").click(function() {
                 $.post("/config/ws/auth/startConfig", $("#auth-form").serialize()).done(function(data) {
-                    $("#auth-jsonView").replaceWith(data);
+                    if ($(data).attr('id') === "dialog-error") {
+                        $("#dialog-error").replaceWith(data);
+                        $("#dialog-error").modal("show");
+                    } else {
 
-                    $("#auth-getJsonFields").off();
-                    $("#auth-getJsonFields").click(function() {
-                        var jsonValue = $("#auth-json").text();
-                        $.post("/config/ws/auth/configAuth", { json: jsonValue } ).done(function(data) {
-                            $("#auth-fieldsView").replaceWith(data);
+                        $("#auth-jsonView").replaceWith(data);
 
-                            selectField();
+                        $("#auth-getJsonFields").off();
+                        $("#auth-getJsonFields").click(function() {
+                            var jsonValue = $("#auth-json").text();
+                            $.post("/config/ws/auth/configAuth", { json: jsonValue } ).done(function(data) {
+                                $("#auth-fieldsView").replaceWith(data);
+
+                                selectField();
+                            });
                         });
-                    });
+                    }
                 });
             });
 

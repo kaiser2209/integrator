@@ -151,6 +151,7 @@ public class WebServiceController {
                     .build();
 
             ConfigUtils.saveConfig(config);
+            LogUtils.saveLog("Configurações salvas!");
 
         } catch (Exception e) {
             LogUtils.saveLog(e.getMessage() +  " - WebServiceController.java:156");
@@ -168,56 +169,67 @@ public class WebServiceController {
                                   @RequestParam String[] bodyKey,
                                   @RequestParam String[] bodyValue) throws JsonProcessingException {
 
-        //bodyKey = TestUtils.getAuthTestKeys();
-        //bodyValue = TestUtils.getAuthTestValues();
-        //ws_path = TestUtils.getAuthUrl();
+        bodyKey = TestUtils.getAuthTestKeys();
+        bodyValue = TestUtils.getAuthTestValues();
+        ws_path = TestUtils.getAuthUrl();
+        try {
 
-        RestTemplate restTemplate = new RestTemplate();
+            RestTemplate restTemplate = new RestTemplate();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        MultiValueMap<String, String> postParameters = new LinkedMultiValueMap<>();
-        for(int i = 0; i < bodyKey.length; i++) {
-            postParameters.add(bodyKey[i], bodyValue[i]);
+            MultiValueMap<String, String> postParameters = new LinkedMultiValueMap<>();
+            for (int i = 0; i < bodyKey.length; i++) {
+                postParameters.add(bodyKey[i], bodyValue[i]);
+            }
+
+            HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(postParameters, headers);
+
+            ResponseEntity<String> response = restTemplate.exchange(ws_path, method, request, String.class);
+
+            map.addAttribute("result", FileUtils.getFormattedJson(response.getBody()));
+
+            Map<String, String> authBodyKeys = new HashMap<>();
+            for (int i = 0; i < bodyKey.length; i++) {
+                authBodyKeys.put(bodyKey[i], bodyValue[i]);
+            }
+
+            ConfigUtils.setConfig(new ConfigBuilder()
+                    .setConfigAuth(new ConfigAuthBuilder()
+                            .setMethodType(method)
+                            .setPath(ws_path)
+                            .setBodyParameters(authBodyKeys)
+                            .build())
+                    .build());
+
+            return "dataFragments :: #auth-jsonView";
+        } catch (Exception e) {
+            LogUtils.saveLog(e.getMessage() + " - WebServiceController.java:206");
+            LogUtils.saveLog(Arrays.toString(e.getStackTrace()));
+            map.addAttribute("title", "Erro");
+            map.addAttribute("errorMessage", e.getMessage());
+            return "dataFragments :: #dialog-error";
         }
 
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(postParameters, headers);
 
-        ResponseEntity<String> response = restTemplate.exchange(ws_path, method, request, String.class);
-
-        map.addAttribute("result", FileUtils.getFormattedJson(response.getBody()));
-
-        Map<String, String> authBodyKeys = new HashMap<>();
-        for(int i = 0; i < bodyKey.length; i++) {
-            authBodyKeys.put(bodyKey[i], bodyValue[i]);
-        }
-
-        ConfigUtils.setConfig(new ConfigBuilder()
-                .setConfigAuth(new ConfigAuthBuilder()
-                        .setMethodType(method)
-                        .setPath(ws_path)
-                        .setBodyParameters(authBodyKeys)
-                        .build())
-                .build());
-
-        System.out.println(FileUtils.getFormattedJson(response.getBody()));
-
-        System.out.println(ConfigUtils.getConfig().toString());
-
-        return "dataFragments :: #auth-jsonView";
     }
 
     @PostMapping(value = "/config/ws/auth/configAuth", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
     public String configAuth(ModelMap map,
                              @RequestParam String json) throws JsonProcessingException {
 
-        JsonNode jsonNode = JsonUtils.getJsonObject(json);
+        try {
 
-        List<String> fields = JsonUtils.getJsonFields(jsonNode);
+            JsonNode jsonNode = JsonUtils.getJsonObject(json);
 
-        map.addAttribute("fields", fields);
-        map.addAttribute("authJsonFields", json);
+            List<String> fields = JsonUtils.getJsonFields(jsonNode);
+
+            map.addAttribute("fields", fields);
+            map.addAttribute("authJsonFields", json);
+        } catch (Exception e) {
+            LogUtils.saveLog(e.getMessage() + " - WebServiceController.java:225");
+        }
 
         return "dataFragments :: #auth-jsonFields";
     }
@@ -228,23 +240,27 @@ public class WebServiceController {
                              @RequestParam(value = "value", defaultValue = "") String[] value,
                              @RequestParam(value = "authJson", defaultValue = "") String authJson) throws JsonProcessingException {
 
-        String authorizationValue = "";
+        try {
+            String authorizationValue = "";
 
-        JsonNode json = JsonUtils.getJsonObject(authJson);
+            JsonNode json = JsonUtils.getJsonObject(authJson);
 
-        for(String v : value) {
-            authorizationValue += json.get(v).textValue() + " ";
+            for (String v : value) {
+                authorizationValue += json.get(v).textValue() + " ";
+            }
+
+            authorizationValue = authorizationValue.trim();
+
+            map.addAttribute("headerKey", key);
+            map.addAttribute("headerValue", authorizationValue);
+
+            ConfigUtils.getConfig().getConfigAuth().setFieldsUsedInAuth(value);
+            ConfigUtils.getConfig().getConfigAuth().setAuthField(key);
+
+        } catch (Exception e) {
+            LogUtils.saveLog(e.getMessage() + " - WebServiceController.java:256");
+
         }
-
-        authorizationValue = authorizationValue.trim();
-
-        map.addAttribute("headerKey", key);
-        map.addAttribute("headerValue", authorizationValue);
-
-        ConfigUtils.getConfig().getConfigAuth().setFieldsUsedInAuth(value);
-        ConfigUtils.getConfig().getConfigAuth().setAuthField(key);
-
-        System.out.println(ConfigUtils.getConfig().toString());
 
         return "dataFragments :: #cad-config";
     }
@@ -256,50 +272,59 @@ public class WebServiceController {
                               @RequestParam String[] key,
                               @RequestParam String[] value,
                               @RequestParam String campo,
-                              @RequestParam long valor,
+                              @RequestParam(defaultValue = "0") long valor,
                               @RequestParam String operador) throws JsonProcessingException {
 
-        RestTemplate restTemplate = new RestTemplate();
+        try {
 
-        HttpHeaders headers = new HttpHeaders();
+            RestTemplate restTemplate = new RestTemplate();
 
-        for(int i = 0; i < key.length; i++) {
-            headers.add(key[i], value[i]);
+            HttpHeaders headers = new HttpHeaders();
+
+            for (int i = 0; i < key.length; i++) {
+                headers.add(key[i], value[i]);
+            }
+
+            BuscaCadProdutos buscaCadProdutos = new BuscaCadProdutos();
+            buscaCadProdutos.setPage(1);
+            buscaCadProdutos.addClausula(campo, valor, operador);
+
+            ObjectMapper mapper = new ObjectMapper();
+            String json = mapper.writeValueAsString(buscaCadProdutos);
+
+            HttpEntity<String> request = new HttpEntity<>(json, headers);
+
+            ResponseEntity<String> response = restTemplate.exchange(ws_path, method, request, String.class);
+
+            ConfigUtils.getConfig().setConfigCadastroProdutos(new ConfigCadastroProdutosBuilder()
+                    .setPath(ws_path)
+                    .setMethod(method)
+                    .setSearchParameters(buscaCadProdutos)
+                    .build());
+
+            Set<Header> configHeaders = new HashSet<>();
+            for (int i = 0; i < key.length; i++) {
+                Header h = HeaderBuilder.get()
+                        .addKeySet(key[i], value[i])
+                        .build();
+                configHeaders.add(h);
+            }
+
+            ConfigUtils.getConfig().setHeaders(configHeaders);
+
+            map.addAttribute("result", FileUtils.getFormattedJson(response.getBody()));
+            map.addAttribute("headers", headers);
+
+            return "dataFragments :: #cadJsonView";
+
+        } catch (Exception e) {
+            LogUtils.saveLog(e.getMessage() + " - WebServiceController.java:312");
+            LogUtils.saveLog(Arrays.toString(e.getStackTrace()));
+            map.addAttribute("title", "Erro");
+            map.addAttribute("errorMessage", e.getMessage());
+            return "dataFragments :: #dialog-error";
         }
 
-        BuscaCadProdutos buscaCadProdutos = new BuscaCadProdutos();
-        buscaCadProdutos.setPage(1);
-        buscaCadProdutos.addClausula(campo, valor, operador);
-
-        ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writeValueAsString(buscaCadProdutos);
-
-        HttpEntity<String> request = new HttpEntity<>(json, headers);
-
-        ResponseEntity<String> response = restTemplate.exchange(ws_path, method, request, String.class);
-
-        ConfigUtils.getConfig().setConfigCadastroProdutos(new ConfigCadastroProdutosBuilder()
-                .setPath(ws_path)
-                .setMethod(method)
-                .setSearchParameters(buscaCadProdutos)
-                .build());
-
-        Set<Header> configHeaders = new HashSet<>();
-        for(int i = 0; i < key.length; i++) {
-            Header h = HeaderBuilder.get()
-                    .addKeySet(key[i], value[i])
-                    .build();
-            configHeaders.add(h);
-        }
-
-        ConfigUtils.getConfig().setHeaders(configHeaders);
-
-        System.out.println(ConfigUtils.getConfig());
-
-        map.addAttribute("result", FileUtils.getFormattedJson(response.getBody()));
-        map.addAttribute("headers", headers);
-
-        return "dataFragments :: #cadJsonView";
     }
 
     @PostMapping(value = "/config/ws/cad/loadFields", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
@@ -308,19 +333,24 @@ public class WebServiceController {
                                   @RequestParam String[] headerKey,
                                   @RequestParam String[] headerValue) throws JsonProcessingException {
 
-        Map<String, String> headerMap = new HashMap<>();
+        try {
 
-        for(int i = 0; i < headerKey.length; i++) {
-            headerMap.put(headerKey[i], headerValue[i]);
+            Map<String, String> headerMap = new HashMap<>();
+
+            for (int i = 0; i < headerKey.length; i++) {
+                headerMap.put(headerKey[i], headerValue[i]);
+            }
+
+            JsonNode jsonNode = JsonUtils.getJsonObject(json);
+
+            List<String> fields = JsonUtils.getJsonFields(jsonNode.get("data").get(0));
+
+            map.addAttribute("fields", fields);
+            map.addAttribute("headers", headerMap);
+            map.addAttribute("json", json);
+        } catch (Exception e) {
+            LogUtils.saveLog(e.getMessage() + " - WebServiceController.java:340");
         }
-
-        JsonNode jsonNode = JsonUtils.getJsonObject(json);
-
-        List<String> fields = JsonUtils.getJsonFields(jsonNode.get("data").get(0));
-
-        map.addAttribute("fields", fields);
-        map.addAttribute("headers", headerMap);
-        map.addAttribute("json", json);
 
         return "dataFragments :: #cad-findValueContent";
     }
@@ -330,60 +360,70 @@ public class WebServiceController {
                                    @RequestParam HttpMethod method,
                                    @RequestParam String ws_path,
                                    @RequestParam String campo,
-                                   @RequestParam long valor,
+                                   @RequestParam(defaultValue = "0") long valor,
                                    @RequestParam String operador,
                                    @RequestParam String jsonProduto,
                                    @RequestParam String[] key,
                                    @RequestParam String[] value) throws JsonProcessingException {
 
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders httpHeaders = new HttpHeaders();
+        try {
 
-        for(int i = 0; i < key.length; i++) {
-            httpHeaders.add(key[i], value[i]);
-        }
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders httpHeaders = new HttpHeaders();
 
-        BuscaCadProdutos buscaCadProdutos = new BuscaCadProdutos();
-        buscaCadProdutos.setPage(1);
-        buscaCadProdutos.addClausula(campo, valor, operador);
-
-        ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writeValueAsString(buscaCadProdutos);
-
-        System.out.println(json);
-
-        HttpEntity<String> request = new HttpEntity<>(json, httpHeaders);
-
-        ResponseEntity<String> response = restTemplate.exchange(ws_path, method, request, String.class);
-
-        map.addAttribute("result", FileUtils.getFormattedJson(response.getBody()));
-
-        JsonNode jsonNodeProduto = JsonUtils.getJsonObject(jsonProduto);
-        JsonNode jsonNodeCusto = JsonUtils.getJsonObject(FileUtils.getFormattedJson(response.getBody()));
-
-        List<String> fields = JsonUtils.getJsonFields(jsonNodeProduto.get("data").get(0));
-        List<String> fieldsCusto = JsonUtils.getJsonFields(jsonNodeCusto.get("data").get(0));
-        List<String> fieldsToAdd = new ArrayList<>();
-
-        for(String f : fieldsCusto) {
-            if(!fields.contains(f)) {
-                fieldsToAdd.add(f);
+            for (int i = 0; i < key.length; i++) {
+                httpHeaders.add(key[i], value[i]);
             }
+
+            BuscaCadProdutos buscaCadProdutos = new BuscaCadProdutos();
+            buscaCadProdutos.setPage(1);
+            buscaCadProdutos.addClausula(campo, valor, operador);
+
+            ObjectMapper mapper = new ObjectMapper();
+            String json = mapper.writeValueAsString(buscaCadProdutos);
+
+            System.out.println(json);
+
+            HttpEntity<String> request = new HttpEntity<>(json, httpHeaders);
+
+            ResponseEntity<String> response = restTemplate.exchange(ws_path, method, request, String.class);
+
+            map.addAttribute("result", FileUtils.getFormattedJson(response.getBody()));
+
+            JsonNode jsonNodeProduto = JsonUtils.getJsonObject(jsonProduto);
+            JsonNode jsonNodeCusto = JsonUtils.getJsonObject(FileUtils.getFormattedJson(response.getBody()));
+
+            List<String> fields = JsonUtils.getJsonFields(jsonNodeProduto.get("data").get(0));
+            List<String> fieldsCusto = JsonUtils.getJsonFields(jsonNodeCusto.get("data").get(0));
+            List<String> fieldsToAdd = new ArrayList<>();
+
+            for (String f : fieldsCusto) {
+                if (!fields.contains(f)) {
+                    fieldsToAdd.add(f);
+                }
+            }
+
+            ConfigUtils.getConfig().setConfigCustosProdutos(new ConfigCustosProdutosBuilder()
+                    .setPath(ws_path)
+                    .setSearchParameters(buscaCadProdutos)
+                    .setMethod(method)
+                    .build());
+
+            fields.addAll(fieldsToAdd);
+
+            map.addAttribute("fields", fields);
+
+            return "dataFragments :: #cadFieldsValues";
+
+        } catch (Exception e) {
+            LogUtils.saveLog(e.getMessage() + " - WebServiceController.java:404");
+            LogUtils.saveLog(Arrays.toString(e.getStackTrace()));
+            map.addAttribute("title", "Erro");
+            map.addAttribute("errorMessage", e.getMessage());
+            return "dataFragments :: #dialog-error";
         }
 
-        ConfigUtils.getConfig().setConfigCustosProdutos(new ConfigCustosProdutosBuilder()
-                .setPath(ws_path)
-                .setSearchParameters(buscaCadProdutos)
-                .setMethod(method)
-                .build());
 
-        System.out.println(ConfigUtils.getConfig().toString());
-
-        fields.addAll(fieldsToAdd);
-
-        map.addAttribute("fields", fields);
-
-        return "dataFragments :: #cadFieldsValues";
     }
 
     @PostMapping(value = "/config/ws/cad/saveConfig", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
@@ -392,21 +432,27 @@ public class WebServiceController {
                                    @RequestParam String[] originalName,
                                    @RequestParam String[] newName) {
 
-        ConfigUtils.getConfig().setIntegrationType(integrationType);
+        try {
 
-        Set<Field> fields = new HashSet<>();
+            ConfigUtils.getConfig().setIntegrationType(integrationType);
 
-        for(int i = 0; i < originalName.length; i++) {
-            if (!originalName[i].equals("0")) {
-                fields.add(FieldBuilder.get()
-                        .setOriginalName(originalName[i])
-                        .setNewName(newName[i])
-                        .build());
+            Set<Field> fields = new HashSet<>();
+
+            for (int i = 0; i < originalName.length; i++) {
+                if (!originalName[i].equals("0")) {
+                    fields.add(FieldBuilder.get()
+                            .setOriginalName(originalName[i])
+                            .setNewName(newName[i])
+                            .build());
+                }
             }
-        }
 
-        ConfigUtils.getConfig().setFields(fields);
-        ConfigUtils.saveConfig();
+            ConfigUtils.getConfig().setFields(fields);
+            ConfigUtils.saveConfig();
+
+        } catch (Exception e) {
+            LogUtils.saveLog(e.getMessage() + " - WebServiceController.java:435");
+        }
 
         return "dataFragments :: #save-complete";
     }
