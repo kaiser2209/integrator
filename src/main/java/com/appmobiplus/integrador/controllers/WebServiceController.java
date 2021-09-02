@@ -277,6 +277,17 @@ public class WebServiceController {
 
         try {
 
+            ConfigCadastroProduto getCadastro = new ConfigCadastroProdutoBuilder()
+                    .setPath(ws_path)
+                    .setMethod(method)
+                    .setHeader(ConfigUtils.getMapParameters(key, value))
+                    .addBody("campo", campo)
+                    .addBody("valor", String.valueOf(valor))
+                    .addBody("operador", operador)
+                    .build();
+
+            System.out.println(getCadastro.toString());
+
             RestTemplate restTemplate = new RestTemplate();
 
             HttpHeaders headers = new HttpHeaders();

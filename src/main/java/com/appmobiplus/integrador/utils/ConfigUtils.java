@@ -17,6 +17,7 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -221,5 +222,14 @@ public class ConfigUtils {
         }
 
         return h;
+    }
+
+    public static Map<String, String> getMapParameters(String[] key, String[] value) {
+        Map<String, String> parameters = new HashMap<>();
+        for(int i = 0; i < key.length; i++) {
+            parameters.put(key[i], value[i]);
+        }
+
+        return parameters;
     }
 }
