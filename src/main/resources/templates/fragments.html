@@ -360,6 +360,45 @@
 
                 $("#ws_path").val(url + parameters);
             });
+
+            var authLines = [];
+            authLines[0] = $("#table-auth-parameters-keys tr")[1];
+
+            $("#auth-ws_path").on('input', function() {
+                var value = $(this).val();
+                if(value.indexOf('?') > -1) {
+                    var parameters = value.substr(value.indexOf('?') + 1);
+                    var parameters = parameters.split('&');
+
+                    var delLines = $("#table-auth-parameters-keys tbody tr");
+                    var newLines = [];
+                    $.each(delLines, function(index, line) {
+                        var i = (delLines.length - index) - 1;
+                        if(i > (parameters.length - 1)) {
+                            delLines[index].remove();
+                        }
+                    });
+
+                    authLines = $("#table-auth-parameters-keys tbody tr");
+
+                    $.each(parameters, function(index, val) {
+                        if(authLines.length < index + 1) {
+                            authLines.push('<tr>' +
+                                '<td><input type="text" class="form-control border-0" name="parameterKey" /></td>' +
+                                '<td><input type="text" class="form-control border-0" name="parameterValue" /></td>' +
+                            '</tr>');
+                            $("#table-auth-parameters-keys tr:last").after(authLines[index]);
+                            authLines[index] = $("#table-auth-parameters-keys tr")[index + 1];
+                        }
+
+                        var inputs = $(authLines[index]).find('input');
+                        var pairKeyValue = val.split('=');
+                        $(inputs[0]).val(pairKeyValue[0]);
+                        $(inputs[1]).val(pairKeyValue[1]);
+                    });
+
+                }
+            });
         });
     </script>
 </head>

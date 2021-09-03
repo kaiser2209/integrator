@@ -110,16 +110,39 @@
                                 </select>
                             </div>
                             <input type="hidden" name="integrationType" value="WEB_SERVICE" />
-                            <input type="text" class="form-control" name="ws_path" aria-describedby="next" aria-label="Próximo" required />
+                            <input type="text" class="form-control" name="ws_path" id="auth-ws_path" aria-describedby="next" aria-label="Próximo" required />
                             <button type="button" class="btn btn-outline-secondary" id="auth-send">Próximo</button>
                         </div>
                         <div class="border rounder p-3 mb-3">
                             <div class="nav nav-tabs" id="auth-keys" role="tablist">
-                                <button class="nav-link active" id="auth-header-tab" data-bs-toggle="tab" data-bs-target="#auth-header" type="button" role="tab" aria-controls="auth-header" aria-selected="true">Header</button>
+                                <button class="nav-link active" id="auth-parameter-tab" data-bs-toggle="tab" data-bs-target="#auth-parameter" type="button" role="tab" aria-controls="auth-parameter" aria-selected="true">Parameters</button>
+                                <button class="nav-link" id="auth-header-tab" data-bs-toggle="tab" data-bs-target="#auth-header" type="button" role="tab" aria-controls="auth-header" aria-selected="true">Header</button>
                                 <button class="nav-link" id="auth-body-tab" data-bs-toggle="tab" data-bs-target="#auth-body" type="button" role="tab" aria-controls="auth-body" aria-selected="false">Body</button>
                             </div>
                             <div class="tab-content" id="auth-content">
-                                <div class="tab-pane fade show active" id="auth-header" role="tabpanel" aria-labelledby="auth-header">
+                                <div class="tab-pane fade show active" id="auth-parameter" role="tabpanel" aria-labelledby="auth-parameter-tab">
+                                    <table class="table" id="table-auth-parameters-keys">
+                                        <thead>
+                                        <th scope="col">CHAVE</th>
+                                        <th scope="col">VALOR</th>
+                                        <th scope="col"></th>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td>
+                                                <input type="text" class="form-control border-0" name="parameterKey" id="authParameterKey" />
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control border-0" name="parameterValue" id="authParameterValue" />
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <button class="btn btn-outline-secondary" type="button" id="btn-new-auth-parameter-key">Adicionar Chave</button>
+                                </div>
+                                <div class="tab-pane fade" id="auth-header" role="tabpanel" aria-labelledby="auth-header">
 
                                     <table class="table" id="table-auth-header-keys" >
                                         <thead>
