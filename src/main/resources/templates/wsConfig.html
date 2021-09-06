@@ -210,24 +210,26 @@
                                         <table class="table" id="table-auth-raw-fields">
                                             <thead>
                                             <tr>
-                                                <th scope="col">CAMPO</th>
+                                                <th scope="col">CHAVE</th>
                                                 <th scope="col">VALOR</th>
-                                                <th scope="col">OPERADOR</th>
+                                                <th scope="col">TIPO</th>
+                                                <th></th>
                                             </tr>
                                             </thead>
                                             <tbody>
                                             <tr>
-                                                <td><input type="text" class="form-control border-0" name="campo" /></td>
-                                                <td><input type="text" class="form-control border-0" name="valor" /></td>
-                                                <td><select class="form-select" name="operador">
-                                                    <option value="IGUAL" selected>IGUAL</option>
-                                                    <option value="DIFERENTE">DIFERENTE</option>
-                                                    <option value="MENOR">MENOR</option>
-                                                    <option value="MAIOR">MAIOR</option>
+                                                <td><input type="text" class="form-control border-0" name="bodyKeyRaw" /></td>
+                                                <td><input type="text" class="form-control border-0" name="bodyValueRaw" /></td>
+                                                <td><select class="form-select" name="bodyTypeRaw">
+                                                    <option value="text" selected>Texto</option>
+                                                    <option value="number">Número</option>
                                                 </select></td>
+                                                <td></td>
                                             </tr>
                                             </tbody>
                                         </table>
+
+                                        <button class="btn btn-outline-secondary" type="button" id="btn-auth-new-bodyKeyRaw">Adicionar Chave</button>
                                     </div>
                                 </div>
                             </div>

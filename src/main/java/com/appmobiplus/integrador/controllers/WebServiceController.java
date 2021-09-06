@@ -167,26 +167,59 @@ public class WebServiceController {
                                   @RequestParam String[] headerKey,
                                   @RequestParam String[] headerValue,
                                   @RequestParam String[] bodyKey,
-                                  @RequestParam String[] bodyValue) throws JsonProcessingException {
+                                  @RequestParam String[] bodyValue,
+                                  @RequestParam(value = "auth-bodyType") String authbodyType,
+                                  @RequestParam String[] bodyKeyRaw,
+                                  @RequestParam String[] bodyValueRaw,
+                                  @RequestParam String[] bodyTypeRaw) throws JsonProcessingException {
 
         bodyKey = TestUtils.getAuthTestKeys();
         bodyValue = TestUtils.getAuthTestValues();
         ws_path = TestUtils.getAuthUrl();
+
+        Map<String, Object> mapBodyRaw = new HashMap<>();
+
+        if (bodyKeyRaw.length > 0) {
+            for(int i = 0; i < bodyKeyRaw.length; i++) {
+                if (bodyTypeRaw[i].equals("number")) {
+                    mapBodyRaw.put(bodyKeyRaw[i], Long.valueOf(bodyValueRaw[i]));
+                } else {
+                    mapBodyRaw.put(bodyKeyRaw[i], bodyValueRaw[i]);
+                }
+            }
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonBodyRaw = mapper.writeValueAsString(mapBodyRaw);
+
+        System.out.println(jsonBodyRaw);
+
+        System.out.println(Arrays.toString(bodyKeyRaw));
+        System.out.println(Arrays.toString(bodyValueRaw));
+        System.out.println(Arrays.toString(bodyTypeRaw));
+        System.out.println(authbodyType);
+
         try {
 
             RestTemplate restTemplate = new RestTemplate();
 
             HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+            //headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
             MultiValueMap<String, String> postParameters = new LinkedMultiValueMap<>();
             for (int i = 0; i < bodyKey.length; i++) {
                 postParameters.add(bodyKey[i], bodyValue[i]);
             }
 
-            HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(postParameters, headers);
+            ResponseEntity<String> response;
 
-            ResponseEntity<String> response = restTemplate.exchange(ws_path, method, request, String.class);
+            if (authbodyType.equals("raw")) {
+                HttpEntity<String> request = new HttpEntity<>(jsonBodyRaw, headers);
+                response = restTemplate.exchange(ws_path, method, request, String.class);
+            } else {
+                HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(postParameters, headers);
+                response = restTemplate.exchange(ws_path, method, request, String.class);
+            }
 
             map.addAttribute("result", FileUtils.getFormattedJson(response.getBody()));
 
@@ -286,7 +319,9 @@ public class WebServiceController {
                     .addBody("operador", operador)
                     .build();
 
-            System.out.println(getCadastro.toString());
+            //System.out.println(getCadastro.toString());
+
+            Map<String, String> urlParameters = WebServiceUtils.getParameters(ws_path);
 
             RestTemplate restTemplate = new RestTemplate();
 
@@ -311,6 +346,7 @@ public class WebServiceController {
                     .setPath(ws_path)
                     .setMethod(method)
                     .setSearchParameters(buscaCadProdutos)
+                    .setUrlParameters(urlParameters)
                     .build());
 
             Set<Header> configHeaders = new HashSet<>();

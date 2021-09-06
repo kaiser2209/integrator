@@ -319,20 +319,55 @@
             var lines = [];
             lines[0] = $("#table-parameters-keys tr")[1];
 
+            var rewriteParameters = function(inputPath, tableParameters) {
+                if (!($(inputPath).val() === "")) {
+                    var url = $(inputPath).val().split('?')[0];
+                    var lines = $(tableParameters + " tbody tr");
+                    var parameters = "?";
+                    $.each(lines, function(index, val) {
+                        var inputs = $(val).find('input');
+                        if(!($(inputs[0]).val() === "")) {
+                            parameters = parameters + $(inputs[0]).val() + "=" + $(inputs[1]).val();
+                            if(index < lines.length - 1) {
+                                parameters = parameters + "&";
+                            }
+                        }
+                    });
+
+                    $(inputPath).val(url + parameters);
+                }
+            }
+
             $("#ws_path").on('input', function() {
                 var value = $(this).val();
                 if(value.indexOf('?') > -1) {
                     var parameters = value.substr(value.indexOf('?') + 1);
                     var parameters = parameters.split('&');
 
+                    var delLines = $("#table-parameters-keys tbody tr");
+                    var newLines = [];
+                    $.each(delLines, function(index, line) {
+                        var i = (delLines.length - index) - 1;
+                        if(i > (parameters.length - 1)) {
+                            delLines[i].remove();
+                        }
+                    });
+
+                    lines = $("#table-parameters-keys tbody tr");
+
                     $.each(parameters, function(index, val) {
                         if(lines.length < index + 1) {
                             lines.push('<tr>' +
                                 '<td><input type="text" class="form-control border-0" name="parameterKey" /></td>' +
                                 '<td><input type="text" class="form-control border-0" name="parameterValue" /></td>' +
+                                '<td><button type="button" class="btn"><i class="fas fa-backspace text-danger"></i></button></td>' +
                             '</tr>');
                             $("#table-parameters-keys tr:last").after(lines[index]);
                             lines[index] = $("#table-parameters-keys tr")[index + 1];
+                            $(lines[index]).on('click', 'button', function() {
+                                $(lines[index]).remove();
+                                rewriteParameters("#ws_path", "#table-parameters-keys");
+                            });
                         }
 
                         var inputs = $(lines[index]).find('input');
@@ -345,20 +380,7 @@
             });
 
             $("#table-parameters-keys").on('input', 'input', function() {
-                var url = $("#ws_path").val().split('?')[0];
-                var lines = $("#table-parameters-keys tr");
-                var parameters = "?";
-                $.each(lines, function(index, val) {
-                    if(index > 0) {
-                        var inputs = $(val).find('input');
-                        parameters = parameters + $(inputs[0]).val() + "=" + $(inputs[1]).val();
-                    }
-                    if(index < lines.length - 1) {
-                        parameters = parameters + "&";
-                    }
-                });
-
-                $("#ws_path").val(url + parameters);
+                rewriteParameters("#ws_path", "#table-parameters-keys");
             });
 
             var authLines = [];
@@ -375,7 +397,7 @@
                     $.each(delLines, function(index, line) {
                         var i = (delLines.length - index) - 1;
                         if(i > (parameters.length - 1)) {
-                            delLines[index].remove();
+                            delLines[i].remove();
                         }
                     });
 
@@ -386,9 +408,14 @@
                             authLines.push('<tr>' +
                                 '<td><input type="text" class="form-control border-0" name="parameterKey" /></td>' +
                                 '<td><input type="text" class="form-control border-0" name="parameterValue" /></td>' +
+                                '<td><button type="button" class="btn"><i class="fas fa-backspace text-danger"></i></button></td>' +
                             '</tr>');
                             $("#table-auth-parameters-keys tr:last").after(authLines[index]);
                             authLines[index] = $("#table-auth-parameters-keys tr")[index + 1];
+                            $(authLines[index]).on('click', 'button', function() {
+                                $(authLines[index]).remove();
+                                rewriteParameters("#auth-ws_path", "#table-auth-parameters-keys");
+                            });
                         }
 
                         var inputs = $(authLines[index]).find('input');
@@ -398,6 +425,59 @@
                     });
 
                 }
+            });
+
+            $("#table-auth-parameters-keys").on('input', 'input', function() {
+                rewriteParameters("#auth-ws_path", "#table-auth-parameters-keys");
+            });
+
+            $("#btn-new-parameter-key").click(function() {
+                var line =  '<tr>' +
+                            '<td><input type="text" class="form-control border-0" name="parameterKey" /></td>' +
+                            '<td><input type="text" class="form-control border-0" name="parameterValue" /></td>' +
+                            '<td><button type="button" class="btn"><i class="fas fa-backspace text-danger"></i></button></td>' +
+                            '</tr>'
+
+                $("#table-parameters-keys tr:last").after(line);
+                var lastLine = $("#table-parameters-keys tr:last");
+                $(lastLine).on('click', 'button', function() {
+                    $(this).parent().parent().remove();
+                    rewriteParameters("#ws_path", "#table-parameters-keys");
+                });
+            });
+
+            $("#btn-new-auth-parameter-key").click(function() {
+                var line =  '<tr>' +
+                            '<td><input type="text" class="form-control border-0" name="parameterKey" /></td>' +
+                            '<td><input type="text" class="form-control border-0" name="parameterValue" /></td>' +
+                            '<td><button type="button" class="btn"><i class="fas fa-backspace text-danger"></i></button></td>' +
+                            '</tr>'
+
+                $("#table-auth-parameters-keys tr:last").after(line);
+                var lastLine = $("#table-auth-parameters-keys tr:last");
+                $(lastLine).on('click', 'button', function() {
+                    $(this).parent().parent().remove();
+                    rewriteParameters("#auth-ws_path", "#table-auth-parameters-keys");
+                });
+            });
+
+            $("#btn-auth-new-bodyKeyRaw").click(function() {
+                var line = '<tr>' +
+                                '<td><input type="text" class="form-control border-0" name="bodyKeyRaw" /></td>' +
+                                '<td><input type="text" class="form-control border-0" name="bodyValueRaw" /></td>' +
+                                '<td><select class="form-select" name="bodyTypeRaw">' +
+                                    '<option value="text" selected>Text</option>' +
+                                    '<option value="number">Number</option>' +
+                                '</select></td>' +
+                                '<td><button type="button" class="btn"><i class="fas fa-backspace text-danger"></i></button></td>' +
+                            '</tr>';
+
+                $("#table-auth-raw-fields tr:last").after(line);
+
+                var lastLine = $("#table-auth-raw-fields tr:last");
+                $(lastLine).on('click', 'button', function() {
+                    $(this).parent().parent().remove();
+                });
             });
         });
     </script>

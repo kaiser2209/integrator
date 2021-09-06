@@ -1,5 +1,7 @@
 package com.appmobiplus.integrador.configuration;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,6 +36,7 @@ public class BuscaCadProdutos implements Serializable {
         this.clausulas.get(0).setValor(valor);
     }
 
+    @JsonIgnore
     public String getCampo() {
         return this.clausulas.get(0).getCampo();
     }
