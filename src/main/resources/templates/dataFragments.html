@@ -82,7 +82,7 @@
     <div id="auth-jsonFields">
         <h5 class="text-center display-6">Escolha os campos para definir a Chave de Autorização</h5>
         <form method="post" id="auth-fields-form" enctype="application/x-www-form-urlencoded">
-            <div class="d-grid gap-2 d-md-flex" id="auth-list-fields">
+            <div class="m-2 gap-2 d-md-flex row row-cols-auto" id="auth-list-fields">
                 <button th:each="field : ${fields}" class="btn btn-secondary btn-auth-field" type="button" th:text="${field}"></button>
             </div>
             <table class="table">
@@ -130,16 +130,39 @@
                         </select>
                     </div>
                     <input type="hidden" name="integrationType" value="WEB_SERVICE" />
-                    <input type="text" class="form-control" name="ws_path" aria-describedby="next" aria-label="Próximo" required />
+                    <input type="text" class="form-control" name="ws_path" id="cad-ws_path" aria-describedby="next" aria-label="Próximo" required />
                     <button type="button" class="btn btn-outline-secondary" id="cad-send">Próximo</button>
                 </div>
                 <div class="border rounder p-3 mb-3">
                     <div class="nav nav-tabs" id="cad-keys" role="tablist">
-                        <button class="nav-link active" id="cad-header-tab" data-bs-toggle="tab" data-bs-target="#cad-header" type="button" role="tab" aria-controls="cad-header" aria-selected="true">Header</button>
+                        <button class="nav-link active" id="cad-parameter-tab" data-bs-toggle="tab" data-bs-target="#cad-parameter" type="button" role="tab" aria-controls="cad-parameter" aria-selected="true">Parameters</button>
+                        <button class="nav-link" id="cad-header-tab" data-bs-toggle="tab" data-bs-target="#cad-header" type="button" role="tab" aria-controls="cad-header" aria-selected="false">Header</button>
                         <button class="nav-link" id="cad-body-tab" data-bs-toggle="tab" data-bs-target="#cad-body" type="button" role="tab" aria-controls="cad-body" aria-selected="false">Body</button>
                     </div>
                     <div class="tab-content" id="cad-content">
-                        <div class="tab-pane fade show active" id="cad-header" role="tabpanel" aria-labelledby="cad-header">
+                        <div class="tab-pane fade show active" id="cad-parameter" role="tabpanel" aria-labelledby="cad-parameter">
+                            <table class="table" id="table-cad-parameters-keys">
+                                <thead>
+                                <th scope="col">CHAVE</th>
+                                <th scope="col">VALOR</th>
+                                <th scope="col"></th>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>
+                                        <input type="text" class="form-control border-0" name="parameterKey" />
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control border-0" name="parameterValue" />
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                            <button class="btn btn-outline-secondary" type="button" id="btn-new-cad-parameter-key">Adicionar Chave</button>
+                        </div>
+                        <div class="tab-pane fade" id="cad-header" role="tabpanel" aria-labelledby="cad-header">
 
                             <table class="table" id="table-cad-header-keys">
                                 <thead>
@@ -166,7 +189,7 @@
 
                             <button class="btn btn-outline-secondary" type="button" id="btn-cad-new-key" >Adicionar Chave</button>
                         </div>
-                        <div class="tab-pane fade" id="cad-body" role="tabpanel"aria-labelledby="cad-body">
+                        <div class="tab-pane fade" id="cad-body" role="tabpanel" aria-labelledby="cad-body">
                             <div class="p-3">
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input" type="radio" name="cad-bodyType" value="x-www-form-urlencoded" id="cad-urlencoded" checked>

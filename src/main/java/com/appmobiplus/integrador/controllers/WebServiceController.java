@@ -168,14 +168,14 @@ public class WebServiceController {
                                   @RequestParam String[] headerValue,
                                   @RequestParam String[] bodyKey,
                                   @RequestParam String[] bodyValue,
-                                  @RequestParam(value = "auth-bodyType") String authBodyType,
+                                  @RequestParam(value = "auth-bodyType") MediaType authBodyType,
                                   @RequestParam String[] bodyKeyRaw,
                                   @RequestParam String[] bodyValueRaw,
                                   @RequestParam String[] bodyTypeRaw) throws JsonProcessingException {
 
-        //bodyKey = TestUtils.getAuthTestKeys();
-        //bodyValue = TestUtils.getAuthTestValues();
-        //ws_path = TestUtils.getAuthUrl();
+        bodyKey = TestUtils.getAuthTestKeys();
+        bodyValue = TestUtils.getAuthTestValues();
+        ws_path = TestUtils.getAuthUrl();
 
         Map<String, Object> mapBodyRaw = new HashMap<>();
 
@@ -204,11 +204,7 @@ public class WebServiceController {
             RestTemplate restTemplate = new RestTemplate();
 
             HttpHeaders headers = new HttpHeaders();
-            if(authBodyType.equals("raw")) {
-                headers.setContentType(MediaType.APPLICATION_JSON);
-            } else {
-                headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-            }
+            headers.setContentType(authBodyType);
 
             MultiValueMap<String, String> postParameters = new LinkedMultiValueMap<>();
             for (int i = 0; i < bodyKey.length; i++) {
@@ -217,7 +213,7 @@ public class WebServiceController {
 
             ResponseEntity<String> response;
 
-            if (authBodyType.equals("raw")) {
+            if (authBodyType == MediaType.APPLICATION_JSON) {
                 HttpEntity<String> request = new HttpEntity<>(jsonBodyRaw, headers);
                 response = restTemplate.exchange(ws_path, method, request, String.class);
             } else {
@@ -261,6 +257,9 @@ public class WebServiceController {
             JsonNode jsonNode = JsonUtils.getJsonObject(json);
 
             List<String> fields = JsonUtils.getJsonFields(jsonNode);
+            for(int i = 0; i < 10; i++) {
+                fields.add("Teste " + i);
+            }
 
             map.addAttribute("fields", fields);
             map.addAttribute("authJsonFields", json);
@@ -308,9 +307,11 @@ public class WebServiceController {
                               @RequestParam HttpMethod method,
                               @RequestParam String[] key,
                               @RequestParam String[] value,
-                              @RequestParam String campo,
+                              @RequestParam(required = false) String[] parameterKey,
+                              @RequestParam(required = false) String[] parameterValue,
+                              @RequestParam(required = false) String campo,
                               @RequestParam(defaultValue = "0") long valor,
-                              @RequestParam String operador) throws JsonProcessingException {
+                              @RequestParam(required = false) String operador) throws JsonProcessingException {
 
         try {
 
@@ -325,7 +326,16 @@ public class WebServiceController {
 
             //System.out.println(getCadastro.toString());
 
-            Map<String, String> urlParameters = WebServiceUtils.getParameters(ws_path);
+            //Map<String, String> urlParameters = WebServiceUtils.getParameters(ws_path);
+            Map<String, String> urlParameters = new HashMap<>();
+            if (parameterKey != null) {
+                for (int i = 0; i < parameterKey.length; i++) {
+                    urlParameters.put(parameterKey[i], parameterValue[i]);
+                }
+            }
+
+            System.out.println(urlParameters);
+            System.out.println(TestUtils.getJsonProductTest());
 
             RestTemplate restTemplate = new RestTemplate();
 
@@ -336,8 +346,10 @@ public class WebServiceController {
             }
 
             BuscaCadProdutos buscaCadProdutos = new BuscaCadProdutos();
-            buscaCadProdutos.setPage(1);
-            buscaCadProdutos.addClausula(campo, valor, operador);
+            if(campo != null) {
+                buscaCadProdutos.setPage(1);
+                buscaCadProdutos.addClausula(campo, valor, operador);
+            }
 
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(buscaCadProdutos);

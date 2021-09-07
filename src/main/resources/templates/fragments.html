@@ -108,6 +108,68 @@
                                                     }
                                                 });
                                             });
+
+                                            $("#cad-ws_path").on('input', function() {
+                                                var value = $(this).val();
+                                                if(value.indexOf('?') > -1) {
+                                                    var parameters = value.substr(value.indexOf('?') + 1);
+                                                    var parameters = parameters.split('&');
+
+                                                    var delLines = $("#table-cad-parameters-keys tbody tr");
+                                                    var newLines = [];
+                                                    $.each(delLines, function(index, line) {
+                                                        var i = (delLines.length - index) - 1;
+                                                        if(i > (parameters.length - 1)) {
+                                                            delLines[i].remove();
+                                                        }
+                                                    });
+
+                                                    authLines = $("#table-cad-parameters-keys tbody tr");
+
+                                                    $.each(parameters, function(index, val) {
+                                                        if(authLines.length < index + 1) {
+                                                            authLines.push('<tr>' +
+                                                                '<td><input type="text" class="form-control border-0" name="parameterKey" /></td>' +
+                                                                '<td><input type="text" class="form-control border-0" name="parameterValue" /></td>' +
+                                                                '<td><button type="button" class="btn"><i class="fas fa-backspace text-danger"></i></button></td>' +
+                                                            '</tr>');
+                                                            $("#table-cad-parameters-keys tr:last").after(authLines[index]);
+                                                            authLines[index] = $("#table-cad-parameters-keys tr")[index + 1];
+                                                            $(authLines[index]).on('click', 'button', function() {
+                                                                $(authLines[index]).remove();
+                                                                rewriteParameters("#cad-ws_path", "#table-cad-parameters-keys");
+                                                            });
+                                                        }
+
+                                                        var inputs = $(authLines[index]).find('input');
+                                                        var pairKeyValue = val.split('=');
+                                                        $(inputs[0]).val(pairKeyValue[0]);
+                                                        $(inputs[1]).val(pairKeyValue[1]);
+                                                    });
+
+                                                }
+                                            });
+
+                                            $("#table-cad-parameters-keys").on('input', 'input', function() {
+                                                rewriteParameters("#cad-ws_path", "#table-cad-parameters-keys");
+                                            });
+
+                                            $("#btn-new-cad-parameter-key").click(function() {
+                                                var line =  '<tr>' +
+                                                            '<td><input type="text" class="form-control border-0" name="parameterKey" /></td>' +
+                                                            '<td><input type="text" class="form-control border-0" name="parameterValue" /></td>' +
+                                                            '<td><button type="button" class="btn"><i class="fas fa-backspace text-danger"></i></button></td>' +
+                                                            '</tr>'
+
+                                                $("#table-cad-parameters-keys tr:last").after(line);
+                                                var lastLine = $("#table-cad-parameters-keys tr:last");
+                                                $(lastLine).on('click', 'button', function() {
+                                                    $(this).parent().parent().remove();
+                                                    rewriteParameters("#cad-ws_path", "#table-cad-parameters-keys");
+                                                });
+                                            });
+
+
                                         });
                                     });
                                 }

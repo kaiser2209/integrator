@@ -15,11 +15,14 @@ public class WebServiceUtils {
     }
 
     public static Map<String, String> getParameters(String url) {
-        String[] parameters = url.split(Pattern.quote("?"))[1].split(Pattern.quote("&"));
         Map<String, String> returnParameters = new HashMap<>();
-        for(String p : parameters) {
-            String[] parameter = p.split(Pattern.quote("="));
-            returnParameters.put(parameter[0].toLowerCase(Locale.ROOT), parameter[1]);
+        if (url.contains("?")) {
+            String[] parameters = url.split(Pattern.quote("?"))[1].split(Pattern.quote("&"));
+
+            for (String p : parameters) {
+                String[] parameter = p.split(Pattern.quote("="));
+                returnParameters.put(parameter[0].toLowerCase(Locale.ROOT), parameter[1]);
+            }
         }
 
         return returnParameters;
