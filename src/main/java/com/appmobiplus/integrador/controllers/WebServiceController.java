@@ -168,14 +168,14 @@ public class WebServiceController {
                                   @RequestParam String[] headerValue,
                                   @RequestParam String[] bodyKey,
                                   @RequestParam String[] bodyValue,
-                                  @RequestParam(value = "auth-bodyType") String authbodyType,
+                                  @RequestParam(value = "auth-bodyType") String authBodyType,
                                   @RequestParam String[] bodyKeyRaw,
                                   @RequestParam String[] bodyValueRaw,
                                   @RequestParam String[] bodyTypeRaw) throws JsonProcessingException {
 
-        bodyKey = TestUtils.getAuthTestKeys();
-        bodyValue = TestUtils.getAuthTestValues();
-        ws_path = TestUtils.getAuthUrl();
+        //bodyKey = TestUtils.getAuthTestKeys();
+        //bodyValue = TestUtils.getAuthTestValues();
+        //ws_path = TestUtils.getAuthUrl();
 
         Map<String, Object> mapBodyRaw = new HashMap<>();
 
@@ -197,14 +197,18 @@ public class WebServiceController {
         System.out.println(Arrays.toString(bodyKeyRaw));
         System.out.println(Arrays.toString(bodyValueRaw));
         System.out.println(Arrays.toString(bodyTypeRaw));
-        System.out.println(authbodyType);
+        System.out.println(authBodyType);
 
         try {
 
             RestTemplate restTemplate = new RestTemplate();
 
             HttpHeaders headers = new HttpHeaders();
-            //headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+            if(authBodyType.equals("raw")) {
+                headers.setContentType(MediaType.APPLICATION_JSON);
+            } else {
+                headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+            }
 
             MultiValueMap<String, String> postParameters = new LinkedMultiValueMap<>();
             for (int i = 0; i < bodyKey.length; i++) {
@@ -213,7 +217,7 @@ public class WebServiceController {
 
             ResponseEntity<String> response;
 
-            if (authbodyType.equals("raw")) {
+            if (authBodyType.equals("raw")) {
                 HttpEntity<String> request = new HttpEntity<>(jsonBodyRaw, headers);
                 response = restTemplate.exchange(ws_path, method, request, String.class);
             } else {
