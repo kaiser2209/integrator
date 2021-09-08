@@ -173,9 +173,9 @@ public class WebServiceController {
                                   @RequestParam String[] bodyValueRaw,
                                   @RequestParam String[] bodyTypeRaw) throws JsonProcessingException {
 
-        bodyKey = TestUtils.getAuthTestKeys();
-        bodyValue = TestUtils.getAuthTestValues();
-        ws_path = TestUtils.getAuthUrl();
+        //bodyKey = TestUtils.getAuthTestKeys();
+        //bodyValue = TestUtils.getAuthTestValues();
+        //ws_path = TestUtils.getAuthUrl();
 
         Map<String, Object> mapBodyRaw = new HashMap<>();
 
@@ -213,7 +213,9 @@ public class WebServiceController {
 
             ResponseEntity<String> response;
 
-            if (authBodyType == MediaType.APPLICATION_JSON) {
+            System.out.println(MediaType.APPLICATION_JSON);
+
+            if (authBodyType.getType().equals(MediaType.APPLICATION_JSON.getType()) && authBodyType.getSubtype().equals(MediaType.APPLICATION_JSON.getSubtype())) {
                 HttpEntity<String> request = new HttpEntity<>(jsonBodyRaw, headers);
                 response = restTemplate.exchange(ws_path, method, request, String.class);
             } else {
@@ -257,9 +259,6 @@ public class WebServiceController {
             JsonNode jsonNode = JsonUtils.getJsonObject(json);
 
             List<String> fields = JsonUtils.getJsonFields(jsonNode);
-            for(int i = 0; i < 10; i++) {
-                fields.add("Teste " + i);
-            }
 
             map.addAttribute("fields", fields);
             map.addAttribute("authJsonFields", json);
