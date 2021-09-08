@@ -16,20 +16,27 @@ public class TestUtils {
     }
 
     public static String getJsonProductTest() {
-        return "[\r\n" +
-                " {\r\n" +
-                "  \"NumeroEmpresa\":26,\r\n" +
-                "  \"DescCompleta\":\"ABC DRIVER QUADRO EXPOSITOR HOT WHELLS\", \r\n" +
-                "  \"NumeroSegmento\":1, \r\n" +
-                "  \"PrecoVenda\":79.9, \r\n" +
-                "  \"Embalagem\":1.0, \r\n" +
-                "  \"PrecoVendaCaixa\":179.0, \r\n" +
-                "  \"QuantidadeCaixa\":1.0, \r\n" +
-                "  \"DataInicioPromocao\":\"2021-08-04T00:00:00\", \r\n" +
-                "  \"DataFimPromocao\":\"2021-10-03T00:00:00\", \r\n" +
-                "  \"PrecoPromocao\":29.9, \r\n" +
-                " }\r\n" +
-                "]";
+        return "[ {\n" +
+                "  \"NumeroEmpresa\" : 26,\n" +
+                "  \"DescCompleta\" : \"ABC DRIVER QUADRO EXPOSITOR HOT WHELLS\",\n" +
+                "  \"NumeroSegmento\" : 1,\n" +
+                "  \"PrecoVenda\" : 79.9,\n" +
+                "  \"Embalagem\" : 1.0,\n" +
+                "  \"PrecoVendaCaixa\" : 79.9,\n" +
+                "  \"QuantidadeCaixa\" : 1.0,\n" +
+                "  \"DataInicioPromocao\" : \"2021-08-04T00:00:00\",\n" +
+                "  \"DataFimPromocao\" : \"2021-10-03T00:00:00\",\n" +
+                "  \"PrecoPromocao\" : 29.9,\n" +
+                "  \"PromocaoAPartir\" : [ ],\n" +
+                "  \"DataAtualizacao\" : null,\n" +
+                "  \"StatusVenda\" : \"A\",\n" +
+                "  \"ClassificacaoComercial\" : \"A\",\n" +
+                "  \"CodigoAcessoPrincipal\" : \"7898994546016\",\n" +
+                "  \"IdProduto\" : 1351,\n" +
+                "  \"IdFamilia\" : 10955,\n" +
+                "  \"IdProdutoBase\" : null,\n" +
+                "  \"DataUltimaAtualizacao\" : \"2021-08-04T02:02:50\"\n" +
+                "} ]";
 
     }
 }

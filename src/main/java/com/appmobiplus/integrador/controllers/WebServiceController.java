@@ -173,9 +173,9 @@ public class WebServiceController {
                                   @RequestParam String[] bodyValueRaw,
                                   @RequestParam String[] bodyTypeRaw) throws JsonProcessingException {
 
-        //bodyKey = TestUtils.getAuthTestKeys();
-        //bodyValue = TestUtils.getAuthTestValues();
-        //ws_path = TestUtils.getAuthUrl();
+        bodyKey = TestUtils.getAuthTestKeys();
+        bodyValue = TestUtils.getAuthTestValues();
+        ws_path = TestUtils.getAuthUrl();
 
         Map<String, Object> mapBodyRaw = new HashMap<>();
 
@@ -333,9 +333,6 @@ public class WebServiceController {
                 }
             }
 
-            System.out.println(urlParameters);
-            System.out.println(TestUtils.getJsonProductTest());
-
             RestTemplate restTemplate = new RestTemplate();
 
             HttpHeaders headers = new HttpHeaders();
@@ -364,6 +361,8 @@ public class WebServiceController {
                     .setUrlParameters(urlParameters)
                     .build());
 
+            System.out.println(urlParameters);
+
             Set<Header> configHeaders = new HashSet<>();
             for (int i = 0; i < key.length; i++) {
                 Header h = HeaderBuilder.get()
@@ -391,30 +390,42 @@ public class WebServiceController {
 
     @PostMapping(value = "/config/ws/cad/loadFields", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
     public String loadFields(ModelMap map,
+                                  @RequestParam(defaultValue = "false") boolean searchValue,
                                   @RequestParam String json,
                                   @RequestParam String[] headerKey,
                                   @RequestParam String[] headerValue) throws JsonProcessingException {
 
-        try {
+        JsonNode jsonNode = JsonUtils.getJsonObject(json);
 
-            Map<String, String> headerMap = new HashMap<>();
+        if (searchValue) {
+            try {
 
-            for (int i = 0; i < headerKey.length; i++) {
-                headerMap.put(headerKey[i], headerValue[i]);
+                Map<String, String> headerMap = new HashMap<>();
+
+                for (int i = 0; i < headerKey.length; i++) {
+                    headerMap.put(headerKey[i], headerValue[i]);
+                }
+
+                List<String> fields = JsonUtils.getJsonFields(jsonNode.get("data").get(0));
+
+                map.addAttribute("fields", fields);
+                map.addAttribute("headers", headerMap);
+                map.addAttribute("json", json);
+            } catch (Exception e) {
+                LogUtils.saveLog(e.getMessage() + " - WebServiceController.java:340");
             }
 
-            JsonNode jsonNode = JsonUtils.getJsonObject(json);
 
-            List<String> fields = JsonUtils.getJsonFields(jsonNode.get("data").get(0));
+            return "dataFragments :: #cad-findValueContent";
+        } else {
+            jsonNode = JsonUtils.getJsonObject(TestUtils.getJsonProductTest());
+            List<String> fields = JsonUtils.getJsonFieldsInArray(jsonNode);
+            System.out.println(Arrays.toString(fields.toArray()));
 
             map.addAttribute("fields", fields);
-            map.addAttribute("headers", headerMap);
-            map.addAttribute("json", json);
-        } catch (Exception e) {
-            LogUtils.saveLog(e.getMessage() + " - WebServiceController.java:340");
-        }
 
-        return "dataFragments :: #cad-findValueContent";
+            return "dataFragments :: #cad-loadFields";
+        }
     }
 
     @PostMapping(value = "/config/ws/cad/loadFieldsValues", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
@@ -511,6 +522,8 @@ public class WebServiceController {
 
             ConfigUtils.getConfig().setFields(fields);
             ConfigUtils.saveConfig();
+
+            System.out.println(ConfigUtils.getConfig().toString());
 
         } catch (Exception e) {
             LogUtils.saveLog(e.getMessage() + " - WebServiceController.java:435");

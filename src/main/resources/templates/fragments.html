@@ -69,8 +69,28 @@
                                                     } else {
                                                         $("#cad-jsonView").replaceWith(data);
 
+                                                        $("#cad-configureFinish").click(function() {
+                                                            var jsonValue = $("#cad-json").text();
+                                                            $.post("/config/ws/cad/loadFields", { json: jsonValue, searchValue: "false", headerKey: "", headerValue: "" } ).done(function(data) {
+
+                                                                $("#cad-fieldsValues").replaceWith(data);
+
+                                                                $("#cad-saveConfig").click(function() {
+                                                                    $.post("/config/ws/cad/saveConfig", $("#form-saveConfig").serialize()).done(function(data) {
+                                                                        $("#dialog-success").replaceWith(data);
+                                                                        $("#save-complete").modal('show');
+                                                                        $(".redirect-button").off();
+                                                                        $(".redirect-button").click(function() {
+                                                                            $(location).attr("href", "/config/ws");
+                                                                        });
+                                                                    });
+                                                                });
+                                                            });
+                                                        });
+
                                                         $("#cad-findProdValue").click(function() {
                                                             var jsonCadProd = $("#cad-json").text();
+                                                            $("#searchValue").val("true");
                                                             $.post("/config/ws/cad/loadFields", $("#form-sendJsonToFindValue").serialize() ).done(function(data) {
                                                                 $("#cad-findValue").replaceWith(data);
 

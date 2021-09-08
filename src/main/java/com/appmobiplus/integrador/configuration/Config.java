@@ -137,6 +137,16 @@ public class Config implements Serializable {
         this.configCustosProdutos = configCustosProdutos;
     }
 
+    public String getFieldOriginalName(String newName) {
+        for(Field f : fields) {
+            if(f.getNewName().equals(newName)) {
+                return f.getOriginalName();
+            }
+        }
+
+        return null;
+    }
+
     @Override
     public String toString() {
         return "IntegrationType: " + integrationType + "\n" +

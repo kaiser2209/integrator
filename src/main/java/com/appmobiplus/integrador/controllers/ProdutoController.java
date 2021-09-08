@@ -127,133 +127,66 @@ public class ProdutoController {
                     return erro;
                 }
             } else {
-                try {
-                    config.getConfigCadastroProdutos().getSearchParameters().changeValue(Long.valueOf(parameters.get("ean")));
-                    ConfigUtils.verifyAndRenewToken(config.getHeaders(), config.getConfigCadastroProdutos(), config.getConfigAuth());
-                    String responseProduto = ConfigUtils.getResponse(config.getHeaders(), config.getConfigCadastroProdutos(), config.getConfigAuth()).getBody();
-
-                    int total = JsonUtils.getJsonObject(responseProduto).get("total").intValue();
-
+                if (config.getConfigCustosProdutos() == null) {
                     Produto produto = new Produto();
 
-                    JsonNode jsonProduto = JsonUtils.getJsonObject(responseProduto).get("data").get(0);
+                    config.getConfigCadastroProdutos().getUrlParameters().put("codigoAcesso", parameters.get("ean"));
 
-                    BuscaCadProdutos busca = config.getConfigCustosProdutos().getSearchParameters();
-                    String field = busca.getCampo();
+                    String responseProduto = TestUtils.getJsonProductTest();
 
-                    busca.changeValue(jsonProduto.get(field).longValue());
-
-                    String responseCusto = ConfigUtils.getResponse(config.getHeaders(), config.getConfigCustosProdutos(), config.getConfigAuth()).getBody();
-
-                    JsonNode jsonCusto = JsonUtils.getJsonObject(responseCusto).get("data").get(0);
+                    JsonNode jsonProduto = JsonUtils.getJsonObject(responseProduto).get(0);
 
                     Set<Field> fields = config.getFields();
 
-                    for (Field f : fields) {
-                        if (jsonProduto.has(f.getOriginalName())) {
+                    for(Field f : fields) {
+                        if(jsonProduto.has(f.getOriginalName())) {
                             produto.set(f.getNewName(), TypeUtils.getValue(jsonProduto.get(f.getOriginalName())));
-                        } else {
-                            produto.set(f.getNewName(), TypeUtils.getValue(jsonCusto.get(f.getOriginalName())));
                         }
                     }
 
                     return produto;
+                } else {
+                    try {
+                        config.getConfigCadastroProdutos().getSearchParameters().changeValue(Long.valueOf(parameters.get("ean")));
+                        ConfigUtils.verifyAndRenewToken(config.getHeaders(), config.getConfigCadastroProdutos(), config.getConfigAuth());
+                        String responseProduto = ConfigUtils.getResponse(config.getHeaders(), config.getConfigCadastroProdutos(), config.getConfigAuth()).getBody();
 
-                } catch (NullPointerException e) {
-                    Map<String, String> erro = new HashMap<>();
-                    erro.put("errorMessage", "Produto não econtrado!");
-                    erro.put("errorCode", HttpStatus.NOT_FOUND.toString());
+                        int total = JsonUtils.getJsonObject(responseProduto).get("total").intValue();
 
-                    return erro;
-                }
+                        Produto produto = new Produto();
 
-/*
-                RestTemplate restTemplate = new RestTemplate();
+                        JsonNode jsonProduto = JsonUtils.getJsonObject(responseProduto).get("data").get(0);
 
-                HttpHeaders headers = new HttpHeaders();
+                        BuscaCadProdutos busca = config.getConfigCustosProdutos().getSearchParameters();
+                        String field = busca.getCampo();
 
-                MultiValueMap<String, String> postParameters = new LinkedMultiValueMap<>();
+                        busca.changeValue(jsonProduto.get(field).longValue());
 
-                for(String key : config.getConfigAuth().getBodyParameters().keySet()) {
-                    postParameters.add(key, config.getConfigAuth().getBodyParameters().get(key));
-                }
+                        String responseCusto = ConfigUtils.getResponse(config.getHeaders(), config.getConfigCustosProdutos(), config.getConfigAuth()).getBody();
 
-                HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(postParameters, headers);
+                        JsonNode jsonCusto = JsonUtils.getJsonObject(responseCusto).get("data").get(0);
 
-                ResponseEntity<String> response = restTemplate.exchange(config.getConfigAuth().getPath(), config.getConfigAuth().getMethod(), request, String.class);
+                        Set<Field> fields = config.getFields();
 
-                JsonNode jsonNode = JsonUtils.getJsonObject(response.getBody());
+                        for (Field f : fields) {
+                            if (jsonProduto.has(f.getOriginalName())) {
+                                produto.set(f.getNewName(), TypeUtils.getValue(jsonProduto.get(f.getOriginalName())));
+                            } else {
+                                produto.set(f.getNewName(), TypeUtils.getValue(jsonCusto.get(f.getOriginalName())));
+                            }
+                        }
 
-                String authorizationValue = "";
+                        return produto;
 
-                for(String v : config.getConfigAuth().getFieldsUsedInAuth()) {
-                    authorizationValue += jsonNode.get(v).textValue() + " ";
-                }
+                    } catch (NullPointerException e) {
+                        Map<String, String> erro = new HashMap<>();
+                        erro.put("errorMessage", "Produto não econtrado!");
+                        erro.put("errorCode", HttpStatus.NOT_FOUND.toString());
 
-                authorizationValue = authorizationValue.trim();
-
-                Set<Header> authHeaders = config.getHeaders();
-                for(Header h : authHeaders) {
-                    if(h.getKey().equals(config.getConfigAuth().getAuthField())) {
-                        h.setValue(authorizationValue);
+                        return erro;
                     }
                 }
 
-                HttpHeaders httpHeaders = new HttpHeaders();
-
-                for(Header h : config.getHeaders()) {
-                    httpHeaders.add(h.getKey(), h.getValue());
-                }
-
-                ObjectMapper mapper = new ObjectMapper();
-                config.getConfigCadastroProdutos().getSearchParameters().changeValue(Long.valueOf(parameters.get("ean")));
-                String jsonBuscaProduto = mapper.writeValueAsString(config.getConfigCadastroProdutos().getSearchParameters());
-
-                HttpEntity<String> produtoRequest = new HttpEntity<>(jsonBuscaProduto, httpHeaders);
-
-                ResponseEntity<String> produtoResponse = restTemplate.exchange(config.getConfigCadastroProdutos().getPath(), config.getConfigCadastroProdutos().getMethod(), produtoRequest, String.class);
-
-                BuscaCadProdutos busca = config.getConfigCustosProdutos().getSearchParameters();
-                String field = busca.getCampo();
-
-                JsonNode jsonNodeProduto = JsonUtils.getJsonObject(produtoResponse.getBody());
-
-                busca.changeValue(jsonNodeProduto.get("data").get(0).get(field).longValue());
-
-                String jsonBuscaCusto = mapper.writeValueAsString(busca);
-
-                HttpEntity<String> custoRequest = new HttpEntity<>(jsonBuscaCusto, httpHeaders);
-
-                ResponseEntity<String> custoResponse = restTemplate.exchange(config.getConfigCustosProdutos().getPath(), config.getConfigCustosProdutos().getMethod(), custoRequest, String.class);
-
-                JsonNode jsonNodeCusto = JsonUtils.getJsonObject(custoResponse.getBody());
-
-                System.out.println(custoResponse.getBody());
-
-                Produto produto = new Produto();
-
-                System.out.println(jsonNodeProduto.get("data").get(0).get("nrcodbarprod"));
-
-                Map<String, String> savedFields = new HashMap<>();
-                Set<Field> fields = config.getFields();
-                for(Field f : fields) {
-                    savedFields.put(f.getNewName(), f.getOriginalName());
-                }
-
-                JsonNode jsonProdutos = jsonNodeProduto.get("data").get(0);
-                JsonNode jsonCustos = jsonNodeCusto.get("data").get(0);
-
-                for(String key : savedFields.keySet()) {
-                    if(jsonProdutos.has(savedFields.get(key))) {
-                        produto.set(key, TypeUtils.getValue(jsonProdutos.get(savedFields.get(key))));
-                    } else {
-                        produto.set(key, TypeUtils.getValue(jsonCustos.get(savedFields.get(key))));
-                    }
-                }
-
-                return produto;
-
- */
             }
 
         } else if (config.getIntegrationType() == IntegrationType.DATABASE) {

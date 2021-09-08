@@ -47,7 +47,7 @@ public class ConfigCadastroProdutos implements Serializable, ConfigBuscaProduto 
     }
 
     public Map<String, String> getUrlParameters() {
-        return this.getUrlParameters();
+        return this.urlParameters;
     }
 
     public void setUrlParameters(Map<String, String> urlParameters) {
