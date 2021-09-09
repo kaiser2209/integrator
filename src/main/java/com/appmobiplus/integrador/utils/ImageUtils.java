@@ -1,5 +1,6 @@
 package com.appmobiplus.integrador.utils;
 
+import com.appmobiplus.integrador.configuration.Produto;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +25,7 @@ public class ImageUtils {
             ImageIO.write(image, fileExtension, new File(to + fileName + "." + fileExtension));
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            LogUtils.saveLog("Imagem " + fileExtension + " não encontrada no servidor de imagens.");
         }
 
         return false;
@@ -69,5 +70,17 @@ public class ImageUtils {
     public static boolean hasImageDownloaded(String filename, String fileExtension) {
         File file = new File(localPath + filename + "." + fileExtension);
         return file.exists();
+    }
+
+    public static void updateLinkImage(Produto produto) {
+        if(produto.getLink_image() == null || produto.getLink_image().isEmpty()) {
+            if(!hasImageDownloaded(produto.getEan(), "png")) {
+                if (downloadImage(getImageServerPath(), getLocalPath(), produto.getEan(), "png")) {
+                    produto.setLink_image(getImagePath(produto.getEan(), "png"));
+                }
+            } else {
+                produto.setLink_image(getImagePath(produto.getEan(), "png"));
+            }
+        }
     }
 }

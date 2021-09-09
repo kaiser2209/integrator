@@ -160,6 +160,8 @@ public class ProdutoController {
                             }
                         }
 
+                        ImageUtils.updateLinkImage(produto);
+
                         return produto;
                     } catch (NullPointerException e) {
                         Map<String, String> erro = new HashMap<>();
@@ -199,14 +201,16 @@ public class ProdutoController {
                             }
                         }
 
+                        ImageUtils.updateLinkImage(produto);
+
                         return produto;
 
                     } catch (NullPointerException e) {
                         Map<String, String> erro = new HashMap<>();
                         erro.put("errorMessage", "Produto não econtrado!");
                         erro.put("errorCode", HttpStatus.NOT_FOUND.toString());
-
                         return erro;
+
                     }
                 }
 
