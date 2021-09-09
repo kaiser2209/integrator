@@ -173,9 +173,9 @@ public class WebServiceController {
                                   @RequestParam String[] bodyValueRaw,
                                   @RequestParam String[] bodyTypeRaw) throws JsonProcessingException {
 
-        bodyKey = TestUtils.getAuthTestKeys();
-        bodyValue = TestUtils.getAuthTestValues();
-        ws_path = TestUtils.getAuthUrl();
+        //bodyKey = TestUtils.getAuthTestKeys();
+        //bodyValue = TestUtils.getAuthTestValues();
+        //ws_path = TestUtils.getAuthUrl();
 
         Map<String, Object> mapBodyRaw = new HashMap<>();
 
@@ -213,8 +213,6 @@ public class WebServiceController {
 
             ResponseEntity<String> response;
 
-            System.out.println(MediaType.APPLICATION_JSON);
-
             if (authBodyType.getType().equals(MediaType.APPLICATION_JSON.getType()) && authBodyType.getSubtype().equals(MediaType.APPLICATION_JSON.getSubtype())) {
                 HttpEntity<String> request = new HttpEntity<>(jsonBodyRaw, headers);
                 response = restTemplate.exchange(ws_path, method, request, String.class);
@@ -235,6 +233,8 @@ public class WebServiceController {
                             .setMethodType(method)
                             .setPath(ws_path)
                             .setBodyParameters(authBodyKeys)
+                            .setAuthBodyType(authBodyType)
+                            .setAuthJson(jsonBodyRaw)
                             .build())
                     .build());
 
@@ -418,7 +418,7 @@ public class WebServiceController {
 
             return "dataFragments :: #cad-findValueContent";
         } else {
-            jsonNode = JsonUtils.getJsonObject(TestUtils.getJsonProductTest());
+            //jsonNode = JsonUtils.getJsonObject(TestUtils.getJsonProductTest());
             List<String> fields = JsonUtils.getJsonFieldsInArray(jsonNode);
             System.out.println(Arrays.toString(fields.toArray()));
 

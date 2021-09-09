@@ -1,6 +1,7 @@
 package com.appmobiplus.integrador.configuration;
 
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,17 +12,23 @@ public class ConfigAuthBuilder {
     private Map<String, String> bodyParameters = new HashMap<>();
     private String[] fieldsUsedInAuth = new String[0];
     private String authField;
+    private MediaType authBodyType;
+    private String authJson;
 
     public ConfigAuthBuilder(String path,
                              HttpMethod method,
                              Map<String, String> bodyParameters,
                              String[] fieldsUsedInAuth,
-                             String authField) {
+                             String authField,
+                             MediaType authBodyType,
+                             String authJson) {
         this.path = path;
         this.method = method;
         this.bodyParameters = bodyParameters;
         this.fieldsUsedInAuth = fieldsUsedInAuth;
         this.authField = authField;
+        this.authBodyType = authBodyType;
+        this.authJson = authJson;
     }
 
     public ConfigAuthBuilder() {
@@ -58,7 +65,17 @@ public class ConfigAuthBuilder {
         return this;
     }
 
+    public ConfigAuthBuilder setAuthBodyType(MediaType authBodyType) {
+        this.authBodyType = authBodyType;
+        return this;
+    }
+
+    public ConfigAuthBuilder setAuthJson(String authJson) {
+        this.authJson = authJson;
+        return this;
+    }
+
     public ConfigAuth build() {
-        return new ConfigAuth(path, method, bodyParameters, fieldsUsedInAuth, authField);
+        return new ConfigAuth(path, method, bodyParameters, fieldsUsedInAuth, authField, authBodyType, authJson);
     }
 }

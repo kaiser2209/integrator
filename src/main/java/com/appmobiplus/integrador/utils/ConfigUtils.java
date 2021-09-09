@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -183,14 +184,22 @@ public class ConfigUtils {
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
 
         HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(configAuth.getAuthBodyType());
 
         for(String key : configAuth.getBodyParameters().keySet()) {
             parameters.add(key, configAuth.getBodyParameters().get(key));
         }
 
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(parameters, headers);
+        ResponseEntity<String> response;
 
-        ResponseEntity<String> response = restTemplate.exchange(configAuth.getPath(), configAuth.getMethod(), request, String.class);
+        if (configAuth.getAuthBodyType().getType().equals(MediaType.APPLICATION_JSON.getType()) && configAuth.getAuthBodyType().getSubtype().equals(MediaType.APPLICATION_JSON.getSubtype())) {
+            HttpEntity<String> request = new HttpEntity<>(configAuth.getAuthJson(), headers);
+            response = restTemplate.exchange(configAuth.getPath(), configAuth.getMethod(), request, String.class);
+        } else {
+            HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(parameters, headers);
+            response = restTemplate.exchange(configAuth.getPath(), configAuth.getMethod(), request, String.class);
+        }
+
 
         JsonNode authJson = JsonUtils.getJsonObject(response.getBody());
         String authorization = "";

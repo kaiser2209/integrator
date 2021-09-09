@@ -128,23 +128,46 @@ public class ProdutoController {
                 }
             } else {
                 if (config.getConfigCustosProdutos() == null) {
-                    Produto produto = new Produto();
+                    try {
+                        Produto produto = new Produto();
 
-                    config.getConfigCadastroProdutos().getUrlParameters().put("codigoAcesso", parameters.get("ean"));
+                        config.getConfigCadastroProdutos().getUrlParameters().put("codigoAcesso", parameters.get("ean"));
 
-                    String responseProduto = TestUtils.getJsonProductTest();
+                        System.out.println(Arrays.toString(config.getHeaders().toArray()));
 
-                    JsonNode jsonProduto = JsonUtils.getJsonObject(responseProduto).get(0);
+                        String basicUrl = WebServiceUtils.getAbsolutUrl(config.getConfigCadastroProdutos().getPath());
+                        String url = WebServiceUtils.getWebServiceURL(basicUrl, config.getConfigCadastroProdutos().getUrlParameters());
+                        config.getConfigCadastroProdutos().setPath(url);
 
-                    Set<Field> fields = config.getFields();
+                        HttpHeaders headers = ConfigUtils.getHttpHeaders(config.getHeaders());
 
-                    for(Field f : fields) {
-                        if(jsonProduto.has(f.getOriginalName())) {
-                            produto.set(f.getNewName(), TypeUtils.getValue(jsonProduto.get(f.getOriginalName())));
+                        ConfigUtils.verifyAndRenewToken(config.getHeaders(), config.getConfigCadastroProdutos(), config.getConfigAuth());
+
+                        //String responseProduto = TestUtils.getJsonProductTest();
+                        String responseProduto = ConfigUtils.getResponse(config.getHeaders(), config.getConfigCadastroProdutos(), config.getConfigAuth()).getBody();
+
+                        JsonNode jsonProduto = JsonUtils.getJsonObject(responseProduto).get(0);
+
+                        System.out.println(basicUrl);
+                        System.out.println(url);
+                        System.out.println(config.getHeaders());
+
+                        Set<Field> fields = config.getFields();
+
+                        for (Field f : fields) {
+                            if (jsonProduto.has(f.getOriginalName())) {
+                                produto.set(f.getNewName(), TypeUtils.getValue(jsonProduto.get(f.getOriginalName())));
+                            }
                         }
-                    }
 
-                    return produto;
+                        return produto;
+                    } catch (NullPointerException e) {
+                        Map<String, String> erro = new HashMap<>();
+                        erro.put("errorMessage", "Produto não econtrado!");
+                        erro.put("errorCode", HttpStatus.NOT_FOUND.toString());
+
+                        return erro;
+                    }
                 } else {
                     try {
                         config.getConfigCadastroProdutos().getSearchParameters().changeValue(Long.valueOf(parameters.get("ean")));
