@@ -148,10 +148,6 @@ public class ProdutoController {
 
                         JsonNode jsonProduto = JsonUtils.getJsonObject(responseProduto).get(0);
 
-                        System.out.println(basicUrl);
-                        System.out.println(url);
-                        System.out.println(config.getHeaders());
-
                         Set<Field> fields = config.getFields();
 
                         for (Field f : fields) {
