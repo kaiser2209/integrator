@@ -32,45 +32,55 @@ public class WebServiceController {
     CampoRepository campoRepository;
 
 
-
+    //Inicializa a configuração do web service
     @PostMapping(value = "/config/ws/startConfig", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
     public String teste(ModelMap map,
                         @RequestParam String[] key,
                         @RequestParam String[] value,
                         @RequestParam String ws_path) {
-        map.addAttribute("teste", "Agora é um teste válido!");
 
-        try {
+        try {   //Tenta executar o código
 
             RestTemplate restTemplate = new RestTemplate();
 
+            //Declara os headers de acordo com o recebido
             HttpHeaders headers = new HttpHeaders();
             for (int i = 0; i < key.length; i++) {
                 headers.add(key[i], value[i]);
             }
 
+            //Declaração a requisição
             HttpEntity<String> request = new HttpEntity<>(headers);
 
+            //Faz a troca com o servidor e armazena a resposta na variável responseEntity
             ResponseEntity<String> responseEntity = restTemplate.exchange(ws_path, HttpMethod.GET, request, String.class);
 
+            //Salva variável mapHeader com os headers passados
             Map<String, String> mapHeader = new HashMap<>();
             for (int i = 0; i < key.length; i++) {
                 mapHeader.put(key[i], value[i]);
             }
 
+            //Instancia objeto para tratamento de json
             ObjectMapper mapper = new ObjectMapper();
+            //Converte o objeto mapHeader para json e armazena na variável jsonHeader
             String jsonHeader = mapper.writeValueAsString(mapHeader);
+            //Passa o json do retorno para o atributo result
             map.addAttribute("result", FileUtils.getFormattedJson(responseEntity.getBody()));
+            //Passa o jsonHeader para o atributo jsonHeader
             map.addAttribute("jsonHeader", jsonHeader);
 
         } catch (Exception e) {
+            //Salva as informações de erro no log
             LogUtils.saveLog(e.getMessage() + " - WebServiceController.java:67");
         }
 
+            //Retorna o fragmento #json-view definido na página dataFragments
             return "dataFragments :: #json-view";
 
     }
 
+    //Configuração dos campos
     @PostMapping("/config/ws/fields")
     public String getFields(ModelMap map,
                             @RequestParam String json,
@@ -79,27 +89,35 @@ public class WebServiceController {
         try {
 
             ObjectMapper mapper = new ObjectMapper();
+            //Converte a string json para um objeto jsonNode
             JsonNode jsonNode = mapper.readTree(json);
 
+            //Declara a lista de campos
             List<String> fields = new ArrayList<>();
 
+            //Conversão do json header para o mapHeader do tipo map.
             TypeReference<HashMap<String, String>> typeRef = new TypeReference<HashMap<String, String>>() {
             };
             Map<String, String> mapHeader = mapper.readValue(header, typeRef);
 
+            //Pega todos os campos que consta no json e salva na lista de campos
             for (Iterator<String> it = jsonNode.fieldNames(); it.hasNext(); ) {
                 String field = it.next();
                 fields.add(field);
 
             }
 
+            //Passa os campos definidos para o atributo fields
             map.addAttribute("fields", fields);
+            //Passa o mapHeader para o atributo header
             map.addAttribute("header", mapHeader);
 
         } catch (Exception e) {
+            //Salva as informações de erro no log
             LogUtils.saveLog(e.getMessage() + " - WebServiceController.java:100");
         }
 
+        //Retorna o fragmento #json-fields definido na página dataFragments
         return "dataFragments :: #json-fields";
     }
 
