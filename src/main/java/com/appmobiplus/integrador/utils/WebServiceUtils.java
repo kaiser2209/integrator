@@ -2,7 +2,10 @@ package com.appmobiplus.integrador.utils;
 
 import com.appmobiplus.integrador.configuration.Produto;
 import com.appmobiplus.integrador.configuration.ProdutoBuilder;
+import org.apache.juli.logging.Log;
+import org.springframework.ui.ModelMap;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -67,5 +70,13 @@ public class WebServiceUtils {
                 .build();
 
         return p;
+    }
+
+    public static String showDialogError(ModelMap map, Exception e) {
+        LogUtils.saveLog(e.getMessage());
+        LogUtils.saveLog(Arrays.toString(e.getStackTrace()));
+        map.addAttribute("title", "Erro");
+        map.addAttribute("errorMessage", e.getMessage());
+        return "dataFragments :: #dialog-error";
     }
 }

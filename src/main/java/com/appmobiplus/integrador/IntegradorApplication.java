@@ -53,6 +53,8 @@ public class IntegradorApplication implements CommandLineRunner {
 	public void run(String... arg) throws Exception {
 		LogUtils.saveLog("Servidor Iniciado...");
 
+		com.appmobiplus.integrador.firebase.Config c = new com.appmobiplus.integrador.firebase.Config();
+
 		ServerUtils.setPort(port);
 
 		storageService.deleteAll();

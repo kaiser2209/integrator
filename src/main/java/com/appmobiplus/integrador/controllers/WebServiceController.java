@@ -72,7 +72,7 @@ public class WebServiceController {
 
         } catch (Exception e) {
             //Salva as informações de erro no log
-            LogUtils.saveLog(e.getMessage() + " - WebServiceController.java:67");
+            return WebServiceUtils.showDialogError(map, e);
         }
 
             //Retorna o fragmento #json-view definido na página dataFragments
@@ -114,7 +114,7 @@ public class WebServiceController {
 
         } catch (Exception e) {
             //Salva as informações de erro no log
-            LogUtils.saveLog(e.getMessage() + " - WebServiceController.java:100");
+            return WebServiceUtils.showDialogError(map, e);
         }
 
         //Retorna o fragmento #json-fields definido na página dataFragments
@@ -172,7 +172,7 @@ public class WebServiceController {
             LogUtils.saveLog("Configurações salvas!");
 
         } catch (Exception e) {
-            LogUtils.saveLog(e.getMessage() +  " - WebServiceController.java:156");
+            return WebServiceUtils.showDialogError(map, e);
         }
 
         return "dataFragments :: #save-complete";
@@ -258,11 +258,7 @@ public class WebServiceController {
 
             return "dataFragments :: #auth-jsonView";
         } catch (Exception e) {
-            LogUtils.saveLog(e.getMessage() + " - WebServiceController.java:206");
-            LogUtils.saveLog(Arrays.toString(e.getStackTrace()));
-            map.addAttribute("title", "Erro");
-            map.addAttribute("errorMessage", e.getMessage());
-            return "dataFragments :: #dialog-error";
+            return WebServiceUtils.showDialogError(map, e);
         }
 
 
@@ -281,7 +277,7 @@ public class WebServiceController {
             map.addAttribute("fields", fields);
             map.addAttribute("authJsonFields", json);
         } catch (Exception e) {
-            LogUtils.saveLog(e.getMessage() + " - WebServiceController.java:225");
+            return WebServiceUtils.showDialogError(map, e);
         }
 
         return "dataFragments :: #auth-jsonFields";
@@ -311,7 +307,7 @@ public class WebServiceController {
             ConfigUtils.getConfig().getConfigAuth().setAuthField(key);
 
         } catch (Exception e) {
-            LogUtils.saveLog(e.getMessage() + " - WebServiceController.java:256");
+            return WebServiceUtils.showDialogError(map, e);
 
         }
 
@@ -397,11 +393,7 @@ public class WebServiceController {
             return "dataFragments :: #cadJsonView";
 
         } catch (Exception e) {
-            LogUtils.saveLog(e.getMessage() + " - WebServiceController.java:312");
-            LogUtils.saveLog(Arrays.toString(e.getStackTrace()));
-            map.addAttribute("title", "Erro");
-            map.addAttribute("errorMessage", e.getMessage());
-            return "dataFragments :: #dialog-error";
+            return WebServiceUtils.showDialogError(map, e);
         }
 
     }
@@ -430,7 +422,7 @@ public class WebServiceController {
                 map.addAttribute("headers", headerMap);
                 map.addAttribute("json", json);
             } catch (Exception e) {
-                LogUtils.saveLog(e.getMessage() + " - WebServiceController.java:340");
+                return WebServiceUtils.showDialogError(map, e);
             }
 
 
@@ -507,11 +499,7 @@ public class WebServiceController {
             return "dataFragments :: #cadFieldsValues";
 
         } catch (Exception e) {
-            LogUtils.saveLog(e.getMessage() + " - WebServiceController.java:404");
-            LogUtils.saveLog(Arrays.toString(e.getStackTrace()));
-            map.addAttribute("title", "Erro");
-            map.addAttribute("errorMessage", e.getMessage());
-            return "dataFragments :: #dialog-error";
+            return WebServiceUtils.showDialogError(map, e);
         }
 
 
@@ -544,7 +532,7 @@ public class WebServiceController {
             System.out.println(ConfigUtils.getConfig().toString());
 
         } catch (Exception e) {
-            LogUtils.saveLog(e.getMessage() + " - WebServiceController.java:435");
+            return WebServiceUtils.showDialogError(map, e);
         }
 
         return "dataFragments :: #save-complete";
