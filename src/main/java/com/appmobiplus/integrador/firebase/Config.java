@@ -1,10 +1,18 @@
 package com.appmobiplus.integrador.firebase;
 
+import com.google.api.client.googleapis.GoogleUtils;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleOAuthConstants;
+import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.core.ApiFuture;
+import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.*;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import com.google.firebase.auth.ActionCodeSettings;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.cloud.FirestoreClient;
 import com.google.protobuf.Api;
 
@@ -23,32 +31,22 @@ public class Config {
     Firestore db;
 
     public Config() throws IOException {
-        InputStream serviceAccount = new FileInputStream("config/integrador-c5039-firebase-adminsdk-j1wws-58a3695ecb.json");
+
+        InputStream serviceAccount = new FileInputStream("config/plataforma-plus-e5050-firebase-adminsdk-zie5e-90ab2a0373.json");
         credentials = GoogleCredentials.fromStream(serviceAccount);
+
         options = FirebaseOptions.builder()
                 .setCredentials(credentials)
-                .setProjectId("integrador-c5039")
+                //.setProjectId("integrador-c5039")
                 .build();
 
         FirebaseApp.initializeApp(options);
 
         db = FirestoreClient.getFirestore();
 
-        try {
-            save();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+            //save();
 
-        try {
-            readChanges();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+            readCollections();
     }
 
     private void save() throws ExecutionException, InterruptedException {
@@ -91,6 +89,21 @@ public class Config {
                     System.out.println("Sobrenome: " + documentSnapshot.getString("sobrenome"));
                 } else {
                     System.out.println("Vazio");
+                }
+            }
+        });
+    }
+
+    private void readCollections() {
+        CollectionReference collection = db.collection("DBgeral");
+        collection.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirestoreException e) {
+                List<QueryDocumentSnapshot> query = queryDocumentSnapshots.getDocuments();
+                System.out.println(queryDocumentSnapshots.size());
+
+                for(QueryDocumentSnapshot q : query) {
+                    System.out.println(q.getId());
                 }
             }
         });
