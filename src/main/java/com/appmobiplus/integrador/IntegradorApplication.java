@@ -3,6 +3,7 @@ package com.appmobiplus.integrador;
 import com.appmobiplus.integrador.configuration.Config;
 import com.appmobiplus.integrador.configuration.Header;
 import com.appmobiplus.integrador.configuration.IntegrationType;
+import com.appmobiplus.integrador.firebase.FirestoreConfig;
 import com.appmobiplus.integrador.models.Produto;
 import com.appmobiplus.integrador.repositories.ConfigRepository;
 import com.appmobiplus.integrador.repositories.ProdutoRepository;
@@ -53,7 +54,8 @@ public class IntegradorApplication implements CommandLineRunner {
 	public void run(String... arg) throws Exception {
 		LogUtils.saveLog("Servidor Iniciado...");
 
-		com.appmobiplus.integrador.firebase.Config c = new com.appmobiplus.integrador.firebase.Config();
+		//com.appmobiplus.integrador.firebase.Config c = new com.appmobiplus.integrador.firebase.Config();
+		FirestoreConfig.initialize();
 
 		ServerUtils.setPort(port);
 
