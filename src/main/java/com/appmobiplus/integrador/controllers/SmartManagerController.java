@@ -2,6 +2,7 @@ package com.appmobiplus.integrador.controllers;
 
 import com.appmobiplus.integrador.firebase.DocumentReferenceAttributes;
 import com.appmobiplus.integrador.firebase.FirestoreConfig;
+import com.appmobiplus.integrador.utils.WebServiceUtils;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
@@ -26,7 +27,7 @@ public class SmartManagerController {
         DocumentReferenceAttributes newDocument = new DocumentReferenceAttributes(params.get("idCompany"), params.get("idGroup"));
         if(!documents.contains(newDocument)) { //Verifica se não existe uma referência salva com os mesmos parâmetros idCompany e idGroup
             documents.add(newDocument); //Adiciona o nova referência na lista
-            newDocument.setDocumentReference(getDocumentReference(newDocument)); //Salva o caminho do banco de dados (Documento) do Firestore na referência criada
+            newDocument.setDocumentReference(WebServiceUtils.getDocumentReference(newDocument)); //Salva o caminho do banco de dados (Documento) do Firestore na referência criada
         }
 
         //Retorna os dados recuperados do Firestore para o documento com o idCompany e idGroup passados como parâmetro

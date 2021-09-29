@@ -45,6 +45,13 @@ public class ImagesController {
 
     }
 
+    @GetMapping(value = "/midias/.../{image}", produces = MediaType.IMAGE_PNG_VALUE)
+    public @ResponseBody byte[] getMedia(@PathVariable("image") String... image) throws IOException {
+        System.out.println(image);
+        InputStream in = getClass().getResourceAsStream("midias/" + image);
+        return IOUtils.toByteArray(in);
+    }
+
     @GetMapping(value = "/image/{image}", produces = MediaType.IMAGE_PNG_VALUE)
     public @ResponseBody byte[] getImage(@PathVariable("image") String image) throws IOException {
         File file = new File(ImageUtils.getLocalPath() + image);

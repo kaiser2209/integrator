@@ -31,6 +31,15 @@ public class ImageUtils {
         return false;
     }
 
+    public static boolean verifyAndDownloadImage(String from, String to, String filename, String fileExtension) {
+        File file = new File(to + filename + "." + fileExtension);
+        if (!file.exists()) {
+            return  downloadImage(from, to, filename, fileExtension);
+        }
+
+        return true;
+    }
+
     public static String downloadImage(String originLink, String ean, String saveTo) {
         BufferedImage image = null;
         ConfigUtils.checkAndCreateDirectory(saveTo);
