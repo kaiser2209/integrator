@@ -124,8 +124,8 @@ public class WebServiceUtils {
                 String id = (String) d.get("id");
                 String imagePath = createImagePath(id);
                 String thumbImagePath = imagePath + "/thumbs";
-                String sourceImagePath = mediaPath + imagePath;
-                String sourceThumbImagePath = mediaPath + thumbImagePath;
+                String sourceImagePath = (mediaPath + imagePath).replaceAll("image/", "");
+                String sourceThumbImagePath = (mediaPath + thumbImagePath).replaceAll("image/", "");
                 ImageUtils.verifyAndDownloadImage(sourceImagePath + "/", imagePath + "/", filename, extension);
                 ImageUtils.verifyAndDownloadImage(sourceThumbImagePath + "/", thumbImagePath + "/", filename, extension);
                 d.put("link", ConfigUtils.getIpAddress() + ":" + ServerUtils.getPort() + "/" + imagePath + "/" + filename + "." + extension);
@@ -135,7 +135,7 @@ public class WebServiceUtils {
     }
 
     public static String createImagePath(String path) {
-        String imagePath = "midias/" + path.substring(0, path.lastIndexOf("/"));
+        String imagePath = "midias/image/" + path.substring(0, path.lastIndexOf("/"));
         ConfigUtils.checkAndCreateDirectory(imagePath);
         System.out.println(imagePath);
 

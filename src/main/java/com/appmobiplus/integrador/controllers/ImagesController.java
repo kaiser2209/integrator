@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Map;
 
 @Controller
 public class ImagesController {
@@ -45,11 +46,38 @@ public class ImagesController {
 
     }
 
-    @GetMapping(value = "/midias/.../{image}", produces = MediaType.IMAGE_PNG_VALUE)
-    public @ResponseBody byte[] getMedia(@PathVariable("image") String... image) throws IOException {
-        System.out.println(image);
-        InputStream in = getClass().getResourceAsStream("midias/" + image);
-        return IOUtils.toByteArray(in);
+    @GetMapping(value = { "/midias/image/{var1}/{var2}/{var3}/{var4}/{var5}",
+                            "/midias/image/{var1}/{var2}/{var3}/{var4}",
+                            "/midias/image/{var1}/{var2}/{var3}",
+                            "/midias/image/{var1}/{var2}",}, produces = MediaType.IMAGE_PNG_VALUE)
+    public @ResponseBody byte[] getMedia(@PathVariable Map<String, String> var) throws IOException {
+
+        String path = "";
+        for(String key : var.keySet()) {
+            path += "/" + var.get(key);
+        }
+
+        System.out.println(path);
+
+        File file = new File("midias/image" + path);
+        return IOUtils.toByteArray(file.toURI());
+    }
+
+    @GetMapping(value = { "/midias/video/{var1}/{var2}/{var3}/{var4}/{var5}",
+            "/midias/video/{var1}/{var2}/{var3}/{var4}",
+            "/midias/video/{var1}/{var2}/{var3}",
+            "/midias/video/{var1}/{var2}",})
+    public @ResponseBody byte[] getMediaVideo(@PathVariable Map<String, String> var) throws IOException {
+
+        String path = "";
+        for(String key : var.keySet()) {
+            path += "/" + var.get(key);
+        }
+
+        System.out.println(path);
+
+        File file = new File("midias/video" + path);
+        return IOUtils.toByteArray(file.toURI());
     }
 
     @GetMapping(value = "/image/{image}", produces = MediaType.IMAGE_PNG_VALUE)
