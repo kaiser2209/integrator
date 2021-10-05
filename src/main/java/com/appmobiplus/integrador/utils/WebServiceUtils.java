@@ -108,7 +108,10 @@ public class WebServiceUtils {
                 //System.out.println(documentSnapshot.getData());
                 document.setData((Map<String, Object>) documentSnapshot.getData());
                 //System.out.println(Arrays.toString(data.toArray()));
-                downloadAndChangeImagesToLocalPath((List<Map<String, Object>>) document.getData().get("data"));
+                List<Map<String, Object>> data = (List<Map<String, Object>>) document.getData().get("data");
+                downloadAndChangeImagesToLocalPath(data);
+                downloadAndChangeVideosToLocalPath(data);
+
             }
         });
 
@@ -134,6 +137,21 @@ public class WebServiceUtils {
         }
     }
 
+    public static void downloadAndChangeVideosToLocalPath(List<Map<String, Object>> data) {
+        for(Map<String, Object> d : data) {
+            if(d.get("type").equals("video")) {
+                String name = (String) d.get("name");
+                String id = (String) d.get("id");
+                String filename = name.substring(0, name.lastIndexOf("."));
+                String extension = name.substring(name.lastIndexOf(".") + 1);
+                String videoPath = createVideoPath(id);
+                String sourceVideoPath = (mediaPath + videoPath).replaceAll("video/", "");
+                VideoUtils.verifyAndDownloadVideo(sourceVideoPath + "/", videoPath + "/", filename, extension);
+                d.put("link", ConfigUtils.getIpAddress() + ":" + ServerUtils.getPort() + "/" + videoPath + "/" + filename + "." + extension);
+            }
+        }
+    }
+
     public static String createImagePath(String path) {
         String imagePath = "midias/image/" + path.substring(0, path.lastIndexOf("/"));
         ConfigUtils.checkAndCreateDirectory(imagePath);
@@ -141,4 +159,13 @@ public class WebServiceUtils {
 
         return imagePath;
     }
+
+    public static String createVideoPath(String path) {
+        String videoPath = "midias/video/" + path.substring(0, path.lastIndexOf("/"));
+        ConfigUtils.checkAndCreateDirectory(videoPath);
+        System.out.println(videoPath);
+
+        return videoPath;
+    }
+
 }

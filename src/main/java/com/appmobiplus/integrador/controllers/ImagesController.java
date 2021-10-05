@@ -67,7 +67,7 @@ public class ImagesController {
             "/midias/video/{var1}/{var2}/{var3}/{var4}",
             "/midias/video/{var1}/{var2}/{var3}",
             "/midias/video/{var1}/{var2}",})
-    public @ResponseBody byte[] getMediaVideo(@PathVariable Map<String, String> var) throws IOException {
+    public @ResponseBody ResponseEntity getMediaVideo(@PathVariable Map<String, String> var) throws IOException {
 
         String path = "";
         for(String key : var.keySet()) {
@@ -77,7 +77,10 @@ public class ImagesController {
         System.out.println(path);
 
         File file = new File("midias/video" + path);
-        return IOUtils.toByteArray(file.toURI());
+        return ResponseEntity.status(HttpStatus.OK)
+                .header("Content-Type", "video/" + "mp4")
+                .body(IOUtils.toByteArray(file.toURI()));
+        //return IOUtils.toByteArray(file.toURI());
     }
 
     @GetMapping(value = "/image/{image}", produces = MediaType.IMAGE_PNG_VALUE)
