@@ -5,6 +5,7 @@ import com.appmobiplus.integrador.configuration.Produto;
 import com.appmobiplus.integrador.configuration.ProdutoBuilder;
 import com.appmobiplus.integrador.firebase.DocumentReferenceAttributes;
 import com.appmobiplus.integrador.firebase.FirestoreConfig;
+import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.EventListener;
@@ -13,6 +14,7 @@ import org.apache.juli.logging.Log;
 import org.springframework.ui.ModelMap;
 
 import javax.annotation.Nullable;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -111,11 +113,70 @@ public class WebServiceUtils {
                 List<Map<String, Object>> data = (List<Map<String, Object>>) document.getData().get("data");
                 downloadAndChangeImagesToLocalPath(data);
                 downloadAndChangeVideosToLocalPath(data);
-
+                setWeatherData(data);
             }
         });
 
         return db;
+    }
+
+    public static void setWeatherData(List<Map<String, Object>> data) {
+        for(Map<String, Object> d : data) {
+            if(d.get("type").equals("weather")) {
+                DocumentReference db = FirestoreConfig.getFirestoreDB().collection("DBgeral")
+                        .document("Climas")
+                        .collection("base")
+                        .document((String) d.get("id"));
+
+                db.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirestoreException e) {
+                        if (e != null) {
+                            return;
+                        }
+
+                        Map<String, Object> current = (Map<String, Object>) ((Map<String, Object>) documentSnapshot.get("nextDays")).get("current");
+                        List<Map<String, Object>> daily = (ArrayList<Map<String, Object>>) ((Map<String, Object>) documentSnapshot.get("nextDays")).get("daily");
+
+
+                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTime(((Timestamp) documentSnapshot.get("lastUpdated")).toDate());
+
+                        d.put("temperature", current.get("temp"));
+                        d.put("moonPhase", daily.get(0).get("moon_phase"));
+                        d.put("windSpeed", current.get("wind_speed"));
+                        d.put("date", sdf.format(calendar.getTime()));
+                        d.put("day", getCurrentDay(calendar.get(Calendar.DAY_OF_WEEK)));
+                        d.put("uvIndex", current.get("uvi"));
+                        d.put("cityCode", documentSnapshot.get("cidade"));
+                        d.put("cityName", ((Map<String, Object>) documentSnapshot.get("data")).get("name"));
+                        d.put("icon", ((ArrayList<Map<String, Object>>) current.get("weather")).get(0).get("icon"));
+                    }
+                });
+            }
+        }
+    }
+
+    public static String getCurrentDay(int day) {
+        switch (day) {
+            case Calendar.SUNDAY:
+                return "Domingo";
+            case Calendar.MONDAY:
+                return "Segunda-Feira";
+            case Calendar.TUESDAY:
+                return "Terça-Feira";
+            case Calendar.WEDNESDAY:
+                return "Quarta-Feira";
+            case Calendar.THURSDAY:
+                return "Quinta-Feira";
+            case Calendar.FRIDAY:
+                return "Sexta-Feira";
+            case Calendar.SATURDAY:
+                return "Sábado";
+            default:
+                return "";
+        }
     }
 
     public static void downloadAndChangeImagesToLocalPath(List<Map<String, Object>> data) {
