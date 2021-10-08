@@ -111,13 +111,64 @@ public class WebServiceUtils {
                 document.setData((Map<String, Object>) documentSnapshot.getData());
                 //System.out.println(Arrays.toString(data.toArray()));
                 List<Map<String, Object>> data = (List<Map<String, Object>>) document.getData().get("data");
-                downloadAndChangeImagesToLocalPath(data);
-                downloadAndChangeVideosToLocalPath(data);
-                setWeatherData(data);
+                for(Map<String, Object> d : data) {
+                    switch ((String) d.get("type")) {
+                        case "image":
+                            downloadAndChangeImagesToLocalPath(d);
+                            break;
+                        case "video":
+                            downloadAndChangeVideosToLocalPath(d);
+                            break;
+                        case "weather":
+                            setWeatherData(d);
+                            break;
+                        default:
+                        System.out.println("Nenhuma opção");
+                    }
+                }
+                //downloadAndChangeImagesToLocalPath(data);
+                //downloadAndChangeVideosToLocalPath(data);
+                //setWeatherData(data);
             }
         });
 
         return db;
+    }
+
+    public static void setWeatherData(Map<String, Object> weatherData) {
+        DocumentReference db = FirestoreConfig.getFirestoreDB().collection("DBgeral")
+                .document("Climas")
+                .collection("base")
+                .document((String) weatherData.get("id"));
+
+        db.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirestoreException e) {
+                if (e != null) {
+                    return;
+                }
+
+                Map<String, Object> current = (Map<String, Object>) ((Map<String, Object>) documentSnapshot.get("nextDays")).get("current");
+                List<Map<String, Object>> daily = (ArrayList<Map<String, Object>>) ((Map<String, Object>) documentSnapshot.get("nextDays")).get("daily");
+
+
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(((Timestamp) documentSnapshot.get("lastUpdated")).toDate());
+
+                weatherData.put("temperature", current.get("temp"));
+                weatherData.put("moonPhase", daily.get(0).get("moon_phase"));
+                weatherData.put("windSpeed", current.get("wind_speed"));
+                weatherData.put("date", sdf.format(calendar.getTime()));
+                weatherData.put("day", getCurrentDay(calendar.get(Calendar.DAY_OF_WEEK)));
+                weatherData.put("uvIndex", current.get("uvi"));
+                weatherData.put("cityCode", documentSnapshot.get("cidade"));
+                weatherData.put("cityName", ((Map<String, Object>) documentSnapshot.get("data")).get("name"));
+                weatherData.put("icon", ((ArrayList<Map<String, Object>>) current.get("weather")).get(0).get("icon"));
+
+                System.out.println("Buscou weather data");
+            }
+        });
     }
 
     public static void setWeatherData(List<Map<String, Object>> data) {
@@ -179,6 +230,21 @@ public class WebServiceUtils {
         }
     }
 
+    public static void downloadAndChangeImagesToLocalPath(Map<String, Object> imageData) {
+        String name = (String) imageData.get("name");
+        String filename = name.substring(0, name.lastIndexOf("."));
+        String extension = name.substring(name.lastIndexOf(".") + 1);
+        String id = (String) imageData.get("id");
+        String imagePath = createImagePath(id);
+        String thumbImagePath = imagePath + "/thumbs";
+        String sourceImagePath = (mediaPath + imagePath).replaceAll("image/", "");
+        String sourceThumbImagePath = (mediaPath + thumbImagePath).replaceAll("image/", "");
+        ImageUtils.verifyAndDownloadImage(sourceImagePath + "/", imagePath + "/", filename, extension);
+        ImageUtils.verifyAndDownloadImage(sourceThumbImagePath + "/", thumbImagePath + "/", filename, extension);
+        imageData.put("link", ConfigUtils.getIpAddress() + ":" + ServerUtils.getPort() + "/" + imagePath + "/" + filename + "." + extension);
+        imageData.put("thumbUrl", ConfigUtils.getIpAddress() + ":" + ServerUtils.getPort() + "/" + thumbImagePath + "/" + filename + "." + extension);
+    }
+
     public static void downloadAndChangeImagesToLocalPath(List<Map<String, Object>> data) {
         for(Map<String, Object> d : data) {
             if(d.get("type").equals("image")) {
@@ -196,6 +262,17 @@ public class WebServiceUtils {
                 d.put("thumbUrl", ConfigUtils.getIpAddress() + ":" + ServerUtils.getPort() + "/" + thumbImagePath + "/" + filename + "." + extension);
             }
         }
+    }
+
+    public static void downloadAndChangeVideosToLocalPath(Map<String, Object> videoData) {
+        String name = (String) videoData.get("name");
+        String id = (String) videoData.get("id");
+        String filename = name.substring(0, name.lastIndexOf("."));
+        String extension = name.substring(name.lastIndexOf(".") + 1);
+        String videoPath = createVideoPath(id);
+        String sourceVideoPath = (mediaPath + videoPath).replaceAll("video/", "");
+        VideoUtils.verifyAndDownloadVideo(sourceVideoPath + "/", videoPath + "/", filename, extension);
+        videoData.put("link", ConfigUtils.getIpAddress() + ":" + ServerUtils.getPort() + "/" + videoPath + "/" + filename + "." + extension);
     }
 
     public static void downloadAndChangeVideosToLocalPath(List<Map<String, Object>> data) {
