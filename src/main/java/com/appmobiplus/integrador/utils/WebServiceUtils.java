@@ -6,10 +6,8 @@ import com.appmobiplus.integrador.configuration.ProdutoBuilder;
 import com.appmobiplus.integrador.firebase.DocumentReferenceAttributes;
 import com.appmobiplus.integrador.firebase.FirestoreConfig;
 import com.google.cloud.Timestamp;
-import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.DocumentSnapshot;
+import com.google.cloud.firestore.*;
 import com.google.cloud.firestore.EventListener;
-import com.google.cloud.firestore.FirestoreException;
 import org.apache.juli.logging.Log;
 import org.springframework.ui.ModelMap;
 
@@ -20,6 +18,8 @@ import java.util.regex.Pattern;
 
 public class WebServiceUtils {
     private static final String mediaPath = "https://storage-api.appmobiplus.com/app/";
+    private static Map<String, Object> weatherData = new HashMap<>();
+    private static Map<String, Object> newsData = new LinkedHashMap<>();
 
     public static String getAbsolutUrl(String url) {
         return url.split(Pattern.quote("?"))[0];
@@ -122,6 +122,8 @@ public class WebServiceUtils {
                         case "weather":
                             setWeatherData(d);
                             break;
+                        case "news":
+                            setNewsData(d);
                         default:
                         System.out.println("Nenhuma opção");
                     }
@@ -135,40 +137,82 @@ public class WebServiceUtils {
         return db;
     }
 
-    public static void setWeatherData(Map<String, Object> weatherData) {
+    public static void setWeatherData(final Map<String, Object> weather) {
         DocumentReference db = FirestoreConfig.getFirestoreDB().collection("DBgeral")
                 .document("Climas")
                 .collection("base")
-                .document((String) weatherData.get("id"));
+                .document((String) weather.get("id"));
 
-        db.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        if (!weatherData.containsKey(weather.get("id"))) {
+            db.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                @Override
+                public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirestoreException e) {
+                    if (e != null) {
+                        return;
+                    }
+
+                    Map<String, Object> data = new HashMap<>();
+                    Map<String, Object> current = (Map<String, Object>) ((Map<String, Object>) documentSnapshot.get("nextDays")).get("current");
+                    List<Map<String, Object>> daily = (ArrayList<Map<String, Object>>) ((Map<String, Object>) documentSnapshot.get("nextDays")).get("daily");
+
+
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(((Timestamp) documentSnapshot.get("lastUpdated")).toDate());
+
+                    data.put("temperature", current.get("temp"));
+                    data.put("moonPhase", daily.get(0).get("moon_phase"));
+                    data.put("windSpeed", current.get("wind_speed"));
+                    data.put("date", sdf.format(calendar.getTime()));
+                    data.put("day", getCurrentDay(calendar.get(Calendar.DAY_OF_WEEK)));
+                    data.put("uvIndex", current.get("uvi"));
+                    data.put("cityCode", documentSnapshot.get("cidade"));
+                    data.put("cityName", ((Map<String, Object>) documentSnapshot.get("data")).get("name"));
+                    data.put("icon", ((ArrayList<Map<String, Object>>) current.get("weather")).get(0).get("icon"));
+
+                    System.out.println("Buscou weather data");
+
+                    System.out.println(weather.get("id"));
+
+                    weatherData.put((String) weather.get("id"), data);
+
+                    updateWeatherData(weather);
+                }
+            });
+        } else {
+            updateWeatherData(weather);
+        }
+
+    }
+    
+    public static void setNewsData(Map<String, Object> news) {
+        CollectionReference ref = FirestoreConfig.getFirestoreDB().collection("DBgeral")
+                .document("Noticias")
+                .collection((String) news.get("category"));
+
+        ref.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
-            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirestoreException e) {
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirestoreException e) {
                 if (e != null) {
                     return;
                 }
 
-                Map<String, Object> current = (Map<String, Object>) ((Map<String, Object>) documentSnapshot.get("nextDays")).get("current");
-                List<Map<String, Object>> daily = (ArrayList<Map<String, Object>>) ((Map<String, Object>) documentSnapshot.get("nextDays")).get("daily");
+                for(DocumentChange doc : queryDocumentSnapshots.getDocumentChanges()) {
 
+                    newsData.put(doc.getDocument().getId(), doc.getDocument().getData());
+                }
 
-                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(((Timestamp) documentSnapshot.get("lastUpdated")).toDate());
-
-                weatherData.put("temperature", current.get("temp"));
-                weatherData.put("moonPhase", daily.get(0).get("moon_phase"));
-                weatherData.put("windSpeed", current.get("wind_speed"));
-                weatherData.put("date", sdf.format(calendar.getTime()));
-                weatherData.put("day", getCurrentDay(calendar.get(Calendar.DAY_OF_WEEK)));
-                weatherData.put("uvIndex", current.get("uvi"));
-                weatherData.put("cityCode", documentSnapshot.get("cidade"));
-                weatherData.put("cityName", ((Map<String, Object>) documentSnapshot.get("data")).get("name"));
-                weatherData.put("icon", ((ArrayList<Map<String, Object>>) current.get("weather")).get(0).get("icon"));
-
-                System.out.println("Buscou weather data");
+                System.out.println(newsData);
             }
         });
+    }
+
+    public static void updateWeatherData(Map<String, Object> weather) {
+        Map<String, Object> data = (Map<String, Object>) weatherData.get((String) weather.get("id"));
+
+        for(String d : data.keySet()) {
+            weather.put(d, data.get(d));
+        }
     }
 
     public static void setWeatherData(List<Map<String, Object>> data) {

@@ -28,6 +28,7 @@ public class SmartManagerController {
         if(!documents.contains(newDocument)) { //Verifica se não existe uma referência salva com os mesmos parâmetros idCompany e idGroup
             documents.add(newDocument); //Adiciona o nova referência na lista
             newDocument.setDocumentReference(WebServiceUtils.getDocumentReference(newDocument)); //Salva o caminho do banco de dados (Documento) do Firestore na referência criada
+
         }
 
         //Retorna os dados recuperados do Firestore para o documento com o idCompany e idGroup passados como parâmetro
