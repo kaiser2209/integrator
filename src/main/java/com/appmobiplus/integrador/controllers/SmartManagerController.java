@@ -11,10 +11,7 @@ import com.google.cloud.firestore.FirestoreException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 public class SmartManagerController {
@@ -32,7 +29,15 @@ public class SmartManagerController {
         }
 
         //Retorna os dados recuperados do Firestore para o documento com o idCompany e idGroup passados como parâmetro
-        return documents.get(documents.indexOf(newDocument)).getData();
+        Object retorno = documents.get(documents.indexOf(newDocument)).getData();
+
+        if (retorno == null) {
+            Map<String, String> carregando = new HashMap<>();
+            carregando.put("Erro", "Playlist sendo processada...");
+            return carregando;
+        }
+
+        return retorno;
     }
 
     //Método que busca os dados salvos no banco de dados (Documento) do Firestore

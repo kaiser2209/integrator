@@ -190,21 +190,48 @@ public class WebServiceUtils {
                 .document("Noticias")
                 .collection((String) news.get("category"));
 
-        ref.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirestoreException e) {
-                if (e != null) {
-                    return;
+        if(!newsData.containsKey(news.get("category"))) {
+            ref.addSnapshotListener(new EventListener<QuerySnapshot>() {
+                @Override
+                public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirestoreException e) {
+                    if (e != null) {
+                        return;
+                    }
+
+                    Map<String, Object> newsReceived = new LinkedHashMap<>();
+
+                    for (DocumentChange doc : queryDocumentSnapshots.getDocumentChanges()) {
+                        switch (doc.getType()) {
+                            case ADDED:
+                            case MODIFIED:
+                                newsReceived.put(doc.getDocument().getId(), doc.getDocument().getData());
+                                break;
+                            case REMOVED:
+                                newsReceived.remove(doc.getDocument().getId());
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+
+                    List<Map<String, Object>> allNews = new ArrayList<>();
+
+                    for (String key : newsReceived.keySet()) {
+                        allNews.add((Map<String, Object>) newsReceived.get(key));
+                    }
+
+                    newsData.put((String) news.get("category"), allNews);
+
+                    System.out.println(newsData);
+                    System.out.println(news);
+
+                    updateNewsData(news);
                 }
+            });
 
-                for(DocumentChange doc : queryDocumentSnapshots.getDocumentChanges()) {
-
-                    newsData.put(doc.getDocument().getId(), doc.getDocument().getData());
-                }
-
-                System.out.println(newsData);
-            }
-        });
+        } else {
+            updateNewsData(news);
+        }
     }
 
     public static void updateWeatherData(Map<String, Object> weather) {
@@ -213,6 +240,18 @@ public class WebServiceUtils {
         for(String d : data.keySet()) {
             weather.put(d, data.get(d));
         }
+    }
+
+    public static void updateNewsData(Map<String, Object> news) {
+        long limit = (long) news.get("limit");
+        List<Map<String, Object>> data = (List<Map<String, Object>>) newsData.get(news.get("category"));
+        List<Map<String, Object>> filteredNews = new ArrayList<>();
+
+        for(int i = 0; i < limit; i++) {
+            filteredNews.add(data.get(i));
+        }
+
+        news.put("data", filteredNews);
     }
 
     public static void setWeatherData(List<Map<String, Object>> data) {
