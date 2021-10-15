@@ -55,9 +55,6 @@ public class IntegradorApplication implements CommandLineRunner {
 		storageService.deleteAll();
 		storageService.init();
 
-		ImageUtils.downloadImageNews("https://imagens.ne10.uol.com.br/veiculos/_midias/jpg/2021/10/14/image_smmzjlc-19298998.jfif",
-				"teste/teste/teste", "imgTeste", "jfif");
-
 		Runnable compare = new Runnable() {
 			@Override
 			public void run() {
