@@ -1,6 +1,5 @@
 package com.appmobiplus.integrador.utils;
 
-import com.appmobiplus.integrador.configuration.Config;
 import com.appmobiplus.integrador.configuration.Produto;
 import com.appmobiplus.integrador.configuration.ProdutoBuilder;
 import com.appmobiplus.integrador.firebase.DocumentReferenceAttributes;
@@ -8,18 +7,23 @@ import com.appmobiplus.integrador.firebase.FirestoreConfig;
 import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.*;
 import com.google.cloud.firestore.EventListener;
-import org.apache.juli.logging.Log;
 import org.springframework.ui.ModelMap;
 
 import javax.annotation.Nullable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Pattern;
 
 public class WebServiceUtils {
     private static final String mediaPath = "https://storage-api.appmobiplus.com/app/";
     private static Map<String, Object> weatherData = new HashMap<>();
-    private static Map<String, Object> newsData = new LinkedHashMap<>();
+    private static Map<String, Object> newsData = new HashMap<>();
 
     public static String getAbsolutUrl(String url) {
         return url.split(Pattern.quote("?"))[0];
@@ -198,7 +202,7 @@ public class WebServiceUtils {
                         return;
                     }
 
-                    Map<String, Object> newsReceived = new LinkedHashMap<>();
+                    Map<String, Object> newsReceived = new HashMap<>();
 
                     for (DocumentChange doc : queryDocumentSnapshots.getDocumentChanges()) {
                         switch (doc.getType()) {
@@ -220,10 +224,11 @@ public class WebServiceUtils {
                         allNews.add((Map<String, Object>) newsReceived.get(key));
                     }
 
-                    newsData.put((String) news.get("category"), allNews);
+                    downloadNewsImages(allNews);
 
-                    System.out.println(newsData);
                     System.out.println(news);
+
+                    newsData.put((String) news.get("category"), allNews);
 
                     updateNewsData(news);
                 }
@@ -243,15 +248,37 @@ public class WebServiceUtils {
     }
 
     public static void updateNewsData(Map<String, Object> news) {
-        long limit = (long) news.get("limit");
-        List<Map<String, Object>> data = (List<Map<String, Object>>) newsData.get(news.get("category"));
-        List<Map<String, Object>> filteredNews = new ArrayList<>();
+        System.out.println(news);
+        try {
+            long limit = (long) news.get("limit");
+            List<Map<String, Object>> data = (List<Map<String, Object>>) newsData.get(news.get("category"));
 
-        for(int i = 0; i < limit; i++) {
-            filteredNews.add(data.get(i));
+            Collections.sort(data, new Comparator<Map<String, Object>>() {
+                @Override
+                public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+                    /*Calendar c1 = Calendar.getInstance();
+                    c1.setTime(((Timestamp) o1.get("datePublished")).toDate());
+                    Calendar c2 = Calendar.getInstance();
+                    c2.setTime(((Timestamp) o2.get("datePublished")).toDate());*/
+
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSS'Z'");
+                    LocalDateTime d1 = LocalDateTime.parse((String) o1.get("datePublished"), formatter);
+                    LocalDateTime d2 = LocalDateTime.parse((String) o2.get("datePublished"), formatter);
+                    return d2.compareTo(d1);
+                }
+            });
+
+            List<Map<String, Object>> filteredNews = new ArrayList<>();
+
+            for (int i = 0; i < limit; i++) {
+                filteredNews.add(data.get(i));
+            }
+
+            news.put("data", filteredNews);
+        } catch (Exception e) {
+            e.printStackTrace();
+
         }
-
-        news.put("data", filteredNews);
     }
 
     public static void setWeatherData(List<Map<String, Object>> data) {
@@ -310,6 +337,38 @@ public class WebServiceUtils {
                 return "Sábado";
             default:
                 return "";
+        }
+    }
+
+    public static void downloadNewsImages(List<Map<String, Object>> allNews) {
+        try {
+            for (Map<String, Object> news : allNews) {
+                String url = null;
+                try {
+                    url = URLDecoder.decode((String) news.get("image"), StandardCharsets.UTF_8.name());
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+                System.out.println(url);
+                String filename = "";
+                String extension = "";
+                String from = url.substring(0, url.lastIndexOf("/") + 1);
+                if(url.lastIndexOf("/") < url.lastIndexOf(".")) {
+                    filename = url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("."));
+                    extension = url.substring(url.lastIndexOf(".") + 1);
+                    //ImageUtils.verifyAndDownloadImage(from, "midias/news/", filename, extension);
+                    ImageUtils.verifyAndDownloadImageNews(url, "midias/news/", filename, extension);
+                } else {
+                    filename = url.substring(url.lastIndexOf("/"));
+                    //ImageUtils.verifyAndDownloadImage(from, "midias/news/", filename);
+                    ImageUtils.verifyAndDownloadImageNews(url, "midias/news/", filename);
+                }
+
+
+                news.put("image", ConfigUtils.getIpAddress() + ":" + ServerUtils.getPort() + "/midias/news/" + filename + "." + extension);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

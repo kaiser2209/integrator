@@ -6,8 +6,8 @@ import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 @Component
@@ -31,10 +31,91 @@ public class ImageUtils {
         return false;
     }
 
+    public static boolean downloadImageNews(String imageUrl, String saveTo, String filename, String extension) {
+
+
+        try {
+            URL url = new URL(imageUrl);
+
+            ConfigUtils.checkAndCreateDirectory(saveTo);
+
+            InputStream in = new BufferedInputStream(url.openStream());
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            byte[] buf = new byte[1024];
+            int n = 0;
+
+            while (-1 != (n = in.read(buf))) {
+                out.write(buf, 0, n);
+            }
+
+            out.close();
+            in.close();
+            byte[] response = out.toByteArray();
+
+            FileOutputStream fos = new FileOutputStream(saveTo + filename + "." + extension);
+            fos.write(response);
+            fos.close();
+
+            return true;
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            return false;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+    }
+
+    public static boolean downloadImageWithoutExtension(String from, String to, String fileName) {
+        BufferedImage image = null;
+        ConfigUtils.checkAndCreateDirectory(to);
+
+        try {
+            URL url = new URL(from + fileName);
+            image = ImageIO.read(url);
+            ImageIO.write(image, "jpg", new File(to + fileName + ".jpg"));
+            return true;
+        } catch (IOException e) {
+            LogUtils.saveLog("Imagem não encontrada no servidor de imagens.");
+        }
+
+        return false;
+    }
+
     public static boolean verifyAndDownloadImage(String from, String to, String filename, String fileExtension) {
         File file = new File(to + filename + "." + fileExtension);
         if (!file.exists()) {
             return  downloadImage(from, to, filename, fileExtension);
+        }
+
+        return true;
+    }
+
+    public static boolean verifyAndDownloadImageNews(String url, String saveTo, String filename, String extension) {
+        File file = new File(saveTo + filename + "." + extension);
+        if (!file.exists()) {
+            return downloadImageNews(url, saveTo, filename, extension);
+        }
+
+        return true;
+    }
+
+    public static boolean verifyAndDownloadImageNews(String url, String saveTo, String filename) {
+        File file = new File(saveTo + filename + "." + "jpg");
+        if (!file.exists()) {
+            return downloadImageNews(url, saveTo, filename, "jpg");
+        }
+
+        return true;
+    }
+
+    public static boolean verifyAndDownloadImage(String from, String to, String filename) {
+        File file = new File(to + filename + ".jpg");
+        if (!file.exists()) {
+            return  downloadImageWithoutExtension(from, to, filename);
         }
 
         return true;
