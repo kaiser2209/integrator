@@ -63,10 +63,12 @@ public class ImagesController {
         return IOUtils.toByteArray(file.toURI());
     }
 
-    @GetMapping(value = { "/midias/news/{image}"}, produces = MediaType.IMAGE_PNG_VALUE)
-    public @ResponseBody byte[] getMediaNews(@PathVariable String image) throws IOException {
+    @GetMapping(value = { "/midias/{dir}/{image}"}, produces = MediaType.IMAGE_PNG_VALUE)
+    public @ResponseBody byte[] getMediaNews(
+            @PathVariable String dir,
+            @PathVariable String image) throws IOException {
 
-        File file = new File("midias/news/" + image);
+        File file = new File("midias/" + dir + "/" + image);
         return IOUtils.toByteArray(file.toURI());
     }
 

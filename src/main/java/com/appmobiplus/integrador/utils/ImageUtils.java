@@ -112,6 +112,50 @@ public class ImageUtils {
         return true;
     }
 
+    public static boolean verifyAndDownload(String url, String saveTo, String filename) {
+        File file = new File(saveTo + filename);
+        if (!file.exists()) {
+            return download(url, saveTo, filename);
+        }
+
+        return true;
+    }
+
+    public static boolean download(String fileUrl, String saveTo, String filename) {
+        try {
+            URL url = new URL(fileUrl);
+
+            ConfigUtils.checkAndCreateDirectory(saveTo);
+
+            InputStream in = new BufferedInputStream(url.openStream());
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            byte[] buf = new byte[1024];
+            int n = 0;
+
+            while (-1 != (n = in.read(buf))) {
+                out.write(buf, 0, n);
+            }
+
+            out.close();
+            in.close();
+            byte[] response = out.toByteArray();
+
+            FileOutputStream fos = new FileOutputStream(saveTo + filename);
+            fos.write(response);
+            fos.close();
+
+            return true;
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            return false;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public static boolean verifyAndDownloadImage(String from, String to, String filename) {
         File file = new File(to + filename + ".jpg");
         if (!file.exists()) {

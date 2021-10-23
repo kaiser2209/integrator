@@ -128,6 +128,10 @@ public class WebServiceUtils {
                             break;
                         case "news":
                             setNewsData(d);
+                            break;
+                        case "table":
+                            setTableData(d);
+                            break;
                         default:
                         System.out.println("Nenhuma opção");
                     }
@@ -139,6 +143,23 @@ public class WebServiceUtils {
         });
 
         return db;
+    }
+
+    public static void setTableData(final Map<String, Object> table) {
+        String backgroundUrl = (String) table.get("headerBackground");
+        if (backgroundUrl != null) {
+            String to = "midias/table/";
+            String file = backgroundUrl.substring(backgroundUrl.lastIndexOf("/") + 1);
+            String extension = file.substring(file.lastIndexOf(".") + 1);
+            String filename = file.substring(0, file.lastIndexOf("."));
+            if(ImageUtils.verifyAndDownload(backgroundUrl, to, file)) {
+                table.put("headerBackground", ConfigUtils.getIpAddress() + ":" + ServerUtils.getPort() + "/" +  to + file);
+            }
+            System.out.println(file);
+            System.out.println(filename);
+            System.out.println(extension);
+            System.out.println(backgroundUrl);
+        }
     }
 
     public static void setWeatherData(final Map<String, Object> weather) {
@@ -174,6 +195,23 @@ public class WebServiceUtils {
                     data.put("cityName", ((Map<String, Object>) documentSnapshot.get("data")).get("name"));
                     data.put("icon", ((ArrayList<Map<String, Object>>) current.get("weather")).get(0).get("icon"));
 
+                    List<Map<String, Object>> nextDays = new ArrayList<>();
+
+                    for (int i = 1; i <= 7; i++) {
+                        Map<String, Object> day = new HashMap<>();
+                        Calendar nextCalendar = Calendar.getInstance();
+                        nextCalendar.add(Calendar.DAY_OF_MONTH, i);
+                        day.put("temperatureMax", ((Map<String, Object>) daily.get(i).get("temp")).get("max"));
+                        day.put("temperaturaMin", ((Map<String, Object>) daily.get(i).get("temp")).get("min"));
+                        day.put("dayWeek", getCurrentDay(nextCalendar.get(Calendar.DAY_OF_WEEK)));
+                        day.put("date", sdf.format(nextCalendar.getTime()));
+                        day.put("iconAsset", getIcon(((ArrayList<Map<String, Object>>) (daily.get(i).get("weather"))).get(0).get("icon").toString(),
+                                (Long) ((ArrayList<Map<String, Object>>) (daily.get(i).get("weather"))).get(0).get("id")));
+                        nextDays.add(day);
+                    }
+
+                    data.put("nextDays", nextDays);
+
                     System.out.println("Buscou weather data");
 
                     System.out.println(weather.get("id"));
@@ -188,7 +226,36 @@ public class WebServiceUtils {
         }
 
     }
-    
+
+    private static String getIcon(String weatherIconCode, Long weatherCode) {
+        //céu limpo
+        if (weatherCode == 800) {
+            if (weatherIconCode.equals("01d")) {
+                return "clear-day.png"; //céu limpo dia
+            } else if (weatherIconCode.equals("01n")) {
+                return "clear-night.png"; //céu limpo noite
+            }
+        } else if (weatherCode >= 500 && weatherCode < 600) { //chuva
+            return "rain.png";
+        } else if (weatherCode >= 600 && weatherCode < 603 && weatherCode >= 615 && weatherCode < 700) { //neve
+            return "snow.png";
+        } else if (weatherCode >= 611 && weatherCode <= 613) { //granizo
+            return "sleet.png";
+        } else if (weatherCode == 741) { //neblina
+            return "fog.png";
+        } else if (weatherCode == 801) { //
+            if (weatherIconCode.equals("02d")) {
+                return "partly-cloudy-day.png";
+            } else if (weatherIconCode.equals("02n")) {
+                return "partly-cloudy-night.png";
+            }
+        } else if (weatherCode >= 802 && weatherCode <= 804) {
+            return "cloudy.png";
+        }
+        return "error";
+    }
+
+
     public static void setNewsData(Map<String, Object> news) {
         CollectionReference ref = FirestoreConfig.getFirestoreDB().collection("DBgeral")
                 .document("Noticias")
@@ -381,8 +448,10 @@ public class WebServiceUtils {
         String thumbImagePath = imagePath + "/thumbs";
         String sourceImagePath = (mediaPath + imagePath).replaceAll("image/", "");
         String sourceThumbImagePath = (mediaPath + thumbImagePath).replaceAll("image/", "");
-        ImageUtils.verifyAndDownloadImage(sourceImagePath + "/", imagePath + "/", filename, extension);
-        ImageUtils.verifyAndDownloadImage(sourceThumbImagePath + "/", thumbImagePath + "/", filename, extension);
+        //ImageUtils.verifyAndDownloadImage(sourceImagePath + "/", imagePath + "/", filename, extension);
+        //ImageUtils.verifyAndDownloadImage(sourceThumbImagePath + "/", thumbImagePath + "/", filename, extension);
+        ImageUtils.verifyAndDownload((String) imageData.get("link"), imagePath + "/", name);
+        ImageUtils.verifyAndDownload((String) imageData.get("thumbUrl"), thumbImagePath + "/", name);
         imageData.put("link", ConfigUtils.getIpAddress() + ":" + ServerUtils.getPort() + "/" + imagePath + "/" + filename + "." + extension);
         imageData.put("thumbUrl", ConfigUtils.getIpAddress() + ":" + ServerUtils.getPort() + "/" + thumbImagePath + "/" + filename + "." + extension);
     }
@@ -398,8 +467,11 @@ public class WebServiceUtils {
                 String thumbImagePath = imagePath + "/thumbs";
                 String sourceImagePath = (mediaPath + imagePath).replaceAll("image/", "");
                 String sourceThumbImagePath = (mediaPath + thumbImagePath).replaceAll("image/", "");
-                ImageUtils.verifyAndDownloadImage(sourceImagePath + "/", imagePath + "/", filename, extension);
-                ImageUtils.verifyAndDownloadImage(sourceThumbImagePath + "/", thumbImagePath + "/", filename, extension);
+                //ImageUtils.verifyAndDownloadImage(sourceImagePath + "/", imagePath + "/", filename, extension);
+                //ImageUtils.verifyAndDownloadImage(sourceThumbImagePath + "/", thumbImagePath + "/", filename, extension);
+                ImageUtils.verifyAndDownload((String) d.get("link"), imagePath + "/", name);
+                ImageUtils.verifyAndDownload((String) d.get("thumbUrl"), imagePath + "/", name);
+
                 d.put("link", ConfigUtils.getIpAddress() + ":" + ServerUtils.getPort() + "/" + imagePath + "/" + filename + "." + extension);
                 d.put("thumbUrl", ConfigUtils.getIpAddress() + ":" + ServerUtils.getPort() + "/" + thumbImagePath + "/" + filename + "." + extension);
             }
