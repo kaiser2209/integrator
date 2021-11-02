@@ -29,7 +29,8 @@ public class SmartManagerController {
         }
 
         //Retorna os dados recuperados do Firestore para o documento com o idCompany e idGroup passados como parâmetro
-        Object retorno = documents.get(documents.indexOf(newDocument)).getData();
+        //Object retorno = documents.get(documents.indexOf(newDocument)).getData();
+        Object retorno = documents.get(documents.indexOf(newDocument)).getGrupo();
 
         if (retorno == null) {
             Map<String, String> carregando = new HashMap<>();

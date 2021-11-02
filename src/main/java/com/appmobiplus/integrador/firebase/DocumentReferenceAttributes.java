@@ -1,5 +1,6 @@
 package com.appmobiplus.integrador.firebase;
 
+import com.appmobiplus.integrador.firebase.databases.Grupo;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.EventListener;
@@ -15,6 +16,15 @@ public class DocumentReferenceAttributes {
     private String idCompany;
     private String idGroup;
     private Map<String, Object> data;
+    private Grupo grupo;
+
+    public Grupo getGrupo() {
+        return grupo;
+    }
+
+    public void setGrupo(Grupo grupo) {
+        this.grupo = grupo;
+    }
 
     public DocumentReferenceAttributes(String idCompany, String idGroup) {
         this.idCompany = idCompany;

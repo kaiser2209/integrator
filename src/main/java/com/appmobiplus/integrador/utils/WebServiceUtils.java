@@ -4,13 +4,19 @@ import com.appmobiplus.integrador.configuration.Produto;
 import com.appmobiplus.integrador.configuration.ProdutoBuilder;
 import com.appmobiplus.integrador.firebase.DocumentReferenceAttributes;
 import com.appmobiplus.integrador.firebase.FirestoreConfig;
+import com.appmobiplus.integrador.firebase.databases.DayWeather;
+import com.appmobiplus.integrador.firebase.databases.DayWeatherCurrent;
+import com.appmobiplus.integrador.firebase.databases.Grupo;
+import com.appmobiplus.integrador.firebase.databases.WeatherBase;
 import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.*;
 import com.google.cloud.firestore.EventListener;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.ui.ModelMap;
 
 import javax.annotation.Nullable;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -112,9 +118,11 @@ public class WebServiceUtils {
 
                 System.out.println("Depois da verificação de erro");
                 //System.out.println(documentSnapshot.getData());
-                document.setData((Map<String, Object>) documentSnapshot.getData());
-                //System.out.println(Arrays.toString(data.toArray()));
-                List<Map<String, Object>> data = (List<Map<String, Object>>) document.getData().get("data");
+                //document.setData((Map<String, Object>) documentSnapshot.getData());
+                document.setGrupo(documentSnapshot.toObject(Grupo.class));
+                //List<Map<String, Object>> data = (List<Map<String, Object>>) document.getData().get("data");
+                List<Map<String, Object>> data = document.getGrupo().getData();
+
                 for(Map<String, Object> d : data) {
                     switch ((String) d.get("type")) {
                         case "image":
@@ -136,9 +144,7 @@ public class WebServiceUtils {
                         System.out.println("Nenhuma opção");
                     }
                 }
-                //downloadAndChangeImagesToLocalPath(data);
-                //downloadAndChangeVideosToLocalPath(data);
-                //setWeatherData(data);
+
             }
         });
 
@@ -173,6 +179,7 @@ public class WebServiceUtils {
                 @Override
                 public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirestoreException e) {
                     if (e != null) {
+                        System.out.println("Erro: " + e.getMessage());
                         return;
                     }
 
@@ -180,12 +187,22 @@ public class WebServiceUtils {
                     Map<String, Object> current = (Map<String, Object>) ((Map<String, Object>) documentSnapshot.get("nextDays")).get("current");
                     List<Map<String, Object>> daily = (ArrayList<Map<String, Object>>) ((Map<String, Object>) documentSnapshot.get("nextDays")).get("daily");
 
+                    WeatherBase base = documentSnapshot.toObject(WeatherBase.class);
+                    DayWeatherCurrent currentDayWeather = base.getNextDays().getCurrent();
+                    List<DayWeather> dailyWeather = base.getNextDays().getDaily();
+
+                    System.out.println("Last Updated: " + base.getLastUpdated());
+                    System.out.println("Clouds All: " + base.getData().getClouds().getAll());
+
+                    System.out.println("Classe do humidity: " + current.get("humidity").getClass());
+
 
                     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
                     Calendar calendar = Calendar.getInstance();
-                    calendar.setTime(((Timestamp) documentSnapshot.get("lastUpdated")).toDate());
+                    //calendar.setTime(((Timestamp) documentSnapshot.get("lastUpdated")).toDate());
+                    calendar.setTime(base.getLastUpdated().toDate());
 
-                    data.put("temperature", current.get("temp"));
+                    /*data.put("temperature", current.get("temp"));
                     data.put("moonPhase", daily.get(0).get("moon_phase"));
                     data.put("windSpeed", current.get("wind_speed"));
                     data.put("date", sdf.format(calendar.getTime()));
@@ -193,7 +210,16 @@ public class WebServiceUtils {
                     data.put("uvIndex", current.get("uvi"));
                     data.put("cityCode", documentSnapshot.get("cidade"));
                     data.put("cityName", ((Map<String, Object>) documentSnapshot.get("data")).get("name"));
-                    data.put("icon", ((ArrayList<Map<String, Object>>) current.get("weather")).get(0).get("icon"));
+                    data.put("icon", ((ArrayList<Map<String, Object>>) current.get("weather")).get(0).get("icon"));*/
+                    data.put("temperature", currentDayWeather.getTemp());
+                    data.put("moonPhase", dailyWeather.get(0).getMoon_phase());
+                    data.put("windSpeed", currentDayWeather.getWind_speed());
+                    data.put("date", sdf.format(calendar.getTime()));
+                    data.put("day", getCurrentDay(calendar.get(Calendar.DAY_OF_WEEK)));
+                    data.put("uvIndex", currentDayWeather.getUvi());
+                    data.put("cityCode", base.getCidade());
+                    data.put("cityName", base.getData().getName());
+                    data.put("icon", currentDayWeather.getWeather().get(0).getIcon());
 
                     List<Map<String, Object>> nextDays = new ArrayList<>();
 
@@ -201,12 +227,18 @@ public class WebServiceUtils {
                         Map<String, Object> day = new HashMap<>();
                         Calendar nextCalendar = Calendar.getInstance();
                         nextCalendar.add(Calendar.DAY_OF_MONTH, i);
-                        day.put("temperatureMax", ((Map<String, Object>) daily.get(i).get("temp")).get("max"));
+                        /*day.put("temperatureMax", ((Map<String, Object>) daily.get(i).get("temp")).get("max"));
                         day.put("temperaturaMin", ((Map<String, Object>) daily.get(i).get("temp")).get("min"));
                         day.put("dayWeek", getCurrentDay(nextCalendar.get(Calendar.DAY_OF_WEEK)));
                         day.put("date", sdf.format(nextCalendar.getTime()));
                         day.put("iconAsset", getIcon(((ArrayList<Map<String, Object>>) (daily.get(i).get("weather"))).get(0).get("icon").toString(),
-                                (Long) ((ArrayList<Map<String, Object>>) (daily.get(i).get("weather"))).get(0).get("id")));
+                                (Long) ((ArrayList<Map<String, Object>>) (daily.get(i).get("weather"))).get(0).get("id")));*/
+                        day.put("temperatureMax", dailyWeather.get(i).getTemp().getMax());
+                        day.put("tempratureMin", dailyWeather.get(i).getTemp().getMin());
+                        day.put("dayWeek", getCurrentDay(nextCalendar.get(Calendar.DAY_OF_WEEK)));
+                        day.put("date", sdf.format(nextCalendar.getTime()));
+                        day.put("iconAsset", getIcon(dailyWeather.get(i).getWeather().get(0).getIcon(),
+                                dailyWeather.get(i).getWeather().get(0).getId()));
                         nextDays.add(day);
                     }
 
@@ -337,7 +369,7 @@ public class WebServiceUtils {
 
             List<Map<String, Object>> filteredNews = new ArrayList<>();
 
-            for (int i = 0; i < limit; i++) {
+            for (int i = 0; i < data.size(); i++) {
                 filteredNews.add(data.get(i));
             }
 
@@ -410,29 +442,21 @@ public class WebServiceUtils {
     public static void downloadNewsImages(List<Map<String, Object>> allNews) {
         try {
             for (Map<String, Object> news : allNews) {
-                String url = null;
+                String stringUrl = null;
+                URL url = null;
                 try {
-                    url = URLDecoder.decode((String) news.get("image"), StandardCharsets.UTF_8.name());
+                    stringUrl = URLDecoder.decode((String) news.get("image"), StandardCharsets.UTF_8.name());
+                    url = new URL(stringUrl);
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
-                System.out.println(url);
-                String filename = "";
-                String extension = "";
-                String from = url.substring(0, url.lastIndexOf("/") + 1);
-                if(url.lastIndexOf("/") < url.lastIndexOf(".")) {
-                    filename = url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("."));
-                    extension = url.substring(url.lastIndexOf(".") + 1);
-                    //ImageUtils.verifyAndDownloadImage(from, "midias/news/", filename, extension);
-                    ImageUtils.verifyAndDownloadImageNews(url, "midias/news/", filename, extension);
-                } else {
-                    filename = url.substring(url.lastIndexOf("/"));
-                    //ImageUtils.verifyAndDownloadImage(from, "midias/news/", filename);
-                    ImageUtils.verifyAndDownloadImageNews(url, "midias/news/", filename);
-                }
+                System.out.println(stringUrl);
+                String file = FilenameUtils.getName(url.getPath());
+                System.out.println("Nome do arquivo -> " + file);
+                ImageUtils.verifyAndDownload(stringUrl, "midias/news/", file);
 
 
-                news.put("image", ConfigUtils.getIpAddress() + ":" + ServerUtils.getPort() + "/midias/news/" + filename + "." + extension);
+                news.put("image", ConfigUtils.getIpAddress() + ":" + ServerUtils.getPort() + "/midias/news/" + file);
             }
         } catch (Exception e) {
             e.printStackTrace();
