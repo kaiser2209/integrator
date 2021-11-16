@@ -15,7 +15,7 @@ import java.util.*;
 
 @RestController
 public class SmartManagerController {
-    //Lista contendo todos listeners configurados
+    //Lista contendo todos listeners configurados do firestore
     private static final List<DocumentReferenceAttributes> documents = new ArrayList<>();
 
     @GetMapping(path = "/smartManager")
